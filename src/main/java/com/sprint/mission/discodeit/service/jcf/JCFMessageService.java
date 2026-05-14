@@ -49,6 +49,7 @@ public class JCFMessageService implements MessageService {
             message.update(newContent);
         }
     }
+
     @Override
     public Message findById(UUID id) {
         return data.get(id);
