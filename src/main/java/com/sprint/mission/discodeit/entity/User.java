@@ -1,5 +1,5 @@
 package com.sprint.mission.discodeit.entity;
-
+//회원
 public class User extends Entity{
         private String username;  // 유저명
         private String password;  // 비밀번호

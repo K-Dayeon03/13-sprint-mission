@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.entity.User;
 
 import java.util.List;
 import java.util.UUID;
-
+//서비스 구현
 public interface UserService {
     User create(String username, String password, String email);
     User findById(UUID id);
