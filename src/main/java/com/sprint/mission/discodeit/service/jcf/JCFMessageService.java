@@ -38,6 +38,11 @@ public class JCFMessageService implements MessageService {
     }
 
     @Override
+    public void update(UUID id, String newContent) {
+
+    }
+
+    @Override
     public Message findById(UUID id) {
         return data.get(id);
     }

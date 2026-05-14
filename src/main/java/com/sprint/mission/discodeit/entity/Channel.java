@@ -1,4 +1,42 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Channel {
+public class Channel extends Entity{
+    ChannelType type;
+    String name;
+    String description;
+
+    public Channel(ChannelType type, String name, String description) {
+        super();
+        this.type = type;
+        this.name = name;
+        this.description = description;
+    }
+    public void update(String newName, String newDescription) {
+        this.name = newName;
+        this.description = newDescription;
+        makeUpdate();
+    }
+    public ChannelType getType() {
+        return type;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+
+    @Override
+    public String toString() {
+        return "Channel{" +
+                "type=" + type +
+                ", name='" + name + '\'' +
+                ", description='" + description + '\'' +
+                '}';
+    }
+
+
 }
