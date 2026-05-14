@@ -37,11 +37,18 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void update(UUID id, String newName, String newDescription) {
+    public void update(UUID id, ChannelType type, ChannelType newType, String newName, String newDescription) {
         Channel channel = data.get(id);
-        if (channel != null) {
-            channel.update(newName, newDescription);
+        if(channel == null){
+            throw new IllegalArgumentException("존재하지 않은 채널입니다. 채널 아이디: " + id);
         }
+
+        //새로운 값이 있을 때만 업데이트
+        channel.update(
+                newType != null ? newType : channel.getType(),
+                newName != null ? newName : channel.getName(),
+                newDescription != null ? newDescription : channel.getDescription()
+        );
     }
 
 

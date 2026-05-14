@@ -11,9 +11,10 @@ public class Channel extends Entity{
         this.name = name;
         this.description = description;
     }
-    public void update(String newName, String newDescription) {
+    public void update(ChannelType newType, String newName, String newDescription) {
         this.name = newName;
         this.description = newDescription;
+        this.type = newType;
         makeUpdate();
     }
     public ChannelType getType() {
