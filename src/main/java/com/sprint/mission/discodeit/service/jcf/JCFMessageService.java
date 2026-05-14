@@ -4,10 +4,7 @@ import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
@@ -36,6 +33,12 @@ public class JCFMessageService implements MessageService {
                 .filter(m -> m.getChannelId().equals(channelId))
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public List<Message> findByAll() {
+        return new ArrayList<>(data.values());
+    }
+
     public List<Message> findByAll(UUID channelId, UUID authorId) {
         return data.values().stream()
                 .filter(m -> m.getChannelId().equals(channelId)
@@ -43,11 +46,19 @@ public class JCFMessageService implements MessageService {
                 .collect(Collectors.toList());
     }
     @Override
-    public void update(UUID id, String newContent) {
-        Message message = data.get(id);
-        if (message != null) {
-            message.update(newContent);
+    public boolean update(UUID id, String newContent) {
+        if (newContent == null || newContent.isBlank()) {
+            throw new IllegalArgumentException("메세지 내용을 입력해주세요.");
         }
+
+        Message message = data.get(id);
+
+        if (message == null) {
+            return false;  // 메시지 없으면 false 반환
+        }
+
+        message.update(newContent);
+        return true;  // 성공 시 true 반환
     }
 
     @Override

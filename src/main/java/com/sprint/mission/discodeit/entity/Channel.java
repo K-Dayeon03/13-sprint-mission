@@ -1,15 +1,18 @@
 package com.sprint.mission.discodeit.entity;
 
-public class Channel extends Entity{
-    ChannelType type;
-    String name;
-    String description;
+import java.util.UUID;
 
-    public Channel(ChannelType type, String name, String description) {
+public class Channel extends Entity{
+    private ChannelType type;
+    private String name;
+    private String description;
+    private UUID authorId;
+    public Channel(ChannelType type, String name, String description, UUID authorId) {
         super();
         this.type = type;
         this.name = name;
         this.description = description;
+        this.authorId = authorId;
     }
     public void update(ChannelType newType, String newName, String newDescription) {
         this.name = newName;
@@ -29,7 +32,7 @@ public class Channel extends Entity{
         return description;
     }
 
-
+    public Object getAuthorId() { return authorId;}
     @Override
     public String toString() {
         return "Channel{" +
@@ -38,6 +41,7 @@ public class Channel extends Entity{
                 ", description='" + description + '\'' +
                 '}';
     }
+
 
 
 }

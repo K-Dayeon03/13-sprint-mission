@@ -17,11 +17,11 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public Channel create(ChannelType type, String name, String description) {
+    public Channel create(ChannelType type, String name, String description, UUID authorId) {
         if(name == null || name.isBlank()){
             throw new IllegalArgumentException("채널명을 입력해주세요.");
         }
-        Channel channel = new Channel(type, name, description);
+        Channel channel = new Channel(type, name, description, authorId);
         data.put(channel.getId(), channel);
         return channel;
     }
@@ -37,7 +37,7 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void update(UUID id, ChannelType type, ChannelType newType, String newName, String newDescription) {
+    public void update(UUID id, ChannelType newType, String newName, String newDescription) {
         Channel channel = data.get(id);
         if(channel == null){
             throw new IllegalArgumentException("존재하지 않은 채널입니다. 채널 아이디: " + id);
@@ -56,5 +56,13 @@ public class JCFChannelService implements ChannelService {
     public void delete(UUID id) {
         messageService.deleteByChannelId(id); // 연관 메시지 먼저 삭제
         data.remove(id);                       // 채널 삭제
+    }
+
+    @Override
+    public void deleteByAuthorId(UUID authorId) {
+        data.values().stream()
+                .filter(c->c.getAuthorId().equals(authorId))
+                .forEach(c->messageService.deleteByChannelId(c.getId()));
+        data.values().removeIf(e -> e.getAuthorId().equals(authorId));
     }
 }

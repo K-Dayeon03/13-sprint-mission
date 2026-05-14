@@ -9,8 +9,10 @@ public interface MessageService {
         Message create(String content, UUID channelId, UUID authorId);
         Message findById(UUID id);
         List<Message> findByChannelId(UUID channelId);
-        void update(UUID id, String newContent);  // 추가
+        List<Message> findByAll();
+        boolean update(UUID id, String newContent); // 추가
         void delete(UUID id);
         void deleteByChannelId(UUID channelId);
         void deleteByAuthorId(UUID authorId);
+
 }
