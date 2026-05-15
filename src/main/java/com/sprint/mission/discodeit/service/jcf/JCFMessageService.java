@@ -1,23 +1,38 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.service.UserService;
 
-import java.nio.channels.Channel;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class JCFMessageService implements MessageService {
+
     private final Map<UUID, Message> data;
+    private ChannelService channelService;
+    private UserService userService;
 
     public JCFMessageService() {
         this.data = new HashMap<>();
     }
 
+    public void init(UserService userService, ChannelService channelService) {
+        this.userService = userService;
+        this.channelService = channelService;
+    }
+
     @Override
     public Message create(String content, UUID channelId, UUID authorId) {
-        if(channelId == null || authorId == null){
-            throw new IllegalArgumentException("채널 또는 작성자 아이디가 존재하지 않습니다.");
+        //채널 아이디가 존재하는지 확인
+        if (channelService.findById(channelId) == null) {
+            System.out.println("존재하지 않는 채널입니다.");
+            return null;
+        }
+        if (userService.findById(authorId) == null) {
+            System.out.println("존재하지 않는 유저입니다.");
+            return null;
         }
         if(content == null || content.isBlank()){
             throw new IllegalArgumentException("메세지 내용을 입력해주세요.");
@@ -81,4 +96,5 @@ public class JCFMessageService implements MessageService {
     public void deleteByAuthorId(UUID authorId) {
         data.values().removeIf(m -> m.getAuthorId().equals(authorId));
     }
+
 }

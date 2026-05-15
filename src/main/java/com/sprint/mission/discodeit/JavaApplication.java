@@ -17,9 +17,13 @@ import java.util.UUID;
 public class JavaApplication {
     public static void main(String[] args) {
         // 의존성을 위해 서비스를 초기화
-        MessageService messageService = new JCFMessageService();
-        ChannelService channelService = new JCFChannelService(messageService);
-        UserService userService = new JCFUserService(channelService, messageService);
+//        MessageService messageService = new JCFMessageService();
+//        ChannelService channelService = new JCFChannelService(messageService);
+//        UserService userService = new JCFUserService(channelService, messageService);
+        JCFMessageService messageService = new JCFMessageService();
+        JCFChannelService channelService = new JCFChannelService(messageService);
+        JCFUserService userService = new JCFUserService(channelService, messageService);
+        messageService.init(userService, channelService);
 
         System.out.println("====== 유저 등록  ======");
         User user1 = userService.create("이경민", "abc1234","naver.com");
@@ -131,14 +135,34 @@ public class JavaApplication {
         channelDelAfter.forEach(c -> System.out.println(c.getName()));
 
         System.out.println("====== 메세지 등록 ======");
-        //일부러 한 채널 메세지 2개, 한 채널에 두명의 유저를 넣음.
-        Message message1 = messageService.create("함지원 스프린트 팀원 및 스터디 팀장", channel1.getId(), user1.getId());//행정-공지 채널 없어서 메세지 등록 안되야함
-        Message message2 = messageService.create("이예은 스프린트 팀원", channel2.getId(), user2.getId()); //학습-공지
-        Message message3 = messageService.create("장준서 스프린트 팀원", channel3.getId(), user3.getId());//일반-공지
-        Message message4 = messageService.create("강다연 스프린트 팀장", channel4.getId(), user4.getId()); //위워크-안내
-        Message message5 = messageService.create("이경민 주강사 수업 안내", channel5.getId(), user5.getId()); //채널명 - 커리어 지원 안내
-        Message message6 = messageService.create("클래스_매니저 공지", channel5.getId(), user5.getId());  //채널명 - 커리어 지원 안내
 
+        System.out.println("====== 메세지 등록 ======");
+
+        // channel1 삭제됐다→ 검증 확인
+        Message message1 = messageService.create("함지원 스프린트 팀원 및 스터디 팀장", channel1.getId(), user1.getId());
+        if (message1 == null) {
+            System.out.println("존재하지 않는 채널입니다.");
+        }
+
+        // user3 삭제됐다 → 검증 확인
+        Message message3 = messageService.create("장준서 스프린트 팀원", channel3.getId(), user3.getId());
+        if (message3 == null) {
+            System.out.println("존재하지 않는 유저입니다.");
+        }
+
+        // 정상 등록
+        Message message2 = messageService.create("이예은 스프린트 팀원", channel2.getId(), user2.getId());
+        Message message4 = messageService.create("강다연 스프린트 팀장", channel4.getId(), user4.getId());
+        Message message5 = messageService.create("이경민 주강사 수업 안내", channel5.getId(), user5.getId());
+        Message message6 = messageService.create("클래스_매니저 공지", channel5.getId(), user5.getId());
+
+        // 수정 시 null 체크
+        System.out.println("====== 메시지 수정 ======");
+        if (message1 != null) {
+            messageService.update(message1.getId(), "[수정된 메세지]");
+        } else {
+            System.out.println("메시지가 없어 수정할 수 없습니다.");
+        }
         //등록 조회
         messageService.findByAll().forEach(m -> System.out.println(m.toString()));
 
@@ -168,12 +192,14 @@ public class JavaApplication {
 
 
         System.out.println("====== 메시지 수정 후======");
-        boolean messageModify = messageService.update(message1.getId(),"[수정된 메세지 테스트입니다.]"); // <=  함지원 스프린트 팀원 및 스터디 팀장
-        if(messageModify){
+
+        if (message1 != null) {
             System.out.println("메세지 수정 성공했습니다!");
+            messageService.update(message1.getId(), "[수정된 메세지]");
             messages.forEach(m -> System.out.println(m.getContent()));
-        }else{
-            System.out.println("존재하지 않는 메세지입니다.");
+
+        } else {
+            System.out.println("메시지가 없어 수정할 수 없습니다.");
         }
 
 
@@ -184,10 +210,17 @@ public class JavaApplication {
         messagesDelBefore.forEach(m -> System.out.println(m.getContent()));
 
         System.out.println("====== 메세지 삭제 후 조회 ======");
-        messageService.delete(message3.getId());//장준서 스프린트 팀원"
+        if (message3 != null) {
+            messageService.delete(message3.getId());
+        } else {
+            System.out.println("삭제할 메시지가 없습니다.");
+            messageService.delete(message4.getId());
+        }
+        System.out.println("====== 메세지 삭제 후 조회 ======");
         List<Message> messagesDelAfter = messageService.findByAll();
         System.out.println("개수 조회: " + messagesDelAfter.size() + "개");
         messagesDelAfter.forEach(m -> System.out.println(m.getContent()));
+
 
 
 
