@@ -1,9 +1,9 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.service.MessageService;
 
+import java.nio.channels.Channel;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -38,6 +38,7 @@ public class JCFMessageService implements MessageService {
     public List<Message> findByAll() {
         return new ArrayList<>(data.values());
     }
+
 
     public List<Message> findByAll(UUID channelId, UUID authorId) {
         return data.values().stream()

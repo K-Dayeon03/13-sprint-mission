@@ -10,7 +10,7 @@ public interface ChannelService {
     Channel create(ChannelType type, String name, String description, UUID authorId);
     Channel findById(UUID id);
     List<Channel> findAll();
-    void update(UUID id, ChannelType newType, String newName, String newDescription);
+    boolean update(UUID id, ChannelType newType, String newName, String newDescription);
     void delete(UUID id);
     void deleteByAuthorId(UUID authorId);
 

@@ -2,7 +2,6 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 
@@ -37,20 +36,18 @@ public class JCFChannelService implements ChannelService {
     }
 
     @Override
-    public void update(UUID id, ChannelType newType, String newName, String newDescription) {
+    public boolean update(UUID id, ChannelType newType, String newName, String newDescription) {
         Channel channel = data.get(id);
-        if(channel == null){
-            throw new IllegalArgumentException("존재하지 않은 채널입니다. 채널 아이디: " + id);
+        if (channel == null) {
+            return false; // 채널 없으면 false 반환
         }
-
-        //새로운 값이 있을 때만 업데이트
         channel.update(
                 newType != null ? newType : channel.getType(),
                 newName != null ? newName : channel.getName(),
                 newDescription != null ? newDescription : channel.getDescription()
         );
+        return true;
     }
-
 
     @Override
     public void delete(UUID id) {
