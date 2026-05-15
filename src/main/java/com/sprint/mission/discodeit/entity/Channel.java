@@ -32,13 +32,16 @@ public class Channel extends Entity{
         return description;
     }
 
-    public Object getAuthorId() { return authorId;}
+    public UUID getAuthorId() { return authorId;}
     @Override
     public String toString() {
         return "Channel{" +
                 "type=" + type +
                 ", name='" + name + '\'' +
                 ", description='" + description + '\'' +
+                ", authorId=" + authorId +
+                ", createdAt=" + getCreatedAt() +
+                ", updatedAt=" + getUpdatedAt() +
                 '}';
     }
 

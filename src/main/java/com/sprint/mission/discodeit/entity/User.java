@@ -33,6 +33,7 @@ public class User extends Entity {
                 ", username=" + username +
                 ", email=" + email +
                 ", createdAt=" + getCreatedAt() +
+                ", updatedAt=" + getUpdatedAt() +
                 "}";
     }
 }
