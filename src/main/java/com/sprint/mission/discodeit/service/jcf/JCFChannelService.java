@@ -55,11 +55,13 @@ public class JCFChannelService implements ChannelService {
         data.remove(id);                       // 채널 삭제
     }
 
+    // deleteByAuthorId 하나만 남기기
     @Override
     public void deleteByAuthorId(UUID authorId) {
         data.values().stream()
-                .filter(c->c.getAuthorId().equals(authorId))
-                .forEach(c->messageService.deleteByChannelId(c.getId()));
+                .filter(c -> c.getAuthorId().equals(authorId))
+                .forEach(c -> messageService.deleteByChannelId(c.getId()));
         data.values().removeIf(e -> e.getAuthorId().equals(authorId));
+
     }
 }
