@@ -5,7 +5,7 @@ import java.util.UUID;
 public class User extends Entity {
 
     private String username;
-    private String password;
+    private String password; //민감한 정보이므로, 직렬화에서 제외시키기
     private String email;
 
     public User(String username, String password, String email) {

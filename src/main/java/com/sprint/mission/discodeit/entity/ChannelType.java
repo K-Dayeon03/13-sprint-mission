@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.entity;
 
-public enum ChannelType  {
+import java.io.Serializable;
+
+public enum ChannelType  implements Serializable {
     PUBLIC("공개",true ),
     PRIVATE("비공개", false );
 
