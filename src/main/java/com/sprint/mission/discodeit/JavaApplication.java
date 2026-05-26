@@ -13,11 +13,22 @@ import com.sprint.mission.discodeit.service.jcf.JCFChannelService;
 import com.sprint.mission.discodeit.service.jcf.JCFMessageService;
 import com.sprint.mission.discodeit.service.jcf.JCFUserService;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
+        try {
+            Files.deleteIfExists(Paths.get("data/users.ser"));
+            Files.deleteIfExists(Paths.get("data/channels.ser"));
+            Files.deleteIfExists(Paths.get("data/messages.ser"));
+            System.out.println("기존 데이터 초기화 완료");
+        } catch (IOException e) {
+            System.out.println("초기화 실패: " + e.getMessage());
+        }
 
         // 서비스 초기화
         FileMessageService messageService = new FileMessageService();
