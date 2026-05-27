@@ -3,9 +3,21 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.file.FileChannelRepository;
+import com.sprint.mission.discodeit.repository.file.FileMessageRepository;
+import com.sprint.mission.discodeit.repository.file.FileUserRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFChannelRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFMessageRepository;
+import com.sprint.mission.discodeit.repository.jcf.JCFUserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.service.basic.BasicChannelService;
+import com.sprint.mission.discodeit.service.basic.BasicMessageService;
+import com.sprint.mission.discodeit.service.basic.BasicUserService;
 import com.sprint.mission.discodeit.service.file.FileChannelService;
 import com.sprint.mission.discodeit.service.file.FileMessageService;
 import com.sprint.mission.discodeit.service.file.FileUserService;
@@ -21,6 +33,19 @@ import java.util.UUID;
 
 public class JavaApplication {
     public static void main(String[] args) {
+//        //저장소 메모리 JCF
+//        MessageRepository messageRepository = new JCFMessageRepository();
+//        ChannelRepository channelRepository = new JCFChannelRepository();
+//        UserRepository userRepository = new JCFUserRepository();
+        // FileRepository
+        MessageRepository messageRepository = new FileMessageRepository();
+        ChannelRepository channelRepository = new FileChannelRepository();
+        UserRepository userRepository = new FileUserRepository();
+        //서비스 비즈니스
+        MessageService messageService = new BasicMessageService(messageRepository, channelRepository, userRepository);
+        ChannelService channelService = new BasicChannelService(channelRepository, messageRepository);
+        UserService userService = new BasicUserService(userRepository, channelRepository, messageRepository);
+
         try {
             Files.deleteIfExists(Paths.get("data/users.ser"));
             Files.deleteIfExists(Paths.get("data/channels.ser"));
@@ -30,10 +55,6 @@ public class JavaApplication {
             System.out.println("초기화 실패: " + e.getMessage());
         }
 
-        // 서비스 초기화
-        FileMessageService messageService = new FileMessageService();
-        FileChannelService channelService = new FileChannelService(messageService);
-        FileUserService userService = new FileUserService(channelService, messageService);
 
         // ====== 유저 CRUD ======
         System.out.println("====== 유저 등록 ======");
