@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.UUID;
 public class JavaApplication {
 
-    // ✅ 클래스 안에, main 밖에 선언
+
     static User setupUser(UserService userService) {
         User user = userService.create("woody", "woody1234", "woody@codeit.com");
         return user;
@@ -48,13 +48,13 @@ public class JavaApplication {
         System.out.println("메시지 생성: " + message.getId());
     }
 
-    // ✅ main은 하나만
+
     public static void main(String[] args) {
 
-//      // JCFRepository로 테스트
-//      MessageRepository messageRepository = new JCFMessageRepository();
-//      ChannelRepository channelRepository = new JCFChannelRepository();
-//      UserRepository userRepository = new JCFUserRepository();
+//        // JCFRepository로 테스트
+//       MessageRepository messageRepository = new JCFMessageRepository();
+//       ChannelRepository channelRepository = new JCFChannelRepository();
+//       UserRepository userRepository = new JCFUserRepository();
 
         //FileRepository로 테스트
         MessageRepository messageRepository = new FileMessageRepository();
