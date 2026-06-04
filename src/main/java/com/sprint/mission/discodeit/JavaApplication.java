@@ -46,8 +46,11 @@ public class JavaApplication {
     static void messageCreateTest(MessageService messageService, Channel channel, User author) {
         Message message = messageService.create("안녕하세요.", channel.getId(), author.getId());
         System.out.println("메시지 생성: " + message.getId());
+        // 생성된 메시지 내용도 같이 출력해서 확인
+        System.out.println("메시지 내용: " + message.getContent());
+        System.out.println("채널 ID    : " + message.getChannelId());
+        System.out.println("작성자 ID  : " + message.getAuthorId());
     }
-
 
     public static void main(String[] args) {
 
