@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
+import lombok.Getter;
+import lombok.Setter;
 
+import java.util.UUID;
+@Getter
 public class User extends Entity {
 
     private String username;
@@ -24,9 +27,9 @@ public class User extends Entity {
         this.email = email;
     }
 
-    public String getUsername() { return username; }
-    public String getPassword() { return password; }
-    public String getEmail() { return email; }
+//    public String getUsername() { return username; }
+//    public String getPassword() { return password; }
+//    public String getEmail() { return email; }
 
     public void update(String newUsername, String newPassword, String newEmail) {
         if (newUsername == null && newPassword == null && newEmail == null) {

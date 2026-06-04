@@ -1,9 +1,12 @@
 package com.sprint.mission.discodeit.entity;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.util.UUID;
 
 //User, Channel, Message 자동 직렬화 가능
+@Getter
 public abstract class Entity implements Serializable {
     //직렬화 및 역직렬화를 수행할 때 이 클래스의 버전을 의미(명시 권장)
     private static final long serialVersionUID = 1L;
@@ -17,9 +20,9 @@ public abstract class Entity implements Serializable {
         this.updatedAt = this.createdAt;
     }
 
-    public UUID getId() { return id; }
-    public Long getCreatedAt() { return createdAt; }
-    public Long getUpdatedAt() { return updatedAt; }
+//    public UUID getId() { return id; }
+//    public Long getCreatedAt() { return createdAt; }
+//    public Long getUpdatedAt() { return updatedAt; }
 
     protected void makeUpdate() {
         this.updatedAt = System.currentTimeMillis();
