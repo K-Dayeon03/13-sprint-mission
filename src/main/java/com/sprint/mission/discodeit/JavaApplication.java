@@ -64,9 +64,9 @@ public class JavaApplication {
         ChannelRepository channelRepository = new FileChannelRepository();
         UserRepository userRepository = new FileUserRepository();
         // BasicService 초기화
+        UserService userService = new BasicUserService(userRepository, channelRepository, messageRepository);
         MessageService messageService = new BasicMessageService(messageRepository, channelRepository, userRepository);
         ChannelService channelService = new BasicChannelService(channelRepository, messageRepository);
-        UserService userService = new BasicUserService(userRepository, channelRepository, messageRepository);
 
         // 셋업
         User user = setupUser(userService);
