@@ -2,66 +2,67 @@ package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 
 import java.util.*;
 
 public class JCFChannelService implements ChannelService {
-    private final Map<UUID, Channel> data;
+    private final ChannelRepository channelRepository;
     private final MessageService messageService;
-    public JCFChannelService(MessageService messageService) {
-        this.data = new HashMap<>();
+
+    public JCFChannelService(ChannelRepository channelRepository, MessageService messageService) {
+        this.channelRepository = channelRepository;
         this.messageService = messageService;
     }
 
     @Override
     public Channel create(ChannelType type, String name, String description, UUID authorId) {
-        if(name == null || name.isBlank()){
+        if (name == null || name.isBlank()) {
             throw new IllegalArgumentException("채널명을 입력해주세요.");
         }
         Channel channel = new Channel(type, name, description, authorId);
-        data.put(channel.getId(), channel);
-        return channel;
+        return channelRepository.save(channel);
     }
 
     @Override
     public Channel findById(UUID id) {
-        return data.get(id);
+        return channelRepository.findById(id);
     }
 
     @Override
-    public List<Channel> findAll() {
-        return new ArrayList<>(data.values());
+    public List<Channel> findByAll() {
+        return channelRepository.findByAll();
     }
 
     @Override
-    public boolean update(UUID id, ChannelType newType, String newName, String newDescription) {
-        Channel channel = data.get(id);
+    public Channel update(UUID id, ChannelType newType, String newName, String newDescription) {
+        Channel channel = channelRepository.findById(id);
         if (channel == null) {
-            return false; // 채널 없으면 false 반환
+            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
         }
         channel.update(
                 newType != null ? newType : channel.getType(),
                 newName != null ? newName : channel.getName(),
                 newDescription != null ? newDescription : channel.getDescription()
         );
-        return true;
+        return channelRepository.save(channel);
     }
 
     @Override
-    public void delete(UUID id) {
+    public void deleteById(UUID id) {
         messageService.deleteByChannelId(id); // 연관 메시지 먼저 삭제
-        data.remove(id);                       // 채널 삭제
+        channelRepository.deleteById(id);
     }
 
-    // deleteByAuthorId 하나만 남기기
     @Override
     public void deleteByAuthorId(UUID authorId) {
-        data.values().stream()
+        channelRepository.findByAll().stream()
                 .filter(c -> c.getAuthorId().equals(authorId))
-                .forEach(c -> messageService.deleteByChannelId(c.getId()));
-        data.values().removeIf(e -> e.getAuthorId().equals(authorId));
-
+                .forEach(c -> {
+                    messageService.deleteByChannelId(c.getId()); // 연관 메시지 먼저 삭제
+                    channelRepository.deleteById(c.getId());
+                });
     }
 }

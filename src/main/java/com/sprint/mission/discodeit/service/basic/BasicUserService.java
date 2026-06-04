@@ -7,7 +7,6 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.UserService;
 
 import java.util.List;
-
 import java.util.UUID;
 
 public class BasicUserService implements UserService {
@@ -20,6 +19,7 @@ public class BasicUserService implements UserService {
         this.channelRepository = channelRepository;
         this.messageRepository = messageRepository;
     }
+
     @Override
     public User create(String username, String password, String email) {
         if (username == null || username.isBlank() ||
@@ -36,26 +36,29 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public List<User> findAll() {
-        return userRepository.findAll();
+    public List<User> findByAll() {
+        return userRepository.findByAll();
     }
 
     @Override
-    public boolean update(UUID id, String currentPassword, String newUsername, String newPassword, String newEmail) {
+    public User update(UUID id, String currentPassword, String newUsername, String newPassword, String newEmail) {
         User user = userRepository.findById(id);
-        if (user == null) return false;
 
-        if (!user.getPassword().equals(currentPassword)) return false;
+        if (user == null) {
+            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
+        }
+        if (!user.getPassword().equals(currentPassword)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
 
         user.update(newUsername, newPassword, newEmail);
-        userRepository.save(user);
-        return true;
+        return userRepository.save(user);
     }
 
     @Override
-    public void delete(UUID id) {
-        messageRepository.deleteByAuthorId(id); //작성한 메세지 삭제
-        channelRepository.deleteByAuthorId(id); //만든 채널 + 메세지 삭제
-        userRepository.deleteById(id); //삭제 저장
+    public void deleteById(UUID id) {
+        messageRepository.deleteByAuthorId(id); // 작성한 메시지 삭제
+        channelRepository.deleteByAuthorId(id); // 만든 채널 + 채널 메시지 삭제
+        userRepository.deleteById(id);
     }
 }

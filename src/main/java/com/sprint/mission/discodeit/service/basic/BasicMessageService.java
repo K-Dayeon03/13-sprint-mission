@@ -28,9 +28,7 @@ public class BasicMessageService implements MessageService {
             if (userRepository.findById(authorId) == null) {
                 throw new IllegalArgumentException("존재하지 않는 유저입니다.");
             }
-            if (content == null || content.isBlank()) {
-                throw new IllegalArgumentException("메세지 내용을 입력해주세요.");
-            }
+        //콘텐츠 검증은 생성에 위임
 
             Message message = new Message(content, channelId, authorId);
             return messageRepository.save(message);
@@ -48,28 +46,23 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<Message> findByAll() {
-        return messageRepository.findAll();
+        return messageRepository.findByAll();
     }
 
     @Override
-    public boolean update(UUID id, String newContent) {
-        if (newContent == null || newContent.isBlank()) {
-            throw new IllegalArgumentException("메세지 내용을 입력해주세요.");
-        }
-
+    public Message update(UUID id, String newContent) {
         Message message = messageRepository.findById(id);
 
         if (message == null) {
-            return false;  // 메시지 없으면 false 반환
+            throw new IllegalArgumentException("존재하지 않는 메시지입니다.");
         }
 
         message.update(newContent);
-        messageRepository.save(message);
-        return true;  // 성공 시 true 반환
+        return messageRepository.save(message);
     }
 
     @Override
-    public void delete(UUID id) {
+    public void deleteById(UUID id) {
         messageRepository.deleteById(id);
     }
 

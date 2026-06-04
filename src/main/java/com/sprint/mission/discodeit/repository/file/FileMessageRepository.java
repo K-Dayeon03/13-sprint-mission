@@ -51,7 +51,7 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll() {
+    public List<Message> findByAll() {
         return new ArrayList<>(loadData().values());
     }
 

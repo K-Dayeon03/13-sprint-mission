@@ -22,7 +22,7 @@ public class JCFUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findAll() {
+    public List<User> findByAll() {
         return new ArrayList<>(data.values());
     }
 

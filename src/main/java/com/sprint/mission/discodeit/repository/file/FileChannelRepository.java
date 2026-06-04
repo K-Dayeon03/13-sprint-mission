@@ -50,7 +50,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public List<Channel> findAll() {
+    public List<Channel> findByAll() {
         return new ArrayList<>(loadData().values());
     }
 

@@ -20,7 +20,7 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll() {
+    public List<Message> findByAll() {
         return new ArrayList<>(data.values());
     }
 

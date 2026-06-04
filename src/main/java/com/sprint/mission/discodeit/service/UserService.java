@@ -8,7 +8,7 @@ import java.util.UUID;
 public interface UserService{
         User create(String username, String password, String email);
         User findById(UUID id);
-        List<User> findAll();
-        boolean update(UUID id, String currentPassword, String newUsername, String newPassword, String newEmail);
-        void delete(UUID id);
+        List<User> findByAll();
+        User update(UUID id, String currentPassword, String newUsername, String newPassword, String newEmail);
+        void deleteById(UUID id);
     }

@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.service.jcf;
 
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.service.UserService;
@@ -10,16 +11,16 @@ import java.util.*;
 
 //연관 삭제위해 추가
 public class JCFUserService implements UserService {
-    private final Map<UUID, User> data;
+    private final UserRepository userRepository;
     private final ChannelService channelService;
     private final MessageService messageService;
 
-    public JCFUserService(ChannelService channelService, MessageService messageService) {
+    public JCFUserService(ChannelService channelService, MessageService messageService, UserRepository userRepository) {
         this.channelService = channelService;
         this.messageService = messageService;
-        this.data = new HashMap<>();
+        this.userRepository = userRepository;
+        // data 필드 제거
     }
-
 
     @Override
     public User create(String username, String password, String email) {
@@ -27,48 +28,37 @@ public class JCFUserService implements UserService {
                 password == null || password.isBlank()) {
             throw new IllegalArgumentException("이름 또는 비밀번호를 작성해주세요.");
         }
-
         User user = new User(username, password, email);
-        data.put(user.getId(), user);
-        return user;
+        return userRepository.save(user); // userRepository로 통일
     }
 
     @Override
     public User findById(UUID id) {
-        return data.get(id);
+        return userRepository.findById(id); // userRepository로 통일
     }
 
     @Override
-    public List<User> findAll() {
-        return new ArrayList<>(data.values());
+    public List<User> findByAll() {
+        return userRepository.findByAll(); // userRepository로 통일
     }
 
     @Override
-    public boolean update(UUID id, String currentPassword, String newUsername, String newPassword, String newEmail) {
-        //먼저 유저 조회
-        User user = data.get(id);
-
-        //존재하는지 확인
+    public User update(UUID id, String currentPassword, String newUsername, String newPassword, String newEmail) {
+        User user = userRepository.findById(id);
         if (user == null) {
-            System.out.println("존재하지 않는 사용자입니다.");
-            return false;
+            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
         }
-        //비밀번호가 일치 않으면 실패
         if (!user.getPassword().equals(currentPassword)) {
-            System.out.println("비밀번호가 일치하지 않습니다.");
-            return false;
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
-        //모두 일치일 경우
         user.update(newUsername, newPassword, newEmail);
-        return true;
+        return userRepository.save(user);
     }
 
     @Override
-    public void delete(UUID id) {
-        //유저 삭제 시 -> 작성한 메세지와 채널을 삭제해야된다.
+    public void deleteById(UUID id) {
         messageService.deleteByAuthorId(id);
         channelService.deleteByAuthorId(id);
-        data.remove(id);
-
+        userRepository.deleteById(id); // userRepository로 통일
     }
 }

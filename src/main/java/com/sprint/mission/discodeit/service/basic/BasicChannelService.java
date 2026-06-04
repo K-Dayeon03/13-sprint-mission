@@ -33,27 +33,27 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public List<Channel> findAll() {
-        return channelRepository.findAll();
+    public List<Channel> findByAll() {
+        return channelRepository.findByAll();
     }
 
     @Override
-    public boolean update(UUID id, ChannelType newType, String newName, String newDescription) {
+    public Channel update(UUID id, ChannelType newType, String newName, String newDescription) {
         Channel channel = channelRepository.findById(id);
+
         if (channel == null) {
-            return false; // 채널 없으면 false 반환
+            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
         }
         channel.update(
                 newType != null ? newType : channel.getType(),
                 newName != null ? newName : channel.getName(),
                 newDescription != null ? newDescription : channel.getDescription()
         );
-        channelRepository.save(channel);
-        return true;
+        return channelRepository.save(channel);
     }
 
     @Override
-    public void delete(UUID id) {
+    public void deleteById(UUID id) {
         messageRepository.deleteByChannelId(id);
         channelRepository.deleteById(id);
     }
@@ -61,7 +61,7 @@ public class BasicChannelService implements ChannelService {
     @Override
     public void deleteByAuthorId(UUID authorId) {
         //해당 유저가 만든 채 조회 후  메세지 삭제
-        channelRepository.findAll().stream()
+        channelRepository.findByAll().stream()
             .filter(c -> c.getAuthorId().equals(authorId))
             .forEach(c -> messageRepository.deleteByChannelId(c.getId()));
         channelRepository.deleteByAuthorId(authorId);

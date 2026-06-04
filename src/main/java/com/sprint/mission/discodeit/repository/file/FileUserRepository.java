@@ -13,14 +13,23 @@ public class FileUserRepository implements UserRepository {
     private static final Path FILE_PATH = Paths.get("data/users.ser");
     @SuppressWarnings("unchecked")//경고 없애기
     private Map<UUID, User> loadData() {
-        if(!Files.exists(FILE_PATH)){
+        if (!Files.exists(FILE_PATH)) {
+            // 파일이 없는 건 정상 — 조용히 빈 Map 반환
             return new HashMap<>();
         }
-        try(ObjectInputStream ois = new ObjectInputStream(
-            new FileInputStream(FILE_PATH.toFile()))){
+        try (ObjectInputStream ois = new ObjectInputStream(
+                new FileInputStream(FILE_PATH.toFile()))) {
             return (Map<UUID, User>) ois.readObject();
-        }catch (IOException | ClassNotFoundException e){
+        } catch (FileNotFoundException e) {
+            // 파일이 없는 경우 (exists 체크 후 삭제된 극히 드문 경우)
+            System.err.println("[UserRepository] 파일을 찾을 수 없습니다: " + e.getMessage());
             return new HashMap<>();
+        } catch (ClassNotFoundException e) {
+            // 클래스 구조가 바뀌어 역직렬화 실패 — 심각한 문제
+            throw new RuntimeException("[UserRepository] 클래스 구조 불일치로 역직렬화에 실패했습니다.", e);
+        } catch (IOException e) {
+            // 파일이 깨진 경우 — 조용히 넘기면 데이터 유실을 모를 수 있음
+            throw new RuntimeException("[UserRepository] 파일이 손상되었습니다: " + FILE_PATH, e);
         }
     }
 
@@ -51,7 +60,7 @@ public class FileUserRepository implements UserRepository {
     }
 
     @Override
-    public List<User> findAll() {
+    public List<User> findByAll() {
         return new ArrayList<>(loadData().values());
     }
 
