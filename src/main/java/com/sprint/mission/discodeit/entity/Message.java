@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
+import java.util.List;
 import java.util.UUID;
 //message
 @Getter
@@ -9,6 +10,7 @@ public class Message extends Entity{
     private String content;
     private UUID channelId;
     private UUID authorId;
+    List<UUID> attachmentIds;
     public Message(String content, UUID channelId, UUID authorId) {
         super();
         //검증
