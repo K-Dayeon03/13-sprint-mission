@@ -8,10 +8,11 @@ import java.util.UUID;
 public class User extends Entity {
 
     private String username;
-    private String password; //민감한 정보이므로, 직렬화에서 제외시키기
+    private transient String password; //직렬화 시 제외 테스트해보기
     private String email;
+    private UUID profileImageId;
 
-    public User(String username, String password, String email) {
+    public User(String username, String password, String email, UUID profileImageId) {
         super();
         if (username == null || username.isBlank()) {
             throw new IllegalArgumentException("사용자 이름은 필수입니다.");
@@ -25,14 +26,12 @@ public class User extends Entity {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.profileImageId = profileImageId;
     }
 
-//    public String getUsername() { return username; }
-//    public String getPassword() { return password; }
-//    public String getEmail() { return email; }
-
-    public void update(String newUsername, String newPassword, String newEmail) {
-        if (newUsername == null && newPassword == null && newEmail == null) {
+    public void update(String newUsername, String newPassword, String newEmail, UUID newProfileImageId) {
+        // profileImageId도 수정 조건에 포함
+        if (newUsername == null && newPassword == null && newEmail == null && newProfileImageId == null) {
             throw new IllegalArgumentException("수정할 내용이 없습니다.");
         }
         if (newUsername != null) {
@@ -52,6 +51,10 @@ public class User extends Entity {
                 throw new IllegalArgumentException("이메일은 빈 문자열일 수 없습니다.");
             }
             this.email = newEmail;
+        }
+        // null이면 기존값 유지, 값이 있으면 교체
+        if (newProfileImageId != null) {
+            this.profileImageId = newProfileImageId;
         }
         makeUpdate();
     }

@@ -1,5 +1,8 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequest;
+import com.sprint.mission.discodeit.dto.request.UpdateUserRequest;
+import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -31,17 +34,17 @@ public class FileUserService implements UserService {
     }
 
     @Override
-    public User findById(UUID id) {
+    public UserResponse findById(UUID id) {
         return userRepository.findById(id);
     }
 
     @Override
-    public List<User> findByAll() {
+    public List<UserResponse> findByAll() {
         return userRepository.findByAll();
     }
 
     @Override
-    public User update(UUID id, String currentPassword, String newUsername, String newPassword, String newEmail) {
+    public UserResponse update(UUID id, UpdateUserRequest userRequest, CreateBinaryContentRequest profileImageRequest) {
         User user = userRepository.findById(id);
 
         if (user == null) {

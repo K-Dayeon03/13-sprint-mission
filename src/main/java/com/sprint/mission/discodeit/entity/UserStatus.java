@@ -12,14 +12,16 @@ import java.util.UUID;
 * */
 @Getter
 public class UserStatus extends Entity{
-    private final UUID id;
     private final UUID userId;
     private Instant lastActiveAt; //마지막 활동 시간
-    public UserStatus(UUID id, UUID userId) {
+    public UserStatus(UUID userId, Instant lastActiveAt) {
         super();
-        this.id = id;
+        if(userId == null){
+            throw new IllegalArgumentException("유저 아이디는 필수 입니다.");
+        }
         this.userId = userId;
-        this.lastActiveAt = Instant.now();
+        this.lastActiveAt = lastActiveAt != null ? lastActiveAt : Instant.now();
+
     }
 
     //5분 이내 활동 시 온라인으로 간주
