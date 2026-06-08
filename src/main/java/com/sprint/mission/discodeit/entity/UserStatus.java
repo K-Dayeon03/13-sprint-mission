@@ -32,4 +32,9 @@ public class UserStatus extends Entity{
     public void updateLastOnlineAt(Instant lastActiveAt){
         this.lastActiveAt = lastActiveAt;
     }
+
+    public void updateLastActiveAt(Instant lastActiveAt) {
+        this.lastActiveAt = lastActiveAt;
+        makeUpdate();
+    }
 }

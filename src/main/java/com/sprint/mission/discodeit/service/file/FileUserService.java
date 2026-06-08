@@ -62,6 +62,6 @@ public class FileUserService implements UserService {
     public void deleteById(UUID id) {
         messageService.deleteByAuthorId(id);  // 작성한 메시지 삭제
         channelService.deleteByAuthorId(id);  // 만든 채널 + 채널 메시지 삭제
-        userRepository.deleteById(id);
+        userRepository.deleteByUserId(id);
     }
 }

@@ -1,5 +1,6 @@
 package com.sprint.mission.discodeit.service.file;
 
+import com.sprint.mission.discodeit.dto.request.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
@@ -53,7 +54,7 @@ public class FileMessageService implements MessageService {
     }
 
     @Override
-    public Message update(UUID id, String newContent) {
+    public Message update(UUID id, UpdateMessageRequest request) {
         Message message = messageRepository.findById(id);
 
         if (message == null) {

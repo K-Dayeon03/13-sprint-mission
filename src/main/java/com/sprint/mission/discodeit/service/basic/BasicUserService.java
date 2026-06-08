@@ -119,8 +119,8 @@ public class BasicUserService implements UserService {
             binaryContentRepository.deleteById(user.getProfileImageId());
         }
         // UserStatus 삭제
-        userStatusRepository.deleteByUserId(id);
+        userStatusRepository.deleteById(id);
         // 유저 삭제
-        userRepository.deleteById(id);
+        userRepository.deleteByUserId(id);
     }
 }

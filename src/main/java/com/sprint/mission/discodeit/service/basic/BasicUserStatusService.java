@@ -1,0 +1,78 @@
+package com.sprint.mission.discodeit.service.basic;
+
+import com.sprint.mission.discodeit.dto.request.CreateUserStatusRequest;
+import com.sprint.mission.discodeit.dto.request.UpdateUserStatusRequest;
+import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.UserRepository;
+import com.sprint.mission.discodeit.repository.UserStatusRepository;
+import com.sprint.mission.discodeit.service.UserStatusService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.List;
+import java.util.UUID;
+
+@Service
+@RequiredArgsConstructor
+public class BasicUserStatusService implements UserStatusService {
+    private final UserStatusRepository userStatusRepository;
+    private final UserRepository userRepository;
+
+    @Override
+    public UserStatus create(CreateUserStatusRequest request) {
+        // 유저 존재 여부 확인
+        if (userRepository.findById(request.userId()) == null) {
+            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
+        }
+        // 같은 User의 UserStatus 중복 체크
+        userStatusRepository.findByUserId(request.userId())
+                .ifPresent(us -> {
+                    throw new IllegalArgumentException("이미 존재하는 UserStatus입니다.");
+                });
+
+        UserStatus userStatus = new UserStatus(request.userId(), Instant.now());
+        return userStatusRepository.save(userStatus);
+    }
+
+    @Override
+    public UserStatus findById(UUID id) {
+        UserStatus userStatus = userStatusRepository.findById(id);
+        if (userStatus == null) {
+            throw new IllegalArgumentException("존재하지 않는 UserStatus입니다.");
+        }
+        return userStatus;
+    }
+
+    @Override
+    public List<UserStatus> findAll() {  // findAllByUserId → findAll, 파라미터 제거
+        return userStatusRepository.findAll();
+    }
+
+    @Override
+    public UserStatus update(UUID id, UpdateUserStatusRequest request) {
+        UserStatus userStatus = userStatusRepository.findById(id);
+        if (userStatus == null) {
+            throw new IllegalArgumentException("존재하지 않는 UserStatus입니다.");
+        }
+        userStatus.updateLastActiveAt(request.lastActiveAt());
+        return userStatusRepository.save(userStatus);
+    }
+
+    @Override
+    public UserStatus updateByUserId(UUID userId, UpdateUserStatusRequest request) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 UserStatus입니다."));
+        userStatus.updateLastActiveAt(request.lastActiveAt());
+        return userStatusRepository.save(userStatus);
+    }
+
+    @Override
+    public void deleteById(UUID id) {
+        UserStatus userStatus = userStatusRepository.findById(id);
+        if (userStatus == null) {
+            throw new IllegalArgumentException("존재하지 않는 UserStatus입니다.");
+        }
+        userStatusRepository.deleteById(id);
+    }
+}
