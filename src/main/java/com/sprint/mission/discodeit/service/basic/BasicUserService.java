@@ -62,15 +62,18 @@ public class BasicUserService implements UserService {
         if (user == null) {
             throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
         }
-        UserStatus userStatus = userStatusRepository.findByUserId(id);
+        // findByUserId()는 Optional 반환 → orElseThrow() 필요
+        UserStatus userStatus = userStatusRepository.findByUserId(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 UserStatus입니다."));
         return UserResponse.from(user, userStatus);
     }
-
     @Override
     public List<UserResponse> findByAll() {
         return userRepository.findByAll().stream()
                 .map(user -> {
-                    UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
+                    // 메서드명 누락 → findByUserId() + orElseThrow()
+                    UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 UserStatus입니다."));
                     return UserResponse.from(user, userStatus);
                 })
                 .toList();
@@ -104,7 +107,8 @@ public class BasicUserService implements UserService {
                 userRequest.newEmail(), newProfileImageId);
         userRepository.save(user);
 
-        UserStatus userStatus = userStatusRepository.findByUserId(id);
+        UserStatus userStatus = userStatusRepository.findByUserId(id)
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 UserStatus입니다."));
         return UserResponse.from(user, userStatus);
     }
 
@@ -114,13 +118,10 @@ public class BasicUserService implements UserService {
         if (user == null) {
             throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
         }
-        // BinaryContent(프로필) 삭제
         if (user.getProfileImageId() != null) {
             binaryContentRepository.deleteById(user.getProfileImageId());
         }
-        // UserStatus 삭제
         userStatusRepository.deleteById(id);
-        // 유저 삭제
-        userRepository.deleteByUserId(id);
+        userRepository.deleteById(id);
     }
 }

@@ -25,7 +25,7 @@ public class BasicAuthService implements AuthService {
                 && u.getPassword().equals(loginRequest.password()))
                 .findFirst()
                 .map(user->{
-                    UserStatus userStatus = userStatusRepository.findByUserId(user.getId());
+                    UserStatus userStatus = userStatusRepository.findById(user.getId());
                     return UserResponse.from(user, userStatus);
                 })
                 .orElseThrow(() -> new IllegalArgumentException("유저 이름 또는 비밀번호가 일치하지 않습니다."));
