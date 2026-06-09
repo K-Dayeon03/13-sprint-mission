@@ -50,6 +50,6 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public void deleteByAuthorId(UUID authorId) {
-        data.values().removeIf(m -> m.getAuthorId().equals(authorId));
+        data.values().removeIf(message -> Objects.equals(message.getAuthorId(), authorId));
     }
 }

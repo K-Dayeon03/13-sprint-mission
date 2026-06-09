@@ -29,9 +29,13 @@ public class JCFBinaryContentRepository implements BinaryContentRepository {
 
     @Override
     public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
-        return ids.stream()
-                .map(data::get)
-                .filter(Objects::nonNull)
+        if (ids == null || ids.isEmpty()) {
+            return Collections.emptyList();
+        }
+
+        // 메모리 맵(data)에서 넘겨받은 ids 목록에 포함된 ID를 가진 객체만 필터링
+        return data.values().stream()
+                .filter(content -> ids.contains(content.getId()))
                 .toList();
     }
 

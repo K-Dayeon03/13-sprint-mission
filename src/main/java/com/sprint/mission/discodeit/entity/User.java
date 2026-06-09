@@ -8,7 +8,7 @@ import java.util.UUID;
 public class User extends Entity {
 
     private String username;
-    private transient String password; //직렬화 시 제외 테스트해보기
+    private String password;
     private String email;
     private UUID profileImageId;
 
@@ -59,14 +59,16 @@ public class User extends Entity {
         makeUpdate();
     }
 
+    // User.java
     @Override
     public String toString() {
-        return "User{" +
-                "id=" + getId() +
-                ", username=" + username +
-                ", email=" + email +
-                ", createdAt=" + getCreatedAt() +
-                ", updatedAt=" + getUpdatedAt() +
-                "}";
+        return "유저{" +
+                "ID=" + getId() +
+                ", 이름='" + username + '\'' +
+                ", 이메일='" + email + '\'' +
+                ", 프로필이미지ID=" + profileImageId +
+                ", 생성시간=" + getCreatedAt() +
+                ", 수정시간=" + getUpdatedAt() +
+                '}';
     }
 }

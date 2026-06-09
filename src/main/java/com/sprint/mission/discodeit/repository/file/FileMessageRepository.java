@@ -95,7 +95,7 @@ saveData(data);                        // 3. 파일에 저장
     @Override
     public void deleteByAuthorId(UUID authorId) {
         Map<UUID, Message> data = loadData();
-        data.values().removeIf(m -> m.getAuthorId().equals(authorId));
+        data.values().removeIf(message -> Objects.equals(message.getAuthorId(), authorId));
         saveData(data);
     }
 }

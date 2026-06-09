@@ -6,20 +6,19 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.stereotype.Repository;
 
 import java.util.*;
+
 @Repository
 @ConditionalOnProperty(
         name = "discodeit.repository.type",
         havingValue = "jcf",
         matchIfMissing = true
 )
-
 public class JCFUserRepository implements UserRepository {
 
-    //저장
     private final Map<UUID, User> data = new HashMap<>();
+
     @Override
     public User save(User user) {
-        //등록/수정 공통 - id기준으로 덮어씀
         data.put(user.getId(), user);
         return user;
     }
@@ -32,6 +31,13 @@ public class JCFUserRepository implements UserRepository {
     @Override
     public List<User> findByAll() {
         return new ArrayList<>(data.values());
+    }
+
+    @Override
+    public Optional<User> findByUsername(String username) {
+        return data.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
     }
 
     @Override

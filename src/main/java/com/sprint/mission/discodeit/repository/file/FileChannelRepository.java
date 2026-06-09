@@ -76,7 +76,7 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void deleteByAuthorId(UUID authorId) {
         Map<UUID, Channel> data = loadData();
-        data.values().removeIf(m -> m.getAuthorId().equals(authorId));
+        data.values().removeIf(channel -> Objects.equals(channel.getAuthorId(), authorId));
         saveData(data);
     }
 }

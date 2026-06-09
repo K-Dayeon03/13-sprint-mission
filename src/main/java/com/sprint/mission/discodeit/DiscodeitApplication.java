@@ -152,10 +152,16 @@ public class DiscodeitApplication {
 		printMessage(updated);
 	}
 
-	static void messageDeleteTest(MessageService messageService, Message message) {
+	// 💡 꼬여있던 메서드 본문을 정상적으로 합치고 필요한 서비스를 인자로 받도록 수정했습니다.
+	static void messageDeleteTest(MessageService messageService, ChannelService channelService, Message message) {
 		printDivider("메시지 삭제");
 		messageService.deleteById(message.getId());
 		System.out.println("메시지 삭제 완료: " + message.getId());
+
+		// 💡 메시지 삭제 직후 채널 재조회 검증 진행
+		printDivider("메시지 삭제 후 채널 조회 (검증)");
+		ChannelResponse channelAfterDelete = channelService.findById(message.getChannelId());
+		printChannel(channelAfterDelete);
 	}
 
 	// ======================== main ========================
@@ -181,7 +187,9 @@ public class DiscodeitApplication {
 		Message message = messageCreateTest(messageService, publicChannel, user);
 		messageFindTest(messageService, publicChannel);
 		messageUpdateTest(messageService, message);
-		messageDeleteTest(messageService, message);
+
+		// 💡 channelService 파라미터를 추가하여 메시지 삭제 및 검증 호출
+		messageDeleteTest(messageService, channelService, message);
 
 		// 유저 삭제 (연관 데이터 같이 삭제 확인)
 		printDivider("유저 삭제");

@@ -18,13 +18,9 @@ public abstract class Entity implements Serializable {
     // 파라미터 없는 생성자 하나만
     public Entity() {
         this.id = UUID.randomUUID();
-        this.createdAt = Instant.ofEpochSecond(System.currentTimeMillis());
+        this.createdAt = Instant.now();
         this.updatedAt = this.createdAt;
     }
-
-//    public UUID getId() { return id; }
-//    public Long getCreatedAt() { return createdAt; }
-//    public Long getUpdatedAt() { return updatedAt; }
 
     protected void makeUpdate() {
         this.updatedAt = Instant.ofEpochSecond(System.currentTimeMillis());

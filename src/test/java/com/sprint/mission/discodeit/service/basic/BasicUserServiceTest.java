@@ -4,7 +4,10 @@ import com.sprint.mission.discodeit.dto.request.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
+import com.sprint.mission.discodeit.repository.MessageRepository;
+import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import org.junit.jupiter.api.BeforeEach;
@@ -34,6 +37,9 @@ class BasicUserServiceTest {
     @Mock UserRepository userRepository;
     @Mock BinaryContentRepository binaryContentRepository;
     @Mock UserStatusRepository userStatusRepository;
+    @Mock MessageRepository messageRepository;
+    @Mock ChannelRepository channelRepository;
+    @Mock ReadStatusRepository readStatusRepository;
     @InjectMocks BasicUserService userService;
 
     private User user;
@@ -139,11 +145,14 @@ class BasicUserServiceTest {
     void deleteById_success() {
         // given
         given(userRepository.findById(user.getId())).willReturn(user);
+        given(channelRepository.findByAll()).willReturn(List.of());
 
         // when
         userService.deleteById(user.getId());
 
         // then
+        verify(messageRepository).deleteByAuthorId(user.getId());
+        verify(channelRepository).deleteByAuthorId(user.getId());
         verify(userStatusRepository).deleteById(user.getId()); // deleteById → deleteByUserId
         verify(userRepository).deleteById(user.getId());
     }

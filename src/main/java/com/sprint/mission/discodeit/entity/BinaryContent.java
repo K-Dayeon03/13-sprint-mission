@@ -19,7 +19,7 @@ public class BinaryContent extends Entity{
 
         // userId와 messageId는 둘 중 하나만 존재해야 함
         if (userId != null && messageId != null) {
-            throw new IllegalArgumentException("userId와 messageId는 동시에 설정될 수 없습니다.");
+            throw new IllegalArgumentException("유저 아이디와 메세지 아이디는 동시에 설정될 수 없습니다.");
         }
 
         if (fileName == null || fileName.isBlank()) {

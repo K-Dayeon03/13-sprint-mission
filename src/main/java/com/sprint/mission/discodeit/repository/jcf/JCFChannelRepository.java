@@ -37,6 +37,6 @@ public class JCFChannelRepository implements ChannelRepository {
 
     @Override
     public void deleteByAuthorId(UUID authorId) {
-        data.values().removeIf(m -> m.getAuthorId().equals(authorId));
+        data.values().removeIf(channel -> Objects.equals(channel.getAuthorId(), authorId));
     }
 }

@@ -11,36 +11,34 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
+
 @Repository
 @ConditionalOnProperty(
         name = "discodeit.repository.type",
         havingValue = "file"
 )
 public class FileUserRepository implements UserRepository {
-    //하드코딩 경로 제거 후 생성자 주입으로 교체
-    // private static final Path filePath = Paths.get("data/users.ser");
+
     private final Path filePath;
+
     public FileUserRepository(@Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
         this.filePath = Paths.get(fileDirectory).resolve("users.ser");
     }
-    @SuppressWarnings("unchecked")//경고 없애기
+
+    @SuppressWarnings("unchecked")
     private Map<UUID, User> loadData() {
         if (!Files.exists(filePath)) {
-            // 파일이 없는 건 정상 — 조용히 빈 Map 반환
             return new HashMap<>();
         }
         try (ObjectInputStream ois = new ObjectInputStream(
                 new FileInputStream(filePath.toFile()))) {
             return (Map<UUID, User>) ois.readObject();
         } catch (FileNotFoundException e) {
-            // 파일이 없는 경우 (exists 체크 후 삭제된 극히 드문 경우)
             System.err.println("[UserRepository] 파일을 찾을 수 없습니다: " + e.getMessage());
             return new HashMap<>();
         } catch (ClassNotFoundException e) {
-            // 클래스 구조가 바뀌어 역직렬화 실패 — 심각한 문제
             throw new RuntimeException("[UserRepository] 클래스 구조 불일치로 역직렬화에 실패했습니다.", e);
         } catch (IOException e) {
-            // 파일이 깨진 경우 — 조용히 넘기면 데이터 유실을 모를 수 있음
             throw new RuntimeException("[UserRepository] 파일이 손상되었습니다: " + filePath, e);
         }
     }
@@ -49,13 +47,12 @@ public class FileUserRepository implements UserRepository {
         try {
             Files.createDirectories(filePath.getParent());
             try(ObjectOutputStream oos = new ObjectOutputStream(
-                new FileOutputStream(filePath.toFile()))){
+                    new FileOutputStream(filePath.toFile()))){
                 oos.writeObject(data);
             }
-
-            }catch (IOException e){
-                throw new RuntimeException("파일 저장에 실패했습니다.", e);
-            }
+        } catch (IOException e){
+            throw new RuntimeException("파일 저장에 실패했습니다.", e);
+        }
     }
 
     @Override
@@ -76,11 +73,19 @@ public class FileUserRepository implements UserRepository {
         return new ArrayList<>(loadData().values());
     }
 
+    // 💡 이 부분이 구현되었습니다.
+    @Override
+    public Optional<User> findByUsername(String username) {
+        Map<UUID, User> data = loadData();
+        return data.values().stream()
+                .filter(user -> user.getUsername().equals(username))
+                .findFirst();
+    }
+
     @Override
     public void deleteById(UUID id) {
         Map<UUID, User> data = loadData();
         data.remove(id);
         saveData(data);
     }
-
 }

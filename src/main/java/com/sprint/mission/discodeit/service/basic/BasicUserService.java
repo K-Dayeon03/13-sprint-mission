@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.dto.request.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.*;
@@ -21,6 +22,9 @@ public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
     private final UserStatusRepository userStatusRepository;
+    private final MessageRepository messageRepository;
+    private final ChannelRepository channelRepository;
+    private final ReadStatusRepository readStatusRepository;
 
 
     @Override
@@ -121,6 +125,15 @@ public class BasicUserService implements UserService {
         if (user.getProfileImageId() != null) {
             binaryContentRepository.deleteById(user.getProfileImageId());
         }
+        channelRepository.findByAll().stream()
+                .filter(channel -> id.equals(channel.getAuthorId()))
+                .map(Channel::getId)
+                .forEach(channelId -> {
+                    messageRepository.deleteByChannelId(channelId);
+                    readStatusRepository.deleteByChannelId(channelId);
+                });
+        messageRepository.deleteByAuthorId(id);
+        channelRepository.deleteByAuthorId(id);
         userStatusRepository.deleteById(id);
         userRepository.deleteById(id);
     }

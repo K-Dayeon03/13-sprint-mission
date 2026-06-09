@@ -27,18 +27,7 @@ public class Message extends Entity{
         this.channelId = channelId;
         this.authorId = authorId;
     }
-//    public String getContent() {
-//        return content;
-//    }
-//
-//
-//    public UUID getChannelId() {
-//        return channelId;
-//    }
-//
-//    public UUID getAuthorId() {
-//        return authorId;
-//    }
+
     // content 수정 메서드 추가
     public void update(String newContent) {
         if (newContent == null) {
@@ -51,13 +40,15 @@ public class Message extends Entity{
         makeUpdate();
     }
 
-
+    // Message.java
     @Override
     public String toString() {
-        return "Message{" +
-                "content='" + content + '\'' +
-                ", channelId=" + channelId +
-                ", authorId=" + authorId +
+        return "메시지{" +
+                "내용='" + content + '\'' +
+                ", 채널ID=" + channelId +
+                ", 작성자ID=" + authorId +
+                ", 생성시간=" + getCreatedAt() +
+                ", 수정시간=" + getUpdatedAt() +
                 '}';
     }
 }
