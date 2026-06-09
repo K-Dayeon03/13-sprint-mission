@@ -121,4 +121,5 @@ public class BasicChannelService implements ChannelService {
         // 채널 삭제
         channelRepository.deleteById(id);
     }
+
 }
