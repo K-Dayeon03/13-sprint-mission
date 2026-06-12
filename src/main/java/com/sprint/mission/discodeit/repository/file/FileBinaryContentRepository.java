@@ -26,7 +26,7 @@ import java.util.UUID;
 )
 public class FileBinaryContentRepository implements BinaryContentRepository {
     private final Path filePath;
-증
+
     public FileBinaryContentRepository(@Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
         this.filePath = Paths.get(fileDirectory).resolve("binary-contents.ser");
     }
