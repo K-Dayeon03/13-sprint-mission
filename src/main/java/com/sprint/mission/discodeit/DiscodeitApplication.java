@@ -27,6 +27,10 @@ public class DiscodeitApplication {
 		System.out.println("\n========== " + title + " ==========");
 	}
 
+	static String display(Object value) {
+		return value != null ? value.toString() : "없음";
+	}
+
 	static void printUser(UserResponse user) {
 		System.out.println("유저 ID     : " + user.id());
 		System.out.println("유저 이름   : " + user.username());
@@ -35,13 +39,20 @@ public class DiscodeitApplication {
 		System.out.println("생성 시간   : " + user.createdAt());
 	}
 
-	static void printChannel(ChannelResponse channel) {
+	static void printChannelForUser(ChannelResponse channel, UserResponse user) {
+		List<java.util.UUID> participantIds = channel.participantIds() != null
+				? channel.participantIds()
+				: List.of(user.id());
+		printChannel(channel, participantIds);
+	}
+
+	static void printChannel(ChannelResponse channel, List<java.util.UUID> participantIds) {
 		System.out.println("채널 ID         : " + channel.id());
 		System.out.println("채널 타입       : " + channel.type());
-		System.out.println("채널 이름       : " + channel.name());
-		System.out.println("채널 설명       : " + channel.description());
-		System.out.println("최근 메시지 시간: " + channel.lastMessageAt());
-		System.out.println("참여자 목록     : " + channel.participantIds());
+		System.out.println("채널 이름       : " + display(channel.name()));
+		System.out.println("채널 설명       : " + display(channel.description()));
+		System.out.println("최근 메시지 시간: " + display(channel.lastMessageAt()));
+		System.out.println("참여자 목록     : " + participantIds);
 	}
 
 	static void printMessage(Message message) {
@@ -52,7 +63,7 @@ public class DiscodeitApplication {
 		System.out.println("생성 시간  : " + message.getCreatedAt());
 	}
 
-	// ======================== 유저 테스트 ========================
+	// ======================== 사용자 시나리오 ========================
 	static UserResponse userCreateTest(UserService userService) {
 		printDivider("유저 생성");
 		UserResponse user = userService.create(
@@ -86,13 +97,13 @@ public class DiscodeitApplication {
 		printUser(updated);
 	}
 
-	// ======================== 채널 테스트 ========================
-	static ChannelResponse channelCreatePublicTest(ChannelService channelService) {
+	// ======================== 채널 시나리오 ========================
+	static ChannelResponse channelCreatePublicTest(ChannelService channelService, UserResponse user) {
 		printDivider("PUBLIC 채널 생성");
 		ChannelResponse channel = channelService.createPublic(
 				new CreatePublicChannelRequest("공지", "공지 채널입니다.")
 		);
-		printChannel(channel);
+		printChannelForUser(channel, user);
 		return channel;
 	}
 
@@ -101,29 +112,35 @@ public class DiscodeitApplication {
 		ChannelResponse channel = channelService.createPrivate(
 				new CreatePrivateChannelRequest(List.of(user.id()))
 		);
-		printChannel(channel);
+		printChannelForUser(channel, user);
 		return channel;
 	}
 
-	static void channelFindTest(ChannelService channelService, UserResponse user) {
-		printDivider("유저가 볼 수 있는 채널 목록 조회");
+	static void channelFindTest(ChannelService channelService, UserResponse user, String title) {
+		printDivider(title);
 		List<ChannelResponse> channels = channelService.findAllByUserId(user.id());
 		channels.forEach(c -> {
-			printChannel(c);
+			printChannelForUser(c, user);
 			System.out.println("---");
 		});
 	}
 
-	static void channelUpdateTest(ChannelService channelService, ChannelResponse channel) {
+	static void channelUpdateTest(ChannelService channelService, ChannelResponse channel, UserResponse user) {
 		printDivider("채널 수정");
 		ChannelResponse updated = channelService.update(
 				channel.id(),
 				new UpdateChannelRequest("공지(수정됨)", "수정된 설명입니다.")
 		);
-		printChannel(updated);
+		printChannelForUser(updated, user);
 	}
 
-	// ======================== 메시지 테스트 ========================
+	static void channelDetailTest(ChannelService channelService, ChannelResponse channel, UserResponse user, String title) {
+		printDivider(title);
+		ChannelResponse found = channelService.findById(channel.id());
+		printChannelForUser(found, user);
+	}
+
+	// ======================== 메시지 시나리오 ========================
 	static Message messageCreateTest(MessageService messageService,
 	                                 ChannelResponse channel, UserResponse author) {
 		printDivider("메시지 생성");
@@ -152,16 +169,15 @@ public class DiscodeitApplication {
 		printMessage(updated);
 	}
 
-	// 💡 꼬여있던 메서드 본문을 정상적으로 합치고 필요한 서비스를 인자로 받도록 수정했습니다.
-	static void messageDeleteTest(MessageService messageService, ChannelService channelService, Message message) {
+	static void messageDeleteTest(MessageService messageService, ChannelService channelService,
+	                              Message message, UserResponse user) {
 		printDivider("메시지 삭제");
 		messageService.deleteById(message.getId());
 		System.out.println("메시지 삭제 완료: " + message.getId());
 
-		// 💡 메시지 삭제 직후 채널 재조회 검증 진행
-		printDivider("메시지 삭제 후 채널 조회 (검증)");
+		printDivider("메시지 삭제 후 채널 상태");
 		ChannelResponse channelAfterDelete = channelService.findById(message.getChannelId());
-		printChannel(channelAfterDelete);
+		printChannelForUser(channelAfterDelete, user);
 	}
 
 	// ======================== main ========================
@@ -172,26 +188,34 @@ public class DiscodeitApplication {
 		ChannelService channelService = context.getBean(ChannelService.class);
 		MessageService messageService = context.getBean(MessageService.class);
 
-		// 유저 테스트
+		printDivider("애플리케이션 시작");
+		System.out.println("Spring Context에서 Service Bean 조회 완료");
+
+		// 1. 사용자 접속
 		UserResponse user = userCreateTest(userService);
 		userFindTest(userService, user);
 		userUpdateTest(userService, user);
 
-		// 채널 테스트
-		ChannelResponse publicChannel = channelCreatePublicTest(channelService);
-		ChannelResponse privateChannel = channelCreatePrivateTest(channelService, user);
-		channelFindTest(channelService, user);
-		channelUpdateTest(channelService, publicChannel);
+		// 2. 서버 채널 준비
+		ChannelResponse publicChannel = channelCreatePublicTest(channelService, user);
+		channelCreatePrivateTest(channelService, user);
+		channelUpdateTest(channelService, publicChannel, user);
 
-		// 메시지 테스트
+		// 3. 채널 목록을 보고 PUBLIC 채널 입장
+		channelFindTest(channelService, user, "현재 유저가 볼 수 있는 채널 목록");
+		channelDetailTest(channelService, publicChannel, user, "PUBLIC 채널 입장");
+
+		// 4. 입장한 채널에서 대화
 		Message message = messageCreateTest(messageService, publicChannel, user);
 		messageFindTest(messageService, publicChannel);
+		channelDetailTest(channelService, publicChannel, user, "메시지 작성 후 채널 상태");
+
+		// 5. 메시지 관리
 		messageUpdateTest(messageService, message);
+		messageFindTest(messageService, publicChannel);
+		messageDeleteTest(messageService, channelService, message, user);
 
-		// 💡 channelService 파라미터를 추가하여 메시지 삭제 및 검증 호출
-		messageDeleteTest(messageService, channelService, message);
-
-		// 유저 삭제 (연관 데이터 같이 삭제 확인)
+		// 6. 정리
 		printDivider("유저 삭제");
 		userService.deleteById(user.id());
 		System.out.println("유저 삭제 완료: " + user.id());

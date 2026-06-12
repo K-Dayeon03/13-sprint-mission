@@ -48,8 +48,10 @@ public class BasicMessageService implements MessageService {
                         attachmentRequest.contentType(),
                         attachmentRequest.bytes()
                 );
-                binaryContentRepository.save(attachment);
+                BinaryContent savedAttachment = binaryContentRepository.save(attachment);
+                message.addAttachmentId(savedAttachment.getId());
             });
+            messageRepository.save(message);
         }
 
         return message;

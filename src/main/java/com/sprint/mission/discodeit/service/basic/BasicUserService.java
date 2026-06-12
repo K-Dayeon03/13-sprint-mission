@@ -131,10 +131,10 @@ public class BasicUserService implements UserService {
                 .forEach(channelId -> {
                     messageRepository.deleteByChannelId(channelId);
                     readStatusRepository.deleteByChannelId(channelId);
-                });
+        });
         messageRepository.deleteByAuthorId(id);
         channelRepository.deleteByAuthorId(id);
-        userStatusRepository.deleteById(id);
+        userStatusRepository.deleteByUserId(id);
         userRepository.deleteById(id);
     }
 }

@@ -31,8 +31,10 @@ public class FileMessageRepository implements MessageRepository {
         try(ObjectInputStream ois = new ObjectInputStream(
                 new FileInputStream(filePath.toFile()))){
             return (Map<UUID, Message>) ois.readObject();
-        }catch (IOException | ClassNotFoundException e){
-            return new HashMap<>();
+        }catch (ClassNotFoundException e){
+            throw new RuntimeException("[MessageRepository] 클래스 구조 불일치로 역직렬화에 실패했습니다.", e);
+        }catch (IOException e){
+            throw new RuntimeException("[MessageRepository] 파일이 손상되었거나 읽을 수 없습니다: " + filePath, e);
         }
     }
 

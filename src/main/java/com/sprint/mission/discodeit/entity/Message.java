@@ -2,15 +2,17 @@ package com.sprint.mission.discodeit.entity;
 
 import lombok.Getter;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 //message
 @Getter
 public class Message extends Entity{
     private String content;
-    private UUID channelId;
-    private UUID authorId;
-    List<UUID> attachmentIds;
+    private final UUID channelId;
+    private final UUID authorId;
+    private final List<UUID> attachmentIds;
+
     public Message(String content, UUID channelId, UUID authorId) {
         super();
         //검증
@@ -26,6 +28,15 @@ public class Message extends Entity{
         this.content = content;
         this.channelId = channelId;
         this.authorId = authorId;
+        this.attachmentIds = new ArrayList<>();
+    }
+
+    public void addAttachmentId(UUID attachmentId) {
+        if (attachmentId == null) {
+            throw new IllegalArgumentException("첨부파일 ID는 필수입니다.");
+        }
+        this.attachmentIds.add(attachmentId);
+        makeUpdate();
     }
 
     // content 수정 메서드 추가

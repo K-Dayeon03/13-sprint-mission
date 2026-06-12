@@ -111,6 +111,7 @@ class BasicChannelServiceTest {
 
         assertThat(response).isNotNull();
         assertThat(response.id()).isEqualTo(publicChannel.getId());
+        assertThat(response.lastMessageAt()).isNull();
     }
 
     @Test

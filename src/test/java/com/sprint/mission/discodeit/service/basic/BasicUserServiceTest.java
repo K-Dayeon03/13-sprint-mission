@@ -153,7 +153,7 @@ class BasicUserServiceTest {
         // then
         verify(messageRepository).deleteByAuthorId(user.getId());
         verify(channelRepository).deleteByAuthorId(user.getId());
-        verify(userStatusRepository).deleteById(user.getId()); // deleteById → deleteByUserId
+        verify(userStatusRepository).deleteByUserId(user.getId());
         verify(userRepository).deleteById(user.getId());
     }
 

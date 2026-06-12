@@ -27,7 +27,8 @@ public class BasicAuthService implements AuthService {
                 .orElseThrow(() -> new IllegalArgumentException("유저 이름 또는 비밀번호가 일치하지 않습니다."));
 
         // 4. 유저 상태 정보 조회
-        UserStatus userStatus = userStatusRepository.findById(user.getId());
+        UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 UserStatus입니다."));
 
         // 5. Response DTO로 변환하여 반환
         return UserResponse.from(user, userStatus);

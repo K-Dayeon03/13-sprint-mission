@@ -8,7 +8,7 @@ public class Channel extends Entity{
     private ChannelType type;
     private String name;
     private String description;
-    private UUID authorId;
+    private final UUID authorId;
     public Channel(ChannelType type, String name, String description, UUID authorId) {
         super();
         this.type = type;
@@ -22,8 +22,6 @@ public class Channel extends Entity{
         this.type = newType;
         makeUpdate();
     }
-
-    public UUID getAuthorId() { return authorId;}
 
     // Channel.java
     @Override

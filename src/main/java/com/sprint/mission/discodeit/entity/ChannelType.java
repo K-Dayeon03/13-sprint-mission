@@ -18,8 +18,4 @@ public enum ChannelType  implements Serializable {
         this.description = description;
         this.isPublic = isPublic;
     }
-
-    public boolean isPublic() {
-        return isPublic;
-    }
 }

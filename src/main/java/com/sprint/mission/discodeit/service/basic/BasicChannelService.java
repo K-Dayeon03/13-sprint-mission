@@ -64,7 +64,7 @@ public class BasicChannelService implements ChannelService {
                 .stream()
                 .map(Message::getCreatedAt)
                 .max(Instant::compareTo)
-                .orElse(Instant.now());
+                .orElse(null);
         //private 채널인 경우 참여자 id 목록 조회
         List<UUID> participantIds = null;
         if (channel.getType() == ChannelType.PRIVATE) {
