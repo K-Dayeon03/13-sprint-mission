@@ -2,6 +2,9 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -9,26 +12,37 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
+@Repository
+@ConditionalOnProperty(
+        name = "discodeit.repository.type",
+        havingValue = "file"
+)
 public class FileChannelRepository implements ChannelRepository {
-    private static final Path FILE_PATH = Paths.get("data/channels.ser");
+//    private static final Path filePath = Paths.get("data/channels.ser");
+    private final Path filePath;
+    public FileChannelRepository(@Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
+        this.filePath = Paths.get(fileDirectory).resolve("channels.ser");
+    }
     @SuppressWarnings("unchecked")
     private Map<UUID, Channel> loadData() {
-        if(!Files.exists(FILE_PATH)){
+        if(!Files.exists(filePath)){
             return new HashMap<>();
         }
         try(ObjectInputStream ois = new ObjectInputStream(
-                new FileInputStream(FILE_PATH.toFile()))){
+                new FileInputStream(filePath.toFile()))){
             return (Map<UUID, Channel>) ois.readObject();
-        }catch (IOException | ClassNotFoundException e){
-            return new HashMap<>();
+        }catch (ClassNotFoundException e){
+            throw new RuntimeException("[ChannelRepository] 클래스 구조 불일치로 역직렬화에 실패했습니다.", e);
+        }catch (IOException e){
+            throw new RuntimeException("[ChannelRepository] 파일이 손상되었거나 읽을 수 없습니다: " + filePath, e);
         }
     }
 
     private void saveData(Map<UUID, Channel> data){
         try {
-            Files.createDirectories(FILE_PATH.getParent());
+            Files.createDirectories(filePath.getParent());
             try(ObjectOutputStream oos = new ObjectOutputStream(
-                    new FileOutputStream(FILE_PATH.toFile()))){
+                    new FileOutputStream(filePath.toFile()))){
                 oos.writeObject(data);
             }
 
@@ -50,7 +64,7 @@ public class FileChannelRepository implements ChannelRepository {
     }
 
     @Override
-    public List<Channel> findAll() {
+    public List<Channel> findByAll() {
         return new ArrayList<>(loadData().values());
     }
 
@@ -64,7 +78,7 @@ public class FileChannelRepository implements ChannelRepository {
     @Override
     public void deleteByAuthorId(UUID authorId) {
         Map<UUID, Channel> data = loadData();
-        data.values().removeIf(m -> m.getAuthorId().equals(authorId));
+        data.values().removeIf(channel -> Objects.equals(channel.getAuthorId(), authorId));
         saveData(data);
     }
 }

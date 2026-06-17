@@ -1,7 +1,9 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.io.Serializable;
+import lombok.Getter;
 
+import java.io.Serializable;
+@Getter
 public enum ChannelType  implements Serializable {
     PUBLIC("공개",true ),
     PRIVATE("비공개", false );
@@ -15,13 +17,5 @@ public enum ChannelType  implements Serializable {
     ChannelType(String description, boolean isPublic) {
         this.description = description;
         this.isPublic = isPublic;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public boolean isPublic() {
-        return isPublic;
     }
 }

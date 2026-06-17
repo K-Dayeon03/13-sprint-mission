@@ -2,10 +2,17 @@ package com.sprint.mission.discodeit.repository.jcf;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.util.*;
 import java.util.stream.Collectors;
-
+@Repository
+@ConditionalOnProperty(
+        name = "discodeit.repository.type",
+        havingValue = "jcf",
+        matchIfMissing = true
+)
 public class JCFMessageRepository implements MessageRepository {
     private final Map<UUID, Message> data = new HashMap<>();
     @Override
@@ -20,7 +27,7 @@ public class JCFMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll() {
+    public List<Message> findByAll() {
         return new ArrayList<>(data.values());
     }
 
@@ -43,6 +50,6 @@ public class JCFMessageRepository implements MessageRepository {
 
     @Override
     public void deleteByAuthorId(UUID authorId) {
-        data.values().removeIf(m -> m.getAuthorId().equals(authorId));
+        data.values().removeIf(message -> Objects.equals(message.getAuthorId(), authorId));
     }
 }

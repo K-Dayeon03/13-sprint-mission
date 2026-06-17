@@ -1,12 +1,14 @@
 package com.sprint.mission.discodeit.entity;
 
-import java.util.UUID;
+import lombok.Getter;
 
+import java.util.UUID;
+@Getter
 public class Channel extends Entity{
     private ChannelType type;
     private String name;
     private String description;
-    private UUID authorId;
+    private final UUID authorId;
     public Channel(ChannelType type, String name, String description, UUID authorId) {
         super();
         this.type = type;
@@ -20,31 +22,18 @@ public class Channel extends Entity{
         this.type = newType;
         makeUpdate();
     }
-    public ChannelType getType() {
-        return type;
-    }
 
-    public String getName() {
-        return name;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public UUID getAuthorId() { return authorId;}
+    // Channel.java
     @Override
     public String toString() {
-        return "Channel{" +
-                "type=" + type +
-                ", name='" + name + '\'' +
-                ", description='" + description + '\'' +
-                ", authorId=" + authorId +
-                ", createdAt=" + getCreatedAt() +
-                ", updatedAt=" + getUpdatedAt() +
+        return "채널{" +
+                "타입=" + type +
+                ", 이름='" + name + '\'' +
+                ", 설명='" + description + '\'' +
+                ", 작성자ID=" + authorId +
+                ", 생성시간=" + getCreatedAt() +
+                ", 수정시간=" + getUpdatedAt() +
                 '}';
     }
-
-
 
 }

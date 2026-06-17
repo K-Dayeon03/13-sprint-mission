@@ -2,6 +2,9 @@ package com.sprint.mission.discodeit.repository.file;
 
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.repository.MessageRepository;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.stereotype.Repository;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -9,27 +12,37 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
-
+@Repository
+@ConditionalOnProperty(
+        name = "discodeit.repository.type",
+        havingValue = "file"
+)
 public class FileMessageRepository implements MessageRepository {
-    private static final Path FILE_PATH = Paths.get("data/messages.ser");
+//    private static final Path filePath = Paths.get("data/messages.ser");
+    private final Path filePath;
+    public FileMessageRepository(@Value("${discodeit.repository.file-directory:.discodeit}") String fileDirectory) {
+        this.filePath = Paths.get(fileDirectory).resolve("messages.ser");
+    }
     @SuppressWarnings("unchecked")
     private Map<UUID, Message> loadData() {
-        if(!Files.exists(FILE_PATH)){
+        if(!Files.exists(filePath)){
             return new HashMap<>();
         }
         try(ObjectInputStream ois = new ObjectInputStream(
-                new FileInputStream(FILE_PATH.toFile()))){
+                new FileInputStream(filePath.toFile()))){
             return (Map<UUID, Message>) ois.readObject();
-        }catch (IOException | ClassNotFoundException e){
-            return new HashMap<>();
+        }catch (ClassNotFoundException e){
+            throw new RuntimeException("[MessageRepository] 클래스 구조 불일치로 역직렬화에 실패했습니다.", e);
+        }catch (IOException e){
+            throw new RuntimeException("[MessageRepository] 파일이 손상되었거나 읽을 수 없습니다: " + filePath, e);
         }
     }
 
     private void saveData(Map<UUID, Message> data){
         try {
-            Files.createDirectories(FILE_PATH.getParent());
+            Files.createDirectories(filePath.getParent());
             try(ObjectOutputStream oos = new ObjectOutputStream(
-                    new FileOutputStream(FILE_PATH.toFile()))){
+                    new FileOutputStream(filePath.toFile()))){
                 oos.writeObject(data);
             }
 
@@ -51,7 +64,7 @@ public class FileMessageRepository implements MessageRepository {
     }
 
     @Override
-    public List<Message> findAll() {
+    public List<Message> findByAll() {
         return new ArrayList<>(loadData().values());
     }
 
@@ -84,7 +97,7 @@ saveData(data);                        // 3. 파일에 저장
     @Override
     public void deleteByAuthorId(UUID authorId) {
         Map<UUID, Message> data = loadData();
-        data.values().removeIf(m -> m.getAuthorId().equals(authorId));
+        data.values().removeIf(message -> Objects.equals(message.getAuthorId(), authorId));
         saveData(data);
     }
 }
