@@ -14,9 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 import java.util.UUID;
-
 @RestController
-@RequestMapping("/api/binary-contents")
 public class BinaryContentController {
     private final BinaryContentService binaryContentService;
 
@@ -24,7 +22,7 @@ public class BinaryContentController {
         this.binaryContentService = binaryContentService;
     }
 
-    @RequestMapping(value = "/{binaryContentId}", method = RequestMethod.GET)
+    @RequestMapping(value = "/api/binary-contents/{binaryContentId}", method = RequestMethod.GET)
     public ResponseEntity<byte[]> download(@PathVariable UUID binaryContentId) {
         BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
 
@@ -37,8 +35,14 @@ public class BinaryContentController {
                 .body(binaryContent.getBytes());
     }
 
-    @RequestMapping(method = RequestMethod.GET)
+    @RequestMapping(value = "/api/binary-contents", method = RequestMethod.GET)
     public ResponseEntity<List<BinaryContent>> findAllByIdIn(@RequestParam List<UUID> ids) {
         return ResponseEntity.ok(binaryContentService.findAllByIdIn(ids));
     }
+
+    @RequestMapping(value = "/api/binaryContent/find", method = RequestMethod.GET)
+    public ResponseEntity<BinaryContent> find(@RequestParam UUID binaryContentId) {
+        return ResponseEntity.ok(binaryContentService.findById(binaryContentId));
+    }
 }
+
