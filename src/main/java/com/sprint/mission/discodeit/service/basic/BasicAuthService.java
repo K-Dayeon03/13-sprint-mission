@@ -10,6 +10,8 @@ import com.sprint.mission.discodeit.service.AuthService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+
 @Service
 @RequiredArgsConstructor
 public class BasicAuthService implements AuthService {
@@ -30,7 +32,11 @@ public class BasicAuthService implements AuthService {
         UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 UserStatus입니다."));
 
-        // 5. Response DTO로 변환하여 반환
+        // 5. 로그인 성공 시 마지막 접속 시간 갱신
+        userStatus.updateLastActiveAt(Instant.now());
+        userStatusRepository.save(userStatus);
+
+        // 6. Response DTO로 변환하여 반환
         return UserResponse.from(user, userStatus);
     }
 }

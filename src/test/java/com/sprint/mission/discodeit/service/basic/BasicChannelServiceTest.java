@@ -19,12 +19,14 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Instant;
+import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 
@@ -78,6 +80,30 @@ class BasicChannelServiceTest {
 
         assertThat(response.type()).isEqualTo(ChannelType.PRIVATE);
         verify(readStatusRepository, times(2)).save(any());
+    }
+
+    @Test
+    @DisplayName("PRIVATE 채널 생성 실패 - 참여자 목록 없음")
+    void createPrivate_fail_emptyParticipantIds() {
+        assertThatThrownBy(() -> channelService.createPrivate(
+                new CreatePrivateChannelRequest(List.of())))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("참여자");
+
+        verify(channelRepository, never()).save(any());
+        verify(readStatusRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("PRIVATE 채널 생성 실패 - 참여자 ID가 null")
+    void createPrivate_fail_nullParticipantId() {
+        assertThatThrownBy(() -> channelService.createPrivate(
+                new CreatePrivateChannelRequest(Collections.singletonList(null))))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("참여자 ID");
+
+        verify(channelRepository, never()).save(any());
+        verify(readStatusRepository, never()).save(any());
     }
 
     @Test
@@ -139,27 +165,26 @@ class BasicChannelServiceTest {
     @DisplayName("userId로 채널 목록 조회 - PUBLIC은 전체, PRIVATE은 참여한 것만")
     void findAllByUserId_success() {
         UUID userId = UUID.randomUUID();
-        UUID otherUserId = UUID.randomUUID();
 
         Channel myPrivateChannel = new Channel(ChannelType.PRIVATE, null, null, null);
         Channel otherPrivateChannel = new Channel(ChannelType.PRIVATE, null, null, null);
 
         ReadStatus myReadStatus = new ReadStatus(userId, myPrivateChannel.getId(), Instant.now());
-        ReadStatus otherReadStatus = new ReadStatus(otherUserId, otherPrivateChannel.getId(), Instant.now());
 
         given(channelRepository.findByAll())
                 .willReturn(List.of(publicChannel, myPrivateChannel, otherPrivateChannel));
+        given(readStatusRepository.findAllByUserId(userId)).willReturn(List.of(myReadStatus));
         given(messageRepository.findByChannelId(publicChannel.getId())).willReturn(List.of());
         given(readStatusRepository.findAllByChannelId(myPrivateChannel.getId()))
                 .willReturn(List.of(myReadStatus));
         given(messageRepository.findByChannelId(myPrivateChannel.getId())).willReturn(List.of());
-        given(readStatusRepository.findAllByChannelId(otherPrivateChannel.getId()))
-                .willReturn(List.of(otherReadStatus));
 
         List<ChannelResponse> responses = channelService.findAllByUserId(userId);
 
         assertThat(responses).hasSize(2);
         assertThat(responses).extracting("type")
                 .containsExactlyInAnyOrder(ChannelType.PUBLIC, ChannelType.PRIVATE);
+        verify(readStatusRepository).findAllByUserId(userId);
+        verify(readStatusRepository, never()).findAllByChannelId(otherPrivateChannel.getId());
     }
 }

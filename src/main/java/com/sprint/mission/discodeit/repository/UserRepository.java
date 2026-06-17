@@ -12,5 +12,6 @@ public interface UserRepository {
     User findById(UUID id);         // 단건 조회
     List<User> findByAll();           // 전체 조회
     Optional<User> findByUsername(String username);
+    boolean existsByUsernameOrEmail(String username, String email);
     void deleteById(UUID id);
 }

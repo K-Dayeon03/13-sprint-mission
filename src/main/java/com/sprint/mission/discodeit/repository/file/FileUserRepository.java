@@ -70,13 +70,19 @@ public class FileUserRepository implements UserRepository {
         return new ArrayList<>(loadData().values());
     }
 
-    // 💡 이 부분이 구현되었습니다.
     @Override
     public Optional<User> findByUsername(String username) {
         Map<UUID, User> data = loadData();
         return data.values().stream()
                 .filter(user -> user.getUsername().equals(username))
                 .findFirst();
+    }
+
+    @Override
+    public boolean existsByUsernameOrEmail(String username, String email) {
+        return loadData().values().stream()
+                .anyMatch(user -> user.getUsername().equals(username)
+                        || user.getEmail().equals(email));
     }
 
     @Override
