@@ -4,43 +4,78 @@
     box-sizing: border-box;
 }
 
+:root {
+    --page: #eef3f1;
+    --surface: #fbfcfb;
+    --surface-soft: #f4f8f6;
+    --surface-hover: #edf5f2;
+    --ink: #26312f;
+    --muted: #667471;
+    --line: #d8e2df;
+    --brand: #2f6f66;
+    --brand-strong: #20584f;
+    --brand-soft: #dbece7;
+    --offline: #e7ecea;
+    --shadow: 0 18px 42px rgba(38, 49, 47, 0.12);
+}
+
 body {
     min-height: 100vh;
-    font-family: Arial, sans-serif;
-    background-color: #f5f5f5;
-    color: #222;
+    font-family: Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background: var(--page);
+    color: var(--ink);
+    line-height: 1.5;
 }
 
 .container {
-    max-width: 800px;
+    width: min(900px, calc(100% - 32px));
     margin: 0 auto;
-    padding: 20px;
+    padding: 64px 0;
 }
 
 h1 {
-    text-align: center;
-    margin-bottom: 30px;
-    color: #333;
+    position: relative;
+    margin: 0 0 12px;
+    color: var(--ink);
+    font-size: 38px;
+    font-weight: 750;
+    line-height: 1.15;
+    letter-spacing: 0;
 }
 
 .status-message {
-    min-height: 22px;
-    margin-bottom: 12px;
-    color: #666;
-    text-align: center;
+    min-height: 24px;
+    margin: 0 0 22px;
+    color: var(--muted);
+    font-size: 15px;
+    font-weight: 500;
 }
 
 .user-list {
-    background-color: white;
+    overflow: hidden;
+    min-height: 180px;
+    background: var(--surface);
+    border: 1px solid var(--line);
     border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow);
+}
+
+.user-list:empty::before {
+    display: none;
+    content: none;
 }
 
 .user-item {
     display: flex;
     align-items: center;
-    padding: 20px;
-    border-bottom: 1px solid #eee;
+    gap: 18px;
+    padding: 22px 24px;
+    border-bottom: 1px solid var(--line);
+    transition: background-color 160ms ease;
+}
+
+.user-item:hover {
+    background-color: var(--surface-hover);
 }
 
 .user-item:last-child {
@@ -48,64 +83,106 @@ h1 {
 }
 
 .user-avatar {
-    width: 60px;
-    height: 60px;
+    flex: 0 0 auto;
+    width: 64px;
+    height: 64px;
     border-radius: 50%;
-    margin-right: 20px;
+    border: 1px solid var(--line);
+    box-shadow: 0 6px 18px rgba(38, 49, 47, 0.10);
     object-fit: cover;
 }
 
 .user-info {
-    flex-grow: 1;
+    min-width: 0;
+    flex: 1;
 }
 
 .user-name {
+    overflow: hidden;
+    margin-bottom: 3px;
+    color: var(--ink);
     font-size: 18px;
-    font-weight: bold;
-    color: #333;
-    margin-bottom: 5px;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .user-email {
+    overflow: hidden;
+    color: var(--muted);
     font-size: 14px;
-    color: #666;
+    font-weight: 500;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .status-badge {
-    padding: 6px 12px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: bold;
+    display: inline-flex;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 7px;
+    min-width: 86px;
+    justify-content: center;
+    padding: 7px 12px;
+    border-radius: 999px;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+}
+
+.status-badge::before {
+    content: "";
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
 }
 
 .online {
-    background-color: #4CAF50;
-    color: white;
+    background-color: var(--brand-soft);
+    color: var(--brand-strong);
+}
+
+.online::before {
+    background-color: var(--brand);
+    box-shadow: 0 0 0 4px rgba(47, 111, 102, 0.14);
 }
 
 .offline {
-    background-color: #9e9e9e;
-    color: white;
+    background-color: var(--offline);
+    color: #69737a;
 }
 
-@media (max-width: 600px) {
+.offline::before {
+    background-color: #96a0a6;
+}
+
+@media (max-width: 640px) {
     .container {
-        padding: 12px;
+        width: min(100% - 24px, 900px);
+        padding: 34px 0;
+    }
+
+    h1 {
+        font-size: 32px;
     }
 
     .user-item {
-        gap: 12px;
+        display: grid;
+        grid-template-columns: 52px minmax(0, 1fr);
+        gap: 12px 14px;
         padding: 16px;
     }
 
     .user-avatar {
-        width: 48px;
-        height: 48px;
-        margin-right: 0;
+        width: 52px;
+        height: 52px;
     }
 
     .status-badge {
+        grid-column: 2;
+        justify-self: start;
+        min-width: 78px;
+        padding: 6px 10px;
         font-size: 12px;
-        white-space: nowrap;
     }
 }
