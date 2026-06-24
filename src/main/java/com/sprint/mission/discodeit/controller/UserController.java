@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -43,10 +44,16 @@ public class UserController {
 
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponse> createWithProfileImage(
-            @RequestPart("userCreateRequest") CreateUserRequest userCreateRequest,
+            @RequestPart(value = "userCreateRequest", required = false) CreateUserRequest userCreateRequest,
+            @RequestParam(required = false) String username,
+            @RequestParam(required = false) String email,
+            @RequestParam(required = false) String password,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
-        UserResponse user = userService.create(userCreateRequest, toBinaryContentRequest(profile));
+        CreateUserRequest request = userCreateRequest != null
+                ? userCreateRequest
+                : new CreateUserRequest(username, email, password);
+        UserResponse user = userService.create(request, toBinaryContentRequest(profile));
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
@@ -63,10 +70,16 @@ public class UserController {
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserResponse> updateWithProfileImage(
             @PathVariable UUID userId,
-            @RequestPart("userUpdateRequest") UpdateUserRequest userUpdateRequest,
+            @RequestPart(value = "userUpdateRequest", required = false) UpdateUserRequest userUpdateRequest,
+            @RequestParam(required = false) String newUsername,
+            @RequestParam(required = false) String newEmail,
+            @RequestParam(required = false) String newPassword,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
-        return ResponseEntity.ok(userService.update(userId, userUpdateRequest, toBinaryContentRequest(profile)));
+        UpdateUserRequest request = userUpdateRequest != null
+                ? userUpdateRequest
+                : new UpdateUserRequest(newUsername, newEmail, newPassword);
+        return ResponseEntity.ok(userService.update(userId, request, toBinaryContentRequest(profile)));
     }
 
     @RequestMapping(value = "/{userId}", method = RequestMethod.DELETE)
