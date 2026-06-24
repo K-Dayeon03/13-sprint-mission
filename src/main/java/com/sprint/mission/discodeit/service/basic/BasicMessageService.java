@@ -25,10 +25,8 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message create(CreateMessageRequest request) {
-        // 채널 존재 여부 확인
-        if (channelRepository.findById(request.channelId()) == null) {
-            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
-        }
+        validateChannelExists(request.channelId());
+
         // 유저 존재 여부 확인
         if (userRepository.findById(request.authorId()) == null) {
             throw new IllegalArgumentException("존재하지 않는 유저입니다.");
@@ -68,6 +66,7 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public List<Message> findAllByChannelId(UUID channelId) {
+        validateChannelExists(channelId);
         return messageRepository.findByChannelId(channelId);
     }
 
@@ -92,5 +91,11 @@ public class BasicMessageService implements MessageService {
         binaryContentRepository.deleteAllByMessageId(message.getId());
         // 메시지 삭제
         messageRepository.deleteById(id);
+    }
+
+    private void validateChannelExists(UUID channelId) {
+        if (channelRepository.findById(channelId) == null) {
+            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
+        }
     }
 }

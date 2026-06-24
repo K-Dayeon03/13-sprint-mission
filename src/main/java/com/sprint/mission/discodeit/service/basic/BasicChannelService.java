@@ -14,7 +14,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class BasicChannelService implements ChannelService {
@@ -35,6 +38,8 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public ChannelResponse createPrivate(CreatePrivateChannelRequest request) {
+        validateParticipantIds(request.participantIds());
+
         //private채널은 name, description 생략
         Channel channel = new Channel(ChannelType.PRIVATE, null, null, null);
         channelRepository.save(channel);
@@ -77,15 +82,17 @@ public class BasicChannelService implements ChannelService {
     }
     @Override
     public List<ChannelResponse> findAllByUserId(UUID userId) {
+        Set<UUID> participatedPrivateChannelIds = readStatusRepository.findAllByUserId(userId).stream()
+                .map(ReadStatus::getChannelId)
+                .collect(Collectors.toSet());
+
         return channelRepository.findByAll().stream()
                 .filter(channel -> {
                     if(channel.getType() == ChannelType.PUBLIC) {
                         return true; //전체조회
                     }
                     //참여한 채널만 조회
-                    return readStatusRepository.findAllByChannelId(channel.getId())
-                            .stream()
-                            .anyMatch(rs -> rs.getUserId().equals(userId));
+                    return participatedPrivateChannelIds.contains(channel.getId());
                 })
                 .map(this::toResponse)
                 .toList();
@@ -120,6 +127,15 @@ public class BasicChannelService implements ChannelService {
         readStatusRepository.deleteByChannelId(id);
         // 채널 삭제
         channelRepository.deleteById(id);
+    }
+
+    private void validateParticipantIds(List<UUID> participantIds) {
+        if (participantIds == null || participantIds.isEmpty()) {
+            throw new IllegalArgumentException("PRIVATE 채널 참여자는 1명 이상이어야 합니다.");
+        }
+        if (participantIds.stream().anyMatch(Objects::isNull)) {
+            throw new IllegalArgumentException("참여자 ID는 필수입니다.");
+        }
     }
 
 }

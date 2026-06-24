@@ -29,34 +29,13 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponse create(CreateUserRequest userRequest, CreateBinaryContentRequest profileImageRequest) {
-       //username, email 중복 체크
-        boolean isDuplicated = userRepository.findByAll().stream()
-                .anyMatch(u -> u.getUsername().equals(userRequest.username())
-                        || u.getEmail().equals(userRequest.email()));
-        if(isDuplicated) {
-            throw new IllegalArgumentException("이미 사용 중인 유저 이름 또는 이메일 입니다.");
-        }
-        //유저 먼저 저장(profileImageId는 나중에 반영)
+        validateUsernameAndEmail(userRequest.username(), userRequest.email());
+
         User user = new User(userRequest.username(), userRequest.password(),
                 userRequest.email(), null);
-        userRepository.save(user);
+        saveUserWithProfileImage(user, profileImageRequest);
 
-        //프로필 이미지 선택적 저장
-        if(profileImageRequest != null){
-            BinaryContent profileImage = new BinaryContent(
-                    user.getId(), // 유저 아이디 설정
-                    null, //메세지 아이디는 널
-                    profileImageRequest.fileName(),
-                    profileImageRequest.contentType(),
-                    profileImageRequest.bytes()
-            );
-            UUID profileImageId = binaryContentRepository.save(profileImage).getId();
-            user.update(null,null,null, profileImageId);
-            userRepository.save(user);
-        }
-        //UserStatus 같이 생성
-        UserStatus userStatus = new UserStatus(user.getId(), Instant.now());
-        userStatusRepository.save(userStatus);
+        UserStatus userStatus = createUserStatus(user.getId());
         return UserResponse.from(user, userStatus);
     }
 
@@ -122,16 +101,64 @@ public class BasicUserService implements UserService {
         if (user == null) {
             throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
         }
+
+        deleteProfileImage(user);
+        deleteAuthoredChannelData(id);
+        deleteUserData(id);
+    }
+
+    private void validateUsernameAndEmail(String username, String email) {
+        if (userRepository.existsByUsernameOrEmail(username, email)) {
+            throw new IllegalArgumentException("이미 사용 중인 유저 이름 또는 이메일 입니다.");
+        }
+    }
+
+    private void saveUserWithProfileImage(User user, CreateBinaryContentRequest profileImageRequest) {
+        userRepository.save(user);
+        if (profileImageRequest == null) {
+            return;
+        }
+
+        UUID profileImageId = saveProfileImage(user.getId(), profileImageRequest);
+        user.update(null, null, null, profileImageId);
+        userRepository.save(user);
+    }
+
+    private UUID saveProfileImage(UUID userId, CreateBinaryContentRequest profileImageRequest) {
+        BinaryContent profileImage = new BinaryContent(
+                userId,
+                null,
+                profileImageRequest.fileName(),
+                profileImageRequest.contentType(),
+                profileImageRequest.bytes()
+        );
+        return binaryContentRepository.save(profileImage).getId();
+    }
+
+    private UserStatus createUserStatus(UUID userId) {
+        UserStatus userStatus = new UserStatus(userId, Instant.now());
+        return userStatusRepository.save(userStatus);
+    }
+
+    private void deleteProfileImage(User user) {
         if (user.getProfileImageId() != null) {
             binaryContentRepository.deleteById(user.getProfileImageId());
         }
+    }
+
+    private void deleteAuthoredChannelData(UUID authorId) {
         channelRepository.findByAll().stream()
-                .filter(channel -> id.equals(channel.getAuthorId()))
+                .filter(channel -> authorId.equals(channel.getAuthorId()))
                 .map(Channel::getId)
-                .forEach(channelId -> {
-                    messageRepository.deleteByChannelId(channelId);
-                    readStatusRepository.deleteByChannelId(channelId);
-        });
+                .forEach(this::deleteChannelData);
+    }
+
+    private void deleteChannelData(UUID channelId) {
+        messageRepository.deleteByChannelId(channelId);
+        readStatusRepository.deleteByChannelId(channelId);
+    }
+
+    private void deleteUserData(UUID id) {
         messageRepository.deleteByAuthorId(id);
         channelRepository.deleteByAuthorId(id);
         userStatusRepository.deleteByUserId(id);

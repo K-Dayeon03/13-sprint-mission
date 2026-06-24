@@ -2,6 +2,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.request.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.entity.Channel;
+import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -29,6 +31,7 @@ import static org.mockito.Mockito.times;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -56,7 +59,7 @@ class BasicUserServiceTest {
     void create_success() {
         // given
         CreateUserRequest request = new CreateUserRequest("woody", "woody@codeit.com", "woody1234");
-        given(userRepository.findByAll()).willReturn(List.of());
+        given(userRepository.existsByUsernameOrEmail("woody", "woody@codeit.com")).willReturn(false);
         given(userRepository.save(any())).willReturn(user);
         given(userStatusRepository.save(any())).willReturn(userStatus);
         // given(userStatusRepository.findByUserId(any())).willReturn(Optional.of(userStatus)); ← 제거
@@ -76,7 +79,7 @@ class BasicUserServiceTest {
     void create_fail_duplicateUsername() {
         // given
         CreateUserRequest request = new CreateUserRequest("woody", "other@codeit.com", "pass1234");
-        given(userRepository.findByAll()).willReturn(List.of(user));
+        given(userRepository.existsByUsernameOrEmail("woody", "other@codeit.com")).willReturn(true);
 
         // when & then
         assertThatThrownBy(() -> userService.create(request, null))
@@ -89,7 +92,7 @@ class BasicUserServiceTest {
     void create_fail_duplicateEmail() {
         // given
         CreateUserRequest request = new CreateUserRequest("other", "woody@codeit.com", "pass1234");
-        given(userRepository.findByAll()).willReturn(List.of(user));
+        given(userRepository.existsByUsernameOrEmail("other", "woody@codeit.com")).willReturn(true);
 
         // when & then
         assertThatThrownBy(() -> userService.create(request, null))
@@ -158,6 +161,33 @@ class BasicUserServiceTest {
     }
 
     @Test
+    @DisplayName("유저 삭제 성공 - 프로필 이미지와 작성 채널 관련 데이터 함께 삭제")
+    void deleteById_success_withRelatedData() {
+        // given
+        UUID profileImageId = UUID.randomUUID();
+        User userWithImage = new User("woody", "woody1234", "woody@codeit.com", profileImageId);
+        Channel authoredChannel = new Channel(ChannelType.PUBLIC, "general", "general channel", userWithImage.getId());
+        Channel otherChannel = new Channel(ChannelType.PUBLIC, "random", "random channel", UUID.randomUUID());
+
+        given(userRepository.findById(userWithImage.getId())).willReturn(userWithImage);
+        given(channelRepository.findByAll()).willReturn(List.of(authoredChannel, otherChannel));
+
+        // when
+        userService.deleteById(userWithImage.getId());
+
+        // then
+        verify(binaryContentRepository).deleteById(profileImageId);
+        verify(messageRepository).deleteByChannelId(authoredChannel.getId());
+        verify(readStatusRepository).deleteByChannelId(authoredChannel.getId());
+        verify(messageRepository, never()).deleteByChannelId(otherChannel.getId());
+        verify(readStatusRepository, never()).deleteByChannelId(otherChannel.getId());
+        verify(messageRepository).deleteByAuthorId(userWithImage.getId());
+        verify(channelRepository).deleteByAuthorId(userWithImage.getId());
+        verify(userStatusRepository).deleteByUserId(userWithImage.getId());
+        verify(userRepository).deleteById(userWithImage.getId());
+    }
+
+    @Test
     @DisplayName("유저 전체 조회")
     void findByAll_success() {
         // given
@@ -213,7 +243,7 @@ class BasicUserServiceTest {
         BinaryContent savedImage = new BinaryContent(user.getId(), null,
                 "profile.png", "image/png", new byte[]{1, 2, 3});
 
-        given(userRepository.findByAll()).willReturn(List.of());
+        given(userRepository.existsByUsernameOrEmail("woody", "woody@codeit.com")).willReturn(false);
         given(userRepository.save(any())).willReturn(user);
         given(binaryContentRepository.save(any())).willReturn(savedImage);
         given(userStatusRepository.save(any())).willReturn(userStatus);

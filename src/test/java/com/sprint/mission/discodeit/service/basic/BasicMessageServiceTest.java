@@ -27,6 +27,7 @@ import java.util.UUID;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ExtendWith(MockitoExtension.class)
@@ -144,6 +145,7 @@ class BasicMessageServiceTest {
     void findAllByChannelId_success() {
         // given
         Message message2 = new Message("반갑습니다.", channel.getId(), user.getId());
+        given(channelRepository.findById(channel.getId())).willReturn(channel);
         given(messageRepository.findByChannelId(channel.getId()))
                 .willReturn(List.of(message, message2));
 
@@ -154,6 +156,19 @@ class BasicMessageServiceTest {
         assertThat(results).hasSize(2);
         assertThat(results).extracting("content")
                 .containsExactlyInAnyOrder("안녕하세요.", "반갑습니다.");
+    }
+
+    @Test
+    @DisplayName("채널 ID로 메시지 목록 조회 실패 - 존재하지 않는 채널")
+    void findAllByChannelId_fail_channelNotFound() {
+        // given
+        given(channelRepository.findById(channel.getId())).willReturn(null);
+
+        // when & then
+        assertThatThrownBy(() -> messageService.findAllByChannelId(channel.getId()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("존재하지 않는 채널");
+        verify(messageRepository, never()).findByChannelId(any());
     }
 
     @Test
