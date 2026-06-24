@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.request.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -185,6 +186,25 @@ class BasicUserServiceTest {
         verify(channelRepository).deleteByAuthorId(userWithImage.getId());
         verify(userStatusRepository).deleteByUserId(userWithImage.getId());
         verify(userRepository).deleteById(userWithImage.getId());
+    }
+
+    @Test
+    @DisplayName("유저 삭제 시 작성 메시지의 첨부파일 같이 삭제")
+    void deleteById_success_deleteAuthoredMessageAttachments() {
+        // given
+        Message authoredMessage = new Message("첨부파일 있는 메시지", UUID.randomUUID(), user.getId());
+
+        given(userRepository.findById(user.getId())).willReturn(user);
+        given(channelRepository.findByAll()).willReturn(List.of());
+        given(messageRepository.findByAll()).willReturn(List.of(authoredMessage));
+
+        // when
+        userService.deleteById(user.getId());
+
+        // then
+        verify(binaryContentRepository).deleteAllByMessageId(authoredMessage.getId());
+        verify(messageRepository).deleteByAuthorId(user.getId());
+        verify(userRepository).deleteById(user.getId());
     }
 
     @Test

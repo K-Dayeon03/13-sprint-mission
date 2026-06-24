@@ -1,7 +1,7 @@
 const API_BASE_URL = '/api';
 const ENDPOINTS = {
-    USERS: `${API_BASE_URL}/user/findAll`,
-    BINARY_CONTENT: `${API_BASE_URL}/binaryContent/find`
+    USERS: `${API_BASE_URL}/users`,
+    BINARY_CONTENT_DOWNLOAD: `${API_BASE_URL}/binary-contents`
 };
 const DEFAULT_AVATAR = 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="120" height="120" viewBox="0 0 120 120"%3E%3Crect width="120" height="120" fill="%23e5e7eb"/%3E%3Ccircle cx="60" cy="45" r="22" fill="%239ca3af"/%3E%3Cpath d="M24 104c6-23 20-34 36-34s30 11 36 34" fill="%239ca3af"/%3E%3C/svg%3E';
 
@@ -25,18 +25,8 @@ async function fetchAndRenderUsers() {
     }
 }
 
-async function fetchUserProfile(profileId) {
-    try {
-        const response = await fetch(`${ENDPOINTS.BINARY_CONTENT}?binaryContentId=${encodeURIComponent(profileId)}`);
-        if (!response.ok) throw new Error('Failed to fetch profile');
-
-        const profile = await response.json();
-
-        return `data:${profile.contentType};base64,${profile.bytes}`;
-    } catch (error) {
-        console.error('Error fetching profile:', error);
-        return DEFAULT_AVATAR;
-    }
+function getUserProfileUrl(profileId) {
+    return `${ENDPOINTS.BINARY_CONTENT_DOWNLOAD}/${encodeURIComponent(profileId)}`;
 }
 
 async function renderUserList(users) {
@@ -48,11 +38,14 @@ async function renderUserList(users) {
         userElement.className = 'user-item';
 
         const profileUrl = user.profileId ?
-            await fetchUserProfile(user.profileId) :
+            getUserProfileUrl(user.profileId) :
             DEFAULT_AVATAR;
 
         const avatar = document.createElement('img');
         avatar.src = profileUrl;
+        avatar.onerror = () => {
+            avatar.src = DEFAULT_AVATAR;
+        };
         avatar.alt = `${user.username} 프로필`;
         avatar.className = 'user-avatar';
 

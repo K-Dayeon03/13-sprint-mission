@@ -6,10 +6,14 @@ import com.sprint.mission.discodeit.dto.request.UpdateChannelRequest;
 import com.sprint.mission.discodeit.dto.response.ChannelResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -36,6 +40,8 @@ class BasicChannelServiceTest {
     @Mock ChannelRepository channelRepository;
     @Mock MessageRepository messageRepository;
     @Mock ReadStatusRepository readStatusRepository;
+    @Mock UserRepository userRepository;
+    @Mock BinaryContentRepository binaryContentRepository;
 
     @InjectMocks BasicChannelService channelService;
 
@@ -72,7 +78,11 @@ class BasicChannelServiceTest {
     @Test
     @DisplayName("PRIVATE 채널 생성 성공")
     void createPrivate_success() {
-        List<UUID> participantIds = List.of(UUID.randomUUID(), UUID.randomUUID());
+        User user1 = new User("user1", "password1", "user1@codeit.com", null);
+        User user2 = new User("user2", "password2", "user2@codeit.com", null);
+        List<UUID> participantIds = List.of(user1.getId(), user2.getId());
+        given(userRepository.findById(user1.getId())).willReturn(user1);
+        given(userRepository.findById(user2.getId())).willReturn(user2);
         given(channelRepository.save(any())).willReturn(privateChannel);
 
         ChannelResponse response = channelService.createPrivate(
@@ -80,6 +90,21 @@ class BasicChannelServiceTest {
 
         assertThat(response.type()).isEqualTo(ChannelType.PRIVATE);
         verify(readStatusRepository, times(2)).save(any());
+    }
+
+    @Test
+    @DisplayName("PRIVATE 채널 생성 실패 - 존재하지 않는 참여자")
+    void createPrivate_fail_notFoundParticipant() {
+        UUID participantId = UUID.randomUUID();
+        given(userRepository.findById(participantId)).willReturn(null);
+
+        assertThatThrownBy(() -> channelService.createPrivate(
+                new CreatePrivateChannelRequest(List.of(participantId))))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("존재하지 않는 유저");
+
+        verify(channelRepository, never()).save(any());
+        verify(readStatusRepository, never()).save(any());
     }
 
     @Test
@@ -120,8 +145,12 @@ class BasicChannelServiceTest {
     @Test
     @DisplayName("채널 삭제 시 메시지, ReadStatus 같이 삭제")
     void deleteById_cascadeDelete() {
+        Message message = new Message("첨부파일 있는 메시지", publicChannel.getId(), UUID.randomUUID());
+        given(messageRepository.findByChannelId(publicChannel.getId())).willReturn(List.of(message));
+
         channelService.deleteById(publicChannel.getId());
 
+        verify(binaryContentRepository).deleteAllByMessageId(message.getId());
         verify(messageRepository).deleteByChannelId(publicChannel.getId());
         verify(readStatusRepository).deleteByChannelId(publicChannel.getId());
         verify(channelRepository).deleteById(publicChannel.getId());

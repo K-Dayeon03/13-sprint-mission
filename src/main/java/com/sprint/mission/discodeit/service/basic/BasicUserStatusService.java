@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.request.CreateUserStatusRequest;
 import com.sprint.mission.discodeit.dto.request.UpdateUserStatusRequest;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.BadRequestException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -23,12 +25,12 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatus create(CreateUserStatusRequest request) {
         // 유저 존재 여부 확인
         if (userRepository.findById(request.userId()) == null) {
-            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
+            throw new NotFoundException("존재하지 않는 유저입니다.");
         }
         // 같은 User의 UserStatus 중복 체크
         userStatusRepository.findByUserId(request.userId())
                 .ifPresent(us -> {
-                    throw new IllegalArgumentException("이미 존재하는 UserStatus입니다.");
+                    throw new BadRequestException("이미 존재하는 UserStatus입니다.");
                 });
 
         UserStatus userStatus = new UserStatus(request.userId(), Instant.now());
@@ -39,7 +41,7 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatus findById(UUID id) {
         UserStatus userStatus = userStatusRepository.findById(id);
         if (userStatus == null) {
-            throw new IllegalArgumentException("존재하지 않는 UserStatus입니다.");
+            throw new NotFoundException("존재하지 않는 UserStatus입니다.");
         }
         return userStatus;
     }
@@ -53,17 +55,17 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatus update(UUID id, UpdateUserStatusRequest request) {
         UserStatus userStatus = userStatusRepository.findById(id);
         if (userStatus == null) {
-            throw new IllegalArgumentException("존재하지 않는 UserStatus입니다.");
+            throw new NotFoundException("존재하지 않는 UserStatus입니다.");
         }
-        userStatus.updateLastActiveAt(request.lastActiveAt());
+        userStatus.updateLastActiveAt(request.newLastActiveAt());
         return userStatusRepository.save(userStatus);
     }
 
     @Override
     public UserStatus updateByUserId(UUID userId, UpdateUserStatusRequest request) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 UserStatus입니다."));
-        userStatus.updateLastActiveAt(request.lastActiveAt());
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
+        userStatus.updateLastActiveAt(request.newLastActiveAt());
         return userStatusRepository.save(userStatus);
     }
 
@@ -71,7 +73,7 @@ public class BasicUserStatusService implements UserStatusService {
     public void deleteById(UUID id) {
         UserStatus userStatus = userStatusRepository.findById(id);
         if (userStatus == null) {
-            throw new IllegalArgumentException("존재하지 않는 UserStatus입니다.");
+            throw new NotFoundException("존재하지 않는 UserStatus입니다.");
         }
         userStatusRepository.deleteById(id);
     }

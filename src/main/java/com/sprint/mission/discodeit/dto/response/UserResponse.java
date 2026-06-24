@@ -14,8 +14,8 @@ public record UserResponse(
         UUID id,
         String username,
         String email,
-        UUID profileImageId,
-        boolean isOnline,
+        UUID profileId,
+        boolean online,
         Instant createdAt,
         Instant updatedAt
 

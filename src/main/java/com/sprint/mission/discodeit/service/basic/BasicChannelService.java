@@ -5,9 +5,13 @@ import com.sprint.mission.discodeit.dto.request.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.request.UpdateChannelRequest;
 import com.sprint.mission.discodeit.dto.response.ChannelResponse;
 import com.sprint.mission.discodeit.entity.*;
+import com.sprint.mission.discodeit.exception.BadRequestException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
+import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -24,11 +28,13 @@ public class BasicChannelService implements ChannelService {
     private final ChannelRepository channelRepository;
     private final MessageRepository messageRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final UserRepository userRepository;
+    private final BinaryContentRepository binaryContentRepository;
 
     @Override
     public ChannelResponse createPublic(CreatePublicChannelRequest request) {
         if(request.name() == null || request.name().isBlank()) {
-            throw new IllegalArgumentException("채널명을 입력해주세요.");
+            throw new BadRequestException("채널명을 입력해주세요.");
         }
         Channel channel = new Channel(ChannelType.PUBLIC, request.name(),
                 request.description(), null);
@@ -57,7 +63,7 @@ public class BasicChannelService implements ChannelService {
     public ChannelResponse findById(UUID id) {
         Channel channel = channelRepository.findById(id);
         if(channel == null) {
-            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
+            throw new NotFoundException("존재하지 않는 채널입니다.");
         }
         return toResponse(channel);
     }
@@ -102,11 +108,11 @@ public class BasicChannelService implements ChannelService {
     public ChannelResponse update(UUID id, UpdateChannelRequest request) {
         Channel channel = channelRepository.findById(id);
         if (channel == null) {
-            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
+            throw new NotFoundException("존재하지 않는 채널입니다.");
         }
         // PRIVATE 채널은 수정 불가
         if (channel.getType() == ChannelType.PRIVATE) {
-            throw new IllegalArgumentException("PRIVATE 채널은 수정할 수 없습니다.");
+            throw new BadRequestException("PRIVATE 채널은 수정할 수 없습니다.");
         }
         channel.update(
                 channel.getType(),
@@ -121,8 +127,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteById(UUID id) {
-        // 관련 Message 삭제
-        messageRepository.deleteByChannelId(id);
+        MessageDeletionSupport.deleteByChannelId(messageRepository, binaryContentRepository, id);
         // 관련 ReadStatus 삭제
         readStatusRepository.deleteByChannelId(id);
         // 채널 삭제
@@ -131,11 +136,17 @@ public class BasicChannelService implements ChannelService {
 
     private void validateParticipantIds(List<UUID> participantIds) {
         if (participantIds == null || participantIds.isEmpty()) {
-            throw new IllegalArgumentException("PRIVATE 채널 참여자는 1명 이상이어야 합니다.");
+            throw new BadRequestException("PRIVATE 채널 참여자는 1명 이상이어야 합니다.");
         }
         if (participantIds.stream().anyMatch(Objects::isNull)) {
-            throw new IllegalArgumentException("참여자 ID는 필수입니다.");
+            throw new BadRequestException("참여자 ID는 필수입니다.");
         }
+        participantIds.stream()
+                .filter(participantId -> userRepository.findById(participantId) == null)
+                .findFirst()
+                .ifPresent(participantId -> {
+                    throw new NotFoundException("존재하지 않는 유저입니다.");
+                });
     }
 
 }
