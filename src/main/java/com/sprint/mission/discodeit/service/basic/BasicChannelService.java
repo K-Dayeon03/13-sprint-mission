@@ -127,6 +127,9 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     public void deleteById(UUID id) {
+        if (channelRepository.findById(id) == null) {
+            throw new NotFoundException("존재하지 않는 채널입니다.");
+        }
         MessageDeletionSupport.deleteByChannelId(messageRepository, binaryContentRepository, id);
         // 관련 ReadStatus 삭제
         readStatusRepository.deleteByChannelId(id);

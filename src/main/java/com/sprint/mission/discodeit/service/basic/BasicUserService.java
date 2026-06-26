@@ -71,6 +71,7 @@ public class BasicUserService implements UserService {
         if (user == null) {
             throw new NotFoundException("존재하지 않는 사용자입니다.");
         }
+        validateUpdatedUsernameAndEmail(id, userRequest);
 
         // 프로필 이미지 교체 시 기존 이미지 삭제 후 새로 저장
         UUID newProfileImageId = user.getProfileImageId();
@@ -111,6 +112,23 @@ public class BasicUserService implements UserService {
 
     private void validateUsernameAndEmail(String username, String email) {
         if (userRepository.existsByUsernameOrEmail(username, email)) {
+            throw new BadRequestException("이미 사용 중인 유저 이름 또는 이메일 입니다.");
+        }
+    }
+
+    private void validateUpdatedUsernameAndEmail(UUID userId, UpdateUserRequest userRequest) {
+        String newUsername = userRequest.newUsername();
+        String newEmail = userRequest.newEmail();
+        if (newUsername == null && newEmail == null) {
+            return;
+        }
+
+        boolean duplicated = userRepository.findByAll().stream()
+                .filter(user -> !user.getId().equals(userId))
+                .anyMatch(user ->
+                        (newUsername != null && user.getUsername().equals(newUsername))
+                                || (newEmail != null && user.getEmail().equals(newEmail)));
+        if (duplicated) {
             throw new BadRequestException("이미 사용 중인 유저 이름 또는 이메일 입니다.");
         }
     }
@@ -163,6 +181,7 @@ public class BasicUserService implements UserService {
     private void deleteUserData(UUID id) {
         MessageDeletionSupport.deleteByAuthorId(messageRepository, binaryContentRepository, id);
         channelRepository.deleteByAuthorId(id);
+        readStatusRepository.deleteByUserId(id);
         userStatusRepository.deleteByUserId(id);
         userRepository.deleteById(id);
     }

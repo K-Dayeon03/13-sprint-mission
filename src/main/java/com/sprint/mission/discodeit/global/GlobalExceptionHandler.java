@@ -12,6 +12,7 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import java.time.Instant;
@@ -47,6 +48,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<ErrorResponse> handleNoResourceFound(NoResourceFoundException e) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(ErrorResponse.of(HttpStatus.NOT_FOUND, e.getMessage()));
+    }
+
+    @ExceptionHandler(MaxUploadSizeExceededException.class)
+    public ResponseEntity<ErrorResponse> handleMaxUploadSizeExceeded(MaxUploadSizeExceededException e) {
+        return ResponseEntity.status(HttpStatus.PAYLOAD_TOO_LARGE)
+                .body(ErrorResponse.of(HttpStatus.PAYLOAD_TOO_LARGE, "업로드 가능한 파일 크기를 초과했습니다."));
     }
 
     @ExceptionHandler({

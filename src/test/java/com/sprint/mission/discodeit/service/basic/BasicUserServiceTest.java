@@ -133,6 +133,7 @@ class BasicUserServiceTest {
         // given
         UpdateUserRequest request = new UpdateUserRequest("newWoody", null, null);
         given(userRepository.findById(user.getId())).willReturn(user);
+        given(userRepository.findByAll()).willReturn(List.of(user));
         given(userRepository.save(any())).willReturn(user);
         given(userStatusRepository.findByUserId(user.getId())).willReturn(Optional.of(userStatus));
 
@@ -157,6 +158,7 @@ class BasicUserServiceTest {
         // then
         verify(messageRepository).deleteByAuthorId(user.getId());
         verify(channelRepository).deleteByAuthorId(user.getId());
+        verify(readStatusRepository).deleteByUserId(user.getId());
         verify(userStatusRepository).deleteByUserId(user.getId());
         verify(userRepository).deleteById(user.getId());
     }
@@ -184,6 +186,7 @@ class BasicUserServiceTest {
         verify(readStatusRepository, never()).deleteByChannelId(otherChannel.getId());
         verify(messageRepository).deleteByAuthorId(userWithImage.getId());
         verify(channelRepository).deleteByAuthorId(userWithImage.getId());
+        verify(readStatusRepository).deleteByUserId(userWithImage.getId());
         verify(userStatusRepository).deleteByUserId(userWithImage.getId());
         verify(userRepository).deleteById(userWithImage.getId());
     }
@@ -238,6 +241,38 @@ class BasicUserServiceTest {
         assertThatThrownBy(() -> userService.update(UUID.randomUUID(), request, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("존재하지 않는 사용자");
+    }
+
+    @Test
+    @DisplayName("유저 수정 실패 - username 중복")
+    void update_fail_duplicateUsername() {
+        User otherUser = new User("buzz", "buzz1234", "buzz@codeit.com", null);
+        UpdateUserRequest request = new UpdateUserRequest("buzz", null, null);
+
+        given(userRepository.findById(user.getId())).willReturn(user);
+        given(userRepository.findByAll()).willReturn(List.of(user, otherUser));
+
+        assertThatThrownBy(() -> userService.update(user.getId(), request, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("이미 사용 중인");
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("유저 수정 실패 - email 중복")
+    void update_fail_duplicateEmail() {
+        User otherUser = new User("buzz", "buzz1234", "buzz@codeit.com", null);
+        UpdateUserRequest request = new UpdateUserRequest(null, "buzz@codeit.com", null);
+
+        given(userRepository.findById(user.getId())).willReturn(user);
+        given(userRepository.findByAll()).willReturn(List.of(user, otherUser));
+
+        assertThatThrownBy(() -> userService.update(user.getId(), request, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("이미 사용 중인");
+
+        verify(userRepository, never()).save(any());
     }
 
     @Test

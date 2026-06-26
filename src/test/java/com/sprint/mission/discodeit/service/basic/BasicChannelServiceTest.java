@@ -146,6 +146,7 @@ class BasicChannelServiceTest {
     @DisplayName("채널 삭제 시 메시지, ReadStatus 같이 삭제")
     void deleteById_cascadeDelete() {
         Message message = new Message("첨부파일 있는 메시지", publicChannel.getId(), UUID.randomUUID());
+        given(channelRepository.findById(publicChannel.getId())).willReturn(publicChannel);
         given(messageRepository.findByChannelId(publicChannel.getId())).willReturn(List.of(message));
 
         channelService.deleteById(publicChannel.getId());
@@ -154,6 +155,20 @@ class BasicChannelServiceTest {
         verify(messageRepository).deleteByChannelId(publicChannel.getId());
         verify(readStatusRepository).deleteByChannelId(publicChannel.getId());
         verify(channelRepository).deleteById(publicChannel.getId());
+    }
+
+    @Test
+    @DisplayName("채널 삭제 실패 - 존재하지 않는 채널")
+    void deleteById_fail_notFound() {
+        given(channelRepository.findById(any())).willReturn(null);
+
+        assertThatThrownBy(() -> channelService.deleteById(UUID.randomUUID()))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("존재하지 않는 채널");
+
+        verify(messageRepository, never()).deleteByChannelId(any());
+        verify(readStatusRepository, never()).deleteByChannelId(any());
+        verify(channelRepository, never()).deleteById(any());
     }
 
     @Test

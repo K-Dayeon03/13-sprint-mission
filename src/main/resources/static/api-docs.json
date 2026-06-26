@@ -52,7 +52,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/UserDto"
+                    "$ref": "#/components/schemas/UserResponse"
                   }
                 }
               }
@@ -137,7 +137,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/ReadStatus"
+                    "$ref": "#/components/schemas/ReadStatusResponse"
                   }
                 }
               }
@@ -183,7 +183,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReadStatus"
+                  "$ref": "#/components/schemas/ReadStatusResponse"
                 }
               }
             }
@@ -218,7 +218,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Message"
+                    "$ref": "#/components/schemas/MessageResponse"
                   }
                 }
               }
@@ -271,7 +271,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Message"
+                  "$ref": "#/components/schemas/MessageResponse"
                 }
               }
             }
@@ -577,7 +577,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReadStatus"
+                  "$ref": "#/components/schemas/ReadStatusResponse"
                 }
               }
             }
@@ -660,7 +660,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/Message"
+                  "$ref": "#/components/schemas/MessageResponse"
                 }
               }
             }
@@ -833,7 +833,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/BinaryContent"
+                    "$ref": "#/components/schemas/BinaryContentResponse"
                   }
                 }
               }
@@ -867,7 +867,7 @@
             "content": {
               "*/*": {
                 "schema": {
-                  "$ref": "#/components/schemas/BinaryContent"
+                  "$ref": "#/components/schemas/BinaryContentResponse"
                 }
               }
             }
@@ -949,7 +949,7 @@
           }
         }
       },
-      "ReadStatus": {
+      "ReadStatusResponse": {
         "type": "object",
         "properties": {
           "id": {
@@ -995,7 +995,7 @@
           }
         }
       },
-      "Message": {
+      "MessageResponse": {
         "type": "object",
         "properties": {
           "id": {
@@ -1181,7 +1181,7 @@
           }
         }
       },
-      "UserDto": {
+      "UserResponse": {
         "type": "object",
         "properties": {
           "id": {
@@ -1244,7 +1244,7 @@
           }
         }
       },
-      "BinaryContent": {
+      "BinaryContentResponse": {
         "type": "object",
         "properties": {
           "id": {
@@ -1268,6 +1268,9 @@
           "bytes": {
             "type": "string",
             "format": "byte"
+          },
+          "downloadUrl": {
+            "type": "string"
           }
         }
       }

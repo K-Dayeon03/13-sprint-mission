@@ -11,6 +11,7 @@ public record BinaryContentResponse(
         String fileName,
         String contentType,
         long size,
+        byte[] bytes,
         String downloadUrl
 ) {
     public static BinaryContentResponse from(BinaryContent binaryContent) {
@@ -20,6 +21,7 @@ public record BinaryContentResponse(
                 binaryContent.getFileName(),
                 binaryContent.getContentType(),
                 binaryContent.getBytes().length,
+                binaryContent.getBytes(),
                 "/api/binary-contents/" + binaryContent.getId()
         );
     }
