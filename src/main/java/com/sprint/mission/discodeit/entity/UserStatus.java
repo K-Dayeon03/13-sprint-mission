@@ -26,14 +26,16 @@ public class UserStatus extends Entity{
 
     //5분 이내 활동 시 온라인으로 간주
     public boolean isOnline(){
+        if (lastActiveAt == null) {
+            return false;
+        }
         return lastActiveAt.isAfter(Instant.now().minusSeconds(300));
     }
 
-    public void updateLastOnlineAt(Instant lastActiveAt){
-        this.lastActiveAt = lastActiveAt;
-    }
-
     public void updateLastActiveAt(Instant lastActiveAt) {
+        if (lastActiveAt == null) {
+            throw new IllegalArgumentException("마지막 활동 시간은 필수입니다.");
+        }
         this.lastActiveAt = lastActiveAt;
         makeUpdate();
     }

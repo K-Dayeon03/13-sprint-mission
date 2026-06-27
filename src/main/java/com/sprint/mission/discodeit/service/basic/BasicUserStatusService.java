@@ -45,11 +45,11 @@ public class BasicUserStatusService implements UserStatusService {
         }
         return userStatus;
     }
-
-    @Override
-    public List<UserStatus> findAll() {  // findAllByUserId → findAll, 파라미터 제거
-        return userStatusRepository.findAll();
-    }
+//
+//    @Override
+//    public List<UserStatus> findAll() {
+//        return userStatusRepository.findAll();
+//    }
 
     @Override
     public UserStatus update(UUID id, UpdateUserStatusRequest request) {
@@ -57,6 +57,7 @@ public class BasicUserStatusService implements UserStatusService {
         if (userStatus == null) {
             throw new NotFoundException("존재하지 않는 UserStatus입니다.");
         }
+        validateUpdateRequest(request);
         userStatus.updateLastActiveAt(request.newLastActiveAt());
         return userStatusRepository.save(userStatus);
     }
@@ -65,6 +66,7 @@ public class BasicUserStatusService implements UserStatusService {
     public UserStatus updateByUserId(UUID userId, UpdateUserStatusRequest request) {
         UserStatus userStatus = userStatusRepository.findByUserId(userId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
+        validateUpdateRequest(request);
         userStatus.updateLastActiveAt(request.newLastActiveAt());
         return userStatusRepository.save(userStatus);
     }
@@ -76,5 +78,11 @@ public class BasicUserStatusService implements UserStatusService {
             throw new NotFoundException("존재하지 않는 UserStatus입니다.");
         }
         userStatusRepository.deleteById(id);
+    }
+
+    private void validateUpdateRequest(UpdateUserStatusRequest request) {
+        if (request == null || request.newLastActiveAt() == null) {
+            throw new BadRequestException("마지막 활동 시간은 필수입니다.");
+        }
     }
 }
