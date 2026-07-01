@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     public BinaryContent findById(UUID id) {
         BinaryContent binaryContent = binaryContentRepository.findById(id);
         if (binaryContent == null) {
-            throw new IllegalArgumentException("존재하지 않는 파일입니다.");
+            throw new NotFoundException("존재하지 않는 파일입니다.");
         }
         return binaryContent;
     }
@@ -50,7 +51,7 @@ public class BasicBinaryContentService implements BinaryContentService {
     public void deleteById(UUID id) {
         BinaryContent binaryContent = binaryContentRepository.findById(id);
         if (binaryContent == null) {
-            throw new IllegalArgumentException("존재하지 않는 파일입니다.");
+            throw new NotFoundException("존재하지 않는 파일입니다.");
         }
         binaryContentRepository.deleteById(id);
     }

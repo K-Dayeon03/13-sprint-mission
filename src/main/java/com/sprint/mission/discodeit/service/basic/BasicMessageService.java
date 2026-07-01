@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.request.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.request.UpdateMessageRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -29,7 +30,7 @@ public class BasicMessageService implements MessageService {
 
         // 유저 존재 여부 확인
         if (userRepository.findById(request.authorId()) == null) {
-            throw new IllegalArgumentException("존재하지 않는 유저입니다.");
+            throw new NotFoundException("존재하지 않는 유저입니다.");
         }
 
         // 메시지 생성
@@ -59,7 +60,7 @@ public class BasicMessageService implements MessageService {
     public Message findById(UUID id) {
         Message message = messageRepository.findById(id);
         if (message == null) {
-            throw new IllegalArgumentException("존재하지 않는 메시지입니다.");
+            throw new NotFoundException("존재하지 않는 메시지입니다.");
         }
         return message;
     }
@@ -74,7 +75,7 @@ public class BasicMessageService implements MessageService {
     public Message update(UUID id, UpdateMessageRequest request) {
         Message message = messageRepository.findById(id);
         if (message == null) {
-            throw new IllegalArgumentException("존재하지 않는 메시지입니다.");
+            throw new NotFoundException("존재하지 않는 메시지입니다.");
         }
         // newContent 검증은 message.update() 내부에 위임
         message.update(request.newContent());
@@ -85,17 +86,14 @@ public class BasicMessageService implements MessageService {
     public void deleteById(UUID id) {
         Message message = messageRepository.findById(id);
         if (message == null) {
-            throw new IllegalArgumentException("존재하지 않는 메시지입니다.");
+            throw new NotFoundException("존재하지 않는 메시지입니다.");
         }
-        // 첨부파일(BinaryContent) 먼저 삭제
-        binaryContentRepository.deleteAllByMessageId(message.getId());
-        // 메시지 삭제
-        messageRepository.deleteById(id);
+        MessageDeletionSupport.deleteById(messageRepository, binaryContentRepository, message);
     }
 
     private void validateChannelExists(UUID channelId) {
         if (channelRepository.findById(channelId) == null) {
-            throw new IllegalArgumentException("존재하지 않는 채널입니다.");
+            throw new NotFoundException("존재하지 않는 채널입니다.");
         }
     }
 }

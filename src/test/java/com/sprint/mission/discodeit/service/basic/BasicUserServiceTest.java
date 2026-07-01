@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.request.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
+import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -132,6 +133,7 @@ class BasicUserServiceTest {
         // given
         UpdateUserRequest request = new UpdateUserRequest("newWoody", null, null);
         given(userRepository.findById(user.getId())).willReturn(user);
+        given(userRepository.findByAll()).willReturn(List.of(user));
         given(userRepository.save(any())).willReturn(user);
         given(userStatusRepository.findByUserId(user.getId())).willReturn(Optional.of(userStatus));
 
@@ -156,6 +158,7 @@ class BasicUserServiceTest {
         // then
         verify(messageRepository).deleteByAuthorId(user.getId());
         verify(channelRepository).deleteByAuthorId(user.getId());
+        verify(readStatusRepository).deleteByUserId(user.getId());
         verify(userStatusRepository).deleteByUserId(user.getId());
         verify(userRepository).deleteById(user.getId());
     }
@@ -183,8 +186,28 @@ class BasicUserServiceTest {
         verify(readStatusRepository, never()).deleteByChannelId(otherChannel.getId());
         verify(messageRepository).deleteByAuthorId(userWithImage.getId());
         verify(channelRepository).deleteByAuthorId(userWithImage.getId());
+        verify(readStatusRepository).deleteByUserId(userWithImage.getId());
         verify(userStatusRepository).deleteByUserId(userWithImage.getId());
         verify(userRepository).deleteById(userWithImage.getId());
+    }
+
+    @Test
+    @DisplayName("유저 삭제 시 작성 메시지의 첨부파일 같이 삭제")
+    void deleteById_success_deleteAuthoredMessageAttachments() {
+        // given
+        Message authoredMessage = new Message("첨부파일 있는 메시지", UUID.randomUUID(), user.getId());
+
+        given(userRepository.findById(user.getId())).willReturn(user);
+        given(channelRepository.findByAll()).willReturn(List.of());
+        given(messageRepository.findByAll()).willReturn(List.of(authoredMessage));
+
+        // when
+        userService.deleteById(user.getId());
+
+        // then
+        verify(binaryContentRepository).deleteAllByMessageId(authoredMessage.getId());
+        verify(messageRepository).deleteByAuthorId(user.getId());
+        verify(userRepository).deleteById(user.getId());
     }
 
     @Test
@@ -218,6 +241,38 @@ class BasicUserServiceTest {
         assertThatThrownBy(() -> userService.update(UUID.randomUUID(), request, null))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("존재하지 않는 사용자");
+    }
+
+    @Test
+    @DisplayName("유저 수정 실패 - username 중복")
+    void update_fail_duplicateUsername() {
+        User otherUser = new User("buzz", "buzz1234", "buzz@codeit.com", null);
+        UpdateUserRequest request = new UpdateUserRequest("buzz", null, null);
+
+        given(userRepository.findById(user.getId())).willReturn(user);
+        given(userRepository.findByAll()).willReturn(List.of(user, otherUser));
+
+        assertThatThrownBy(() -> userService.update(user.getId(), request, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("이미 사용 중인");
+
+        verify(userRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("유저 수정 실패 - email 중복")
+    void update_fail_duplicateEmail() {
+        User otherUser = new User("buzz", "buzz1234", "buzz@codeit.com", null);
+        UpdateUserRequest request = new UpdateUserRequest(null, "buzz@codeit.com", null);
+
+        given(userRepository.findById(user.getId())).willReturn(user);
+        given(userRepository.findByAll()).willReturn(List.of(user, otherUser));
+
+        assertThatThrownBy(() -> userService.update(user.getId(), request, null))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessageContaining("이미 사용 중인");
+
+        verify(userRepository, never()).save(any());
     }
 
     @Test

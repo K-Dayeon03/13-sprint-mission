@@ -7,6 +7,8 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
+import com.sprint.mission.discodeit.exception.BadRequestException;
+import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -43,20 +45,16 @@ public class BasicUserService implements UserService {
     public UserResponse findById(UUID id) {
         User user = userRepository.findById(id);
         if (user == null) {
-            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
+            throw new NotFoundException("존재하지 않는 사용자입니다.");
         }
-        // findByUserId()는 Optional 반환 → orElseThrow() 필요
-        UserStatus userStatus = userStatusRepository.findByUserId(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 UserStatus입니다."));
+        UserStatus userStatus = getOrCreateUserStatus(id);
         return UserResponse.from(user, userStatus);
     }
     @Override
     public List<UserResponse> findByAll() {
         return userRepository.findByAll().stream()
                 .map(user -> {
-                    // 메서드명 누락 → findByUserId() + orElseThrow()
-                    UserStatus userStatus = userStatusRepository.findByUserId(user.getId())
-                            .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 UserStatus입니다."));
+                    UserStatus userStatus = getOrCreateUserStatus(user.getId());
                     return UserResponse.from(user, userStatus);
                 })
                 .toList();
@@ -67,8 +65,9 @@ public class BasicUserService implements UserService {
                                CreateBinaryContentRequest profileImageRequest) {
         User user = userRepository.findById(id);
         if (user == null) {
-            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
+            throw new NotFoundException("존재하지 않는 사용자입니다.");
         }
+        validateUpdatedUsernameAndEmail(id, userRequest);
 
         // 프로필 이미지 교체 시 기존 이미지 삭제 후 새로 저장
         UUID newProfileImageId = user.getProfileImageId();
@@ -90,8 +89,7 @@ public class BasicUserService implements UserService {
                 userRequest.newEmail(), newProfileImageId);
         userRepository.save(user);
 
-        UserStatus userStatus = userStatusRepository.findByUserId(id)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 UserStatus입니다."));
+        UserStatus userStatus = getOrCreateUserStatus(id);
         return UserResponse.from(user, userStatus);
     }
 
@@ -99,7 +97,7 @@ public class BasicUserService implements UserService {
     public void deleteById(UUID id) {
         User user = userRepository.findById(id);
         if (user == null) {
-            throw new IllegalArgumentException("존재하지 않는 사용자입니다.");
+            throw new NotFoundException("존재하지 않는 사용자입니다.");
         }
 
         deleteProfileImage(user);
@@ -109,7 +107,24 @@ public class BasicUserService implements UserService {
 
     private void validateUsernameAndEmail(String username, String email) {
         if (userRepository.existsByUsernameOrEmail(username, email)) {
-            throw new IllegalArgumentException("이미 사용 중인 유저 이름 또는 이메일 입니다.");
+            throw new BadRequestException("이미 사용 중인 유저 이름 또는 이메일 입니다.");
+        }
+    }
+
+    private void validateUpdatedUsernameAndEmail(UUID userId, UpdateUserRequest userRequest) {
+        String newUsername = userRequest.newUsername();
+        String newEmail = userRequest.newEmail();
+        if (newUsername == null && newEmail == null) {
+            return;
+        }
+
+        boolean duplicated = userRepository.findByAll().stream()
+                .filter(user -> !user.getId().equals(userId))
+                .anyMatch(user ->
+                        (newUsername != null && user.getUsername().equals(newUsername))
+                                || (newEmail != null && user.getEmail().equals(newEmail)));
+        if (duplicated) {
+            throw new BadRequestException("이미 사용 중인 유저 이름 또는 이메일 입니다.");
         }
     }
 
@@ -140,6 +155,16 @@ public class BasicUserService implements UserService {
         return userStatusRepository.save(userStatus);
     }
 
+    private UserStatus getOrCreateUserStatus(UUID userId) {
+        UserStatus userStatus = userStatusRepository.findByUserId(userId)
+                .orElseGet(() -> createUserStatus(userId));
+        if (userStatus.getLastActiveAt() == null) {
+            userStatus.updateLastActiveAt(Instant.now());
+            return userStatusRepository.save(userStatus);
+        }
+        return userStatus;
+    }
+
     private void deleteProfileImage(User user) {
         if (user.getProfileImageId() != null) {
             binaryContentRepository.deleteById(user.getProfileImageId());
@@ -154,13 +179,14 @@ public class BasicUserService implements UserService {
     }
 
     private void deleteChannelData(UUID channelId) {
-        messageRepository.deleteByChannelId(channelId);
+        MessageDeletionSupport.deleteByChannelId(messageRepository, binaryContentRepository, channelId);
         readStatusRepository.deleteByChannelId(channelId);
     }
 
     private void deleteUserData(UUID id) {
-        messageRepository.deleteByAuthorId(id);
+        MessageDeletionSupport.deleteByAuthorId(messageRepository, binaryContentRepository, id);
         channelRepository.deleteByAuthorId(id);
+        readStatusRepository.deleteByUserId(id);
         userStatusRepository.deleteByUserId(id);
         userRepository.deleteById(id);
     }

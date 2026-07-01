@@ -105,4 +105,11 @@ public class FileReadStatusRepository implements ReadStatusRepository {
         data.values().removeIf(readStatus -> readStatus.getChannelId().equals(channelId));
         saveData(data);
     }
+
+    @Override
+    public void deleteByUserId(UUID userId) {
+        Map<UUID, ReadStatus> data = loadData();
+        data.values().removeIf(readStatus -> readStatus.getUserId().equals(userId));
+        saveData(data);
+    }
 }
