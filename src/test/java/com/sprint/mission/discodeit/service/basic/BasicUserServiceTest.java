@@ -1,6 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
-import com.sprint.mission.discodeit.dto.request.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.request.UpdateUserRequest;
+
+import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
+import com.sprint.mission.discodeit.dto.command.CreateUserCommand;
+import com.sprint.mission.discodeit.dto.command.UpdateUserCommand;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -20,7 +22,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 
 import java.time.Instant;
@@ -59,7 +60,7 @@ class BasicUserServiceTest {
     @DisplayName("유저 생성 성공")
     void create_success() {
         // given
-        CreateUserRequest request = new CreateUserRequest("woody", "woody@codeit.com", "woody1234");
+        CreateUserCommand request = new CreateUserCommand("woody", "woody@codeit.com", "woody1234");
         given(userRepository.existsByUsernameOrEmail("woody", "woody@codeit.com")).willReturn(false);
         given(userRepository.save(any())).willReturn(user);
         given(userStatusRepository.save(any())).willReturn(userStatus);
@@ -79,7 +80,7 @@ class BasicUserServiceTest {
     @DisplayName("유저 생성 실패 - username 중복")
     void create_fail_duplicateUsername() {
         // given
-        CreateUserRequest request = new CreateUserRequest("woody", "other@codeit.com", "pass1234");
+        CreateUserCommand request = new CreateUserCommand("woody", "other@codeit.com", "pass1234");
         given(userRepository.existsByUsernameOrEmail("woody", "other@codeit.com")).willReturn(true);
 
         // when & then
@@ -92,7 +93,7 @@ class BasicUserServiceTest {
     @DisplayName("유저 생성 실패 - email 중복")
     void create_fail_duplicateEmail() {
         // given
-        CreateUserRequest request = new CreateUserRequest("other", "woody@codeit.com", "pass1234");
+        CreateUserCommand request = new CreateUserCommand("other", "woody@codeit.com", "pass1234");
         given(userRepository.existsByUsernameOrEmail("other", "woody@codeit.com")).willReturn(true);
 
         // when & then
@@ -131,7 +132,7 @@ class BasicUserServiceTest {
     @DisplayName("유저 수정 성공")
     void update_success() {
         // given
-        UpdateUserRequest request = new UpdateUserRequest("newWoody", null, null);
+        UpdateUserCommand request = new UpdateUserCommand("newWoody", null, null);
         given(userRepository.findById(user.getId())).willReturn(user);
         given(userRepository.findByAll()).willReturn(List.of(user));
         given(userRepository.save(any())).willReturn(user);
@@ -234,7 +235,7 @@ class BasicUserServiceTest {
     @DisplayName("유저 수정 실패 - 존재하지 않는 유저")
     void update_fail_notFound() {
         // given
-        UpdateUserRequest request = new UpdateUserRequest("newWoody", null, null);
+        UpdateUserCommand request = new UpdateUserCommand("newWoody", null, null);
         given(userRepository.findById(any())).willReturn(null);
 
         // when & then
@@ -247,7 +248,7 @@ class BasicUserServiceTest {
     @DisplayName("유저 수정 실패 - username 중복")
     void update_fail_duplicateUsername() {
         User otherUser = new User("buzz", "buzz1234", "buzz@codeit.com", null);
-        UpdateUserRequest request = new UpdateUserRequest("buzz", null, null);
+        UpdateUserCommand request = new UpdateUserCommand("buzz", null, null);
 
         given(userRepository.findById(user.getId())).willReturn(user);
         given(userRepository.findByAll()).willReturn(List.of(user, otherUser));
@@ -263,7 +264,7 @@ class BasicUserServiceTest {
     @DisplayName("유저 수정 실패 - email 중복")
     void update_fail_duplicateEmail() {
         User otherUser = new User("buzz", "buzz1234", "buzz@codeit.com", null);
-        UpdateUserRequest request = new UpdateUserRequest(null, "buzz@codeit.com", null);
+        UpdateUserCommand request = new UpdateUserCommand(null, "buzz@codeit.com", null);
 
         given(userRepository.findById(user.getId())).willReturn(user);
         given(userRepository.findByAll()).willReturn(List.of(user, otherUser));
@@ -291,8 +292,8 @@ class BasicUserServiceTest {
     @DisplayName("프로필 이미지와 함께 유저 생성")
     void create_success_withProfileImage() {
         // given
-        CreateUserRequest userRequest = new CreateUserRequest("woody", "woody@codeit.com", "woody1234");
-        CreateBinaryContentRequest imageRequest = new CreateBinaryContentRequest(
+        CreateUserCommand userRequest = new CreateUserCommand("woody", "woody@codeit.com", "woody1234");
+        BinaryContentCommand imageRequest = new BinaryContentCommand(
                 "profile.png", "image/png", new byte[]{1, 2, 3});
 
         BinaryContent savedImage = new BinaryContent(user.getId(), null,
@@ -318,8 +319,8 @@ class BasicUserServiceTest {
         // given
         UUID oldImageId = UUID.randomUUID();
         User userWithImage = new User("woody", "woody1234", "woody@codeit.com", oldImageId);
-        UpdateUserRequest userRequest = new UpdateUserRequest(null, null, null);
-        CreateBinaryContentRequest imageRequest = new CreateBinaryContentRequest(
+        UpdateUserCommand userRequest = new UpdateUserCommand(null, null, null);
+        BinaryContentCommand imageRequest = new BinaryContentCommand(
                 "new.png", "image/png", new byte[]{4, 5, 6});
 
         BinaryContent newImage = new BinaryContent(userWithImage.getId(), null,

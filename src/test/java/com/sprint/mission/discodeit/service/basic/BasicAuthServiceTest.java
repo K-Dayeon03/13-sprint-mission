@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.request.LoginRequest;
+import com.sprint.mission.discodeit.dto.command.LoginCommand;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
@@ -36,7 +36,7 @@ class BasicAuthServiceTest {
         User user = new User("woody", "woody1234", "woody@codeit.com", null);
         Instant oldLastActiveAt = Instant.now().minusSeconds(600);
         UserStatus userStatus = new UserStatus(user.getId(), oldLastActiveAt);
-        LoginRequest request = new LoginRequest("woody", "woody1234");
+        LoginCommand request = new LoginCommand("woody", "woody1234");
 
         given(userRepository.findByUsername("woody")).willReturn(Optional.of(user));
         given(userStatusRepository.findByUserId(user.getId())).willReturn(Optional.of(userStatus));
@@ -55,7 +55,7 @@ class BasicAuthServiceTest {
     void login_fail_invalidPassword() {
         // given
         User user = new User("woody", "woody1234", "woody@codeit.com", null);
-        LoginRequest request = new LoginRequest("woody", "wrong-password");
+        LoginCommand request = new LoginCommand("woody", "wrong-password");
 
         given(userRepository.findByUsername("woody")).willReturn(Optional.of(user));
 

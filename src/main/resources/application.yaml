@@ -7,7 +7,7 @@ spring:
       max-request-size: 20MB
 
 server:
-  port: ${PORT:8080}
+  port: ${PORT:8081}
   servlet:
     encoding:
       charset: UTF-8

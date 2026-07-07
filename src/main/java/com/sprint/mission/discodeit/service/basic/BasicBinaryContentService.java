@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequest;
+import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -18,24 +19,21 @@ public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public BinaryContent create(CreateBinaryContentRequest request) {
+    public BinaryContent create(BinaryContentCommand command) {
         BinaryContent binaryContent = new BinaryContent(
-                null,                  // userId — 호출하는 쪽에서 맥락에 맞게 설정
-                null,                  // messageId — 호출하는 쪽에서 맥락에 맞게 설정
-                request.fileName(),
-                request.contentType(),
-                request.bytes()
+                null,
+                null,
+                command.fileName(),
+                command.contentType(),
+                command.bytes()
         );
         return binaryContentRepository.save(binaryContent);
     }
 
     @Override
     public BinaryContent findById(UUID id) {
-        BinaryContent binaryContent = binaryContentRepository.findById(id);
-        if (binaryContent == null) {
-            throw new NotFoundException("존재하지 않는 파일입니다.");
-        }
-        return binaryContent;
+        return Optional.ofNullable(binaryContentRepository.findById(id))
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 파일입니다."));
     }
 
     @Override
@@ -49,10 +47,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     public void deleteById(UUID id) {
-        BinaryContent binaryContent = binaryContentRepository.findById(id);
-        if (binaryContent == null) {
-            throw new NotFoundException("존재하지 않는 파일입니다.");
-        }
+        findById(id);
         binaryContentRepository.deleteById(id);
     }
 }

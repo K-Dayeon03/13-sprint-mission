@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.request.CreateReadStatusRequest;
-import com.sprint.mission.discodeit.dto.request.UpdateReadStatusRequest;
+import com.sprint.mission.discodeit.dto.command.CreateReadStatusCommand;
+import com.sprint.mission.discodeit.dto.command.UpdateReadStatusCommand;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.BadRequestException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,32 +25,24 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ChannelRepository channelRepository;
 
     @Override
-    public ReadStatus create(CreateReadStatusRequest request) {
-        // 유저 존재 여부 확인
-        if (userRepository.findById(request.userId()) == null) {
-            throw new NotFoundException("존재하지 않는 유저입니다.");
-        }
-        // 채널 존재 여부 확인
-        if (channelRepository.findById(request.channelId()) == null) {
-            throw new NotFoundException("존재하지 않는 채널입니다.");
-        }
-        // 같은 Channel + User 조합 중복 체크
-        readStatusRepository.findByUserIdAndChannelId(request.userId(), request.channelId())
+    public ReadStatus create(CreateReadStatusCommand command) {
+        Optional.ofNullable(userRepository.findById(command.userId()))
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
+        Optional.ofNullable(channelRepository.findById(command.channelId()))
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
+        readStatusRepository.findByUserIdAndChannelId(command.userId(), command.channelId())
                 .ifPresent(rs -> {
                     throw new BadRequestException("이미 존재하는 ReadStatus입니다.");
                 });
 
-        ReadStatus readStatus = new ReadStatus(request.userId(), request.channelId(), request.lastReadAt());
+        ReadStatus readStatus = new ReadStatus(command.userId(), command.channelId(), command.lastReadAt());
         return readStatusRepository.save(readStatus);
     }
 
     @Override
     public ReadStatus findById(UUID id) {
-        ReadStatus readStatus = readStatusRepository.findById(id);
-        if (readStatus == null) {
-            throw new NotFoundException("존재하지 않는 ReadStatus입니다.");
-        }
-        return readStatus;
+        return Optional.ofNullable(readStatusRepository.findById(id))
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 ReadStatus입니다."));
     }
 
     @Override
@@ -58,21 +51,15 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatus update(UUID id, UpdateReadStatusRequest request) {
-        ReadStatus readStatus = readStatusRepository.findById(id);
-        if (readStatus == null) {
-            throw new NotFoundException("존재하지 않는 ReadStatus입니다.");
-        }
-        readStatus.updateLastReadAt(request.newLastReadAt());
+    public ReadStatus update(UUID id, UpdateReadStatusCommand command) {
+        ReadStatus readStatus = findById(id);
+        readStatus.updateLastReadAt(command.newLastReadAt());
         return readStatusRepository.save(readStatus);
     }
 
     @Override
     public void deleteById(UUID id) {
-        ReadStatus readStatus = readStatusRepository.findById(id);
-        if (readStatus == null) {
-            throw new NotFoundException("존재하지 않는 ReadStatus입니다.");
-        }
+        findById(id);
         readStatusRepository.deleteById(id);
     }
 }

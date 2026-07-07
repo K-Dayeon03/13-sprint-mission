@@ -1,8 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.request.CreatePrivateChannelRequest;
-import com.sprint.mission.discodeit.dto.request.CreatePublicChannelRequest;
-import com.sprint.mission.discodeit.dto.request.UpdateChannelRequest;
+import com.sprint.mission.discodeit.dto.command.CreatePrivateChannelCommand;
+import com.sprint.mission.discodeit.dto.command.CreatePublicChannelCommand;
+import com.sprint.mission.discodeit.dto.command.UpdateChannelCommand;
 import com.sprint.mission.discodeit.dto.response.ChannelResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
@@ -60,7 +60,7 @@ class BasicChannelServiceTest {
         given(channelRepository.save(any())).willReturn(publicChannel);
 
         ChannelResponse response = channelService.createPublic(
-                new CreatePublicChannelRequest("공지", "공지 채널입니다."));
+                new CreatePublicChannelCommand("공지", "공지 채널입니다."));
 
         assertThat(response.type()).isEqualTo(ChannelType.PUBLIC);
         assertThat(response.name()).isEqualTo("공지");
@@ -70,7 +70,7 @@ class BasicChannelServiceTest {
     @DisplayName("PUBLIC 채널 생성 실패 - 채널명 없음")
     void createPublic_fail_emptyName() {
         assertThatThrownBy(() -> channelService.createPublic(
-                new CreatePublicChannelRequest("", "설명")))
+                new CreatePublicChannelCommand("", "설명")))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("채널명");
     }
@@ -86,7 +86,7 @@ class BasicChannelServiceTest {
         given(channelRepository.save(any())).willReturn(privateChannel);
 
         ChannelResponse response = channelService.createPrivate(
-                new CreatePrivateChannelRequest(participantIds));
+                new CreatePrivateChannelCommand(participantIds));
 
         assertThat(response.type()).isEqualTo(ChannelType.PRIVATE);
         verify(readStatusRepository, times(2)).save(any());
@@ -99,7 +99,7 @@ class BasicChannelServiceTest {
         given(userRepository.findById(participantId)).willReturn(null);
 
         assertThatThrownBy(() -> channelService.createPrivate(
-                new CreatePrivateChannelRequest(List.of(participantId))))
+                new CreatePrivateChannelCommand(List.of(participantId))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("존재하지 않는 유저");
 
@@ -111,7 +111,7 @@ class BasicChannelServiceTest {
     @DisplayName("PRIVATE 채널 생성 실패 - 참여자 목록 없음")
     void createPrivate_fail_emptyParticipantIds() {
         assertThatThrownBy(() -> channelService.createPrivate(
-                new CreatePrivateChannelRequest(List.of())))
+                new CreatePrivateChannelCommand(List.of())))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("참여자");
 
@@ -123,7 +123,7 @@ class BasicChannelServiceTest {
     @DisplayName("PRIVATE 채널 생성 실패 - 참여자 ID가 null")
     void createPrivate_fail_nullParticipantId() {
         assertThatThrownBy(() -> channelService.createPrivate(
-                new CreatePrivateChannelRequest(Collections.singletonList(null))))
+                new CreatePrivateChannelCommand(Collections.singletonList(null))))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("참여자 ID");
 
@@ -137,7 +137,7 @@ class BasicChannelServiceTest {
         given(channelRepository.findById(privateChannel.getId())).willReturn(privateChannel);
 
         assertThatThrownBy(() -> channelService.update(privateChannel.getId(),
-                new UpdateChannelRequest("새이름", null)))
+                new UpdateChannelCommand("새이름", null)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("PRIVATE 채널은 수정할 수 없습니다");
     }
@@ -200,7 +200,7 @@ class BasicChannelServiceTest {
         given(channelRepository.findById(any())).willReturn(null);
 
         assertThatThrownBy(() -> channelService.update(UUID.randomUUID(),
-                new UpdateChannelRequest("새이름", null)))
+                new UpdateChannelCommand("새이름", null)))
                 .isInstanceOf(IllegalArgumentException.class)
                 .hasMessageContaining("존재하지 않는 채널");
     }

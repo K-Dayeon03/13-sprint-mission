@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.dto.request.UpdateReadStatusRequest;
 import com.sprint.mission.discodeit.dto.response.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.exception.BadRequestException;
+import com.sprint.mission.discodeit.mapper.ReadStatusCommandMapper;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,28 +22,30 @@ import java.util.UUID;
 @RestController
 public class ReadStatusController {
     private final ReadStatusService readStatusService;
+    private final ReadStatusCommandMapper readStatusCommandMapper;
 
-    public ReadStatusController(ReadStatusService readStatusService) {
+    public ReadStatusController(ReadStatusService readStatusService, ReadStatusCommandMapper readStatusCommandMapper) {
         this.readStatusService = readStatusService;
+        this.readStatusCommandMapper = readStatusCommandMapper;
     }
 
     @RequestMapping(value = {"/api/read-statuses", "/api/readStatuses"}, method = RequestMethod.POST)
     public ResponseEntity<ReadStatusResponse> create(@RequestBody CreateReadStatusRequest request) {
-        ReadStatus readStatus = readStatusService.create(request);
+        ReadStatus readStatus = readStatusService.create(readStatusCommandMapper.toCreateCommand(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(ReadStatusResponse.from(readStatus));
     }
 
     @RequestMapping(value = "/api/channels/{channelId}/read-statuses", method = RequestMethod.POST)
     public ResponseEntity<ReadStatusResponse> createByChannelId(@PathVariable UUID channelId,
                                                                 @RequestBody CreateChannelReadStatusRequest request) {
-        ReadStatus readStatus = readStatusService.create(new CreateReadStatusRequest(request.userId(), channelId));
+        ReadStatus readStatus = readStatusService.create(readStatusCommandMapper.toCreateCommand(request.userId(), channelId));
         return ResponseEntity.status(HttpStatus.CREATED).body(ReadStatusResponse.from(readStatus));
     }
 
     @RequestMapping(value = {"/api/read-statuses/{readStatusId}", "/api/readStatuses/{readStatusId}"}, method = RequestMethod.PATCH)
     public ResponseEntity<ReadStatusResponse> update(@PathVariable UUID readStatusId,
                                                      @RequestBody UpdateReadStatusRequest request) {
-        return ResponseEntity.ok(ReadStatusResponse.from(readStatusService.update(readStatusId, request)));
+        return ResponseEntity.ok(ReadStatusResponse.from(readStatusService.update(readStatusId, readStatusCommandMapper.toUpdateCommand(request))));
     }
 
     @RequestMapping(value = "/api/channels/{channelId}/read-statuses/{readStatusId}", method = RequestMethod.PATCH)
@@ -53,7 +56,7 @@ public class ReadStatusController {
         if (!channelId.equals(readStatus.getChannelId())) {
             throw new BadRequestException("채널에 해당하는 ReadStatus가 아닙니다.");
         }
-        return ResponseEntity.ok(ReadStatusResponse.from(readStatusService.update(readStatusId, request)));
+        return ResponseEntity.ok(ReadStatusResponse.from(readStatusService.update(readStatusId, readStatusCommandMapper.toUpdateCommand(request))));
     }
 
     @RequestMapping(value = "/api/users/{userId}/read-statuses", method = RequestMethod.GET)

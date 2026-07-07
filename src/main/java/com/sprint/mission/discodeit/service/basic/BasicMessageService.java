@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.request.CreateMessageRequest;
-import com.sprint.mission.discodeit.dto.request.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.command.CreateMessageCommand;
+import com.sprint.mission.discodeit.dto.command.UpdateMessageCommand;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.exception.NotFoundException;
@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -25,27 +26,22 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public Message create(CreateMessageRequest request) {
-        validateChannelExists(request.channelId());
+    public Message create(CreateMessageCommand command) {
+        validateChannelExists(command.channelId());
 
-        // 유저 존재 여부 확인
-        if (userRepository.findById(request.authorId()) == null) {
-            throw new NotFoundException("존재하지 않는 유저입니다.");
-        }
+        findUserOrThrow(command.authorId());
 
-        // 메시지 생성
-        Message message = new Message(request.content(), request.channelId(), request.authorId());
+        Message message = new Message(command.content(), command.channelId(), command.authorId());
         messageRepository.save(message);
 
-        // 첨부파일 선택적 저장
-        if (request.attachments() != null && !request.attachments().isEmpty()) {
-            request.attachments().forEach(attachmentRequest -> {
+        if (command.attachments() != null && !command.attachments().isEmpty()) {
+            command.attachments().forEach(attachmentCommand -> {
                 BinaryContent attachment = new BinaryContent(
-                        null,               // userId는 null
-                        message.getId(),    // messageId 설정
-                        attachmentRequest.fileName(),
-                        attachmentRequest.contentType(),
-                        attachmentRequest.bytes()
+                        null,
+                        message.getId(),
+                        attachmentCommand.fileName(),
+                        attachmentCommand.contentType(),
+                        attachmentCommand.bytes()
                 );
                 BinaryContent savedAttachment = binaryContentRepository.save(attachment);
                 message.addAttachmentId(savedAttachment.getId());
@@ -58,11 +54,8 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public Message findById(UUID id) {
-        Message message = messageRepository.findById(id);
-        if (message == null) {
-            throw new NotFoundException("존재하지 않는 메시지입니다.");
-        }
-        return message;
+        return Optional.ofNullable(messageRepository.findById(id))
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 메시지입니다."));
     }
 
     @Override
@@ -72,28 +65,25 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public Message update(UUID id, UpdateMessageRequest request) {
-        Message message = messageRepository.findById(id);
-        if (message == null) {
-            throw new NotFoundException("존재하지 않는 메시지입니다.");
-        }
-        // newContent 검증은 message.update() 내부에 위임
-        message.update(request.newContent());
+    public Message update(UUID id, UpdateMessageCommand command) {
+        Message message = findById(id);
+        message.update(command.newContent());
         return messageRepository.save(message);
     }
 
     @Override
     public void deleteById(UUID id) {
-        Message message = messageRepository.findById(id);
-        if (message == null) {
-            throw new NotFoundException("존재하지 않는 메시지입니다.");
-        }
+        Message message = findById(id);
         MessageDeletionSupport.deleteById(messageRepository, binaryContentRepository, message);
     }
 
     private void validateChannelExists(UUID channelId) {
-        if (channelRepository.findById(channelId) == null) {
-            throw new NotFoundException("존재하지 않는 채널입니다.");
-        }
+        Optional.ofNullable(channelRepository.findById(channelId))
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
+    }
+
+    private void findUserOrThrow(UUID userId) {
+        Optional.ofNullable(userRepository.findById(userId))
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
     }
 }

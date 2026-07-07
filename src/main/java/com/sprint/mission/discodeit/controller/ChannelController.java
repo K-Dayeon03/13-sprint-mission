@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.request.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.request.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.request.UpdateChannelRequest;
 import com.sprint.mission.discodeit.dto.response.ChannelResponse;
+import com.sprint.mission.discodeit.mapper.ChannelCommandMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,20 +22,22 @@ import java.util.UUID;
 @RequestMapping("/api/channels")
 public class ChannelController {
     private final ChannelService channelService;
+    private final ChannelCommandMapper channelCommandMapper;
 
-    public ChannelController(ChannelService channelService) {
+    public ChannelController(ChannelService channelService, ChannelCommandMapper channelCommandMapper) {
         this.channelService = channelService;
+        this.channelCommandMapper = channelCommandMapper;
     }
 
     @RequestMapping(value = "/public", method = RequestMethod.POST)
     public ResponseEntity<ChannelResponse> createPublic(@RequestBody CreatePublicChannelRequest request) {
-        ChannelResponse channel = channelService.createPublic(request);
+        ChannelResponse channel = channelService.createPublic(channelCommandMapper.toCreatePublicCommand(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
     @RequestMapping(value = "/private", method = RequestMethod.POST)
     public ResponseEntity<ChannelResponse> createPrivate(@RequestBody CreatePrivateChannelRequest request) {
-        ChannelResponse channel = channelService.createPrivate(request);
+        ChannelResponse channel = channelService.createPrivate(channelCommandMapper.toCreatePrivateCommand(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
@@ -46,7 +49,7 @@ public class ChannelController {
     @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
     public ResponseEntity<ChannelResponse> update(@PathVariable UUID channelId,
                                                   @RequestBody UpdateChannelRequest request) {
-        return ResponseEntity.ok(channelService.update(channelId, request));
+        return ResponseEntity.ok(channelService.update(channelId, channelCommandMapper.toUpdateCommand(request)));
     }
 
     @RequestMapping(value = "/{channelId}", method = RequestMethod.DELETE)

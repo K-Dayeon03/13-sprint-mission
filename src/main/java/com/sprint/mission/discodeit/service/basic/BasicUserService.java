@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
-import com.sprint.mission.discodeit.dto.request.UpdateUserRequest;
-import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequest;
-import com.sprint.mission.discodeit.dto.request.CreateUserRequest;
+
+import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
+import com.sprint.mission.discodeit.dto.command.CreateUserCommand;
+import com.sprint.mission.discodeit.dto.command.UpdateUserCommand;
 import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -30,12 +32,11 @@ public class BasicUserService implements UserService {
 
 
     @Override
-    public UserResponse create(CreateUserRequest userRequest, CreateBinaryContentRequest profileImageRequest) {
-        validateUsernameAndEmail(userRequest.username(), userRequest.email());
+    public UserResponse create(CreateUserCommand command, BinaryContentCommand profileImageCommand) {
+        validateUsernameAndEmail(command.username(), command.email());
 
-        User user = new User(userRequest.username(), userRequest.password(),
-                userRequest.email(), null);
-        saveUserWithProfileImage(user, profileImageRequest);
+        User user = new User(command.username(), command.password(), command.email(), null);
+        saveUserWithProfileImage(user, profileImageCommand);
 
         UserStatus userStatus = createUserStatus(user.getId());
         return UserResponse.from(user, userStatus);
@@ -43,10 +44,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public UserResponse findById(UUID id) {
-        User user = userRepository.findById(id);
-        if (user == null) {
-            throw new NotFoundException("존재하지 않는 사용자입니다.");
-        }
+        User user = findUserOrThrow(id);
         UserStatus userStatus = getOrCreateUserStatus(id);
         return UserResponse.from(user, userStatus);
     }
@@ -61,32 +59,28 @@ public class BasicUserService implements UserService {
     }
 
     @Override
-    public UserResponse update(UUID id, UpdateUserRequest userRequest,
-                               CreateBinaryContentRequest profileImageRequest) {
-        User user = userRepository.findById(id);
-        if (user == null) {
-            throw new NotFoundException("존재하지 않는 사용자입니다.");
-        }
-        validateUpdatedUsernameAndEmail(id, userRequest);
+    public UserResponse update(UUID id, UpdateUserCommand command,
+                               BinaryContentCommand profileImageCommand) {
+        User user = findUserOrThrow(id);
+        validateUpdatedUsernameAndEmail(id, command);
 
-        // 프로필 이미지 교체 시 기존 이미지 삭제 후 새로 저장
         UUID newProfileImageId = user.getProfileImageId();
-        if (profileImageRequest != null) {
+        if (profileImageCommand != null) {
             if (user.getProfileImageId() != null) {
                 binaryContentRepository.deleteById(user.getProfileImageId());
             }
             BinaryContent newImage = new BinaryContent(
-                    user.getId(), // userId 설정
-                    null,         // messageId는 null
-                    profileImageRequest.fileName(),
-                    profileImageRequest.contentType(),
-                    profileImageRequest.bytes()
+                    user.getId(),
+                    null,
+                    profileImageCommand.fileName(),
+                    profileImageCommand.contentType(),
+                    profileImageCommand.bytes()
             );
             newProfileImageId = binaryContentRepository.save(newImage).getId();
         }
 
-        user.update(userRequest.newUsername(), userRequest.newPassword(),
-                userRequest.newEmail(), newProfileImageId);
+        user.update(command.newUsername(), command.newPassword(),
+                command.newEmail(), newProfileImageId);
         userRepository.save(user);
 
         UserStatus userStatus = getOrCreateUserStatus(id);
@@ -95,10 +89,7 @@ public class BasicUserService implements UserService {
 
     @Override
     public void deleteById(UUID id) {
-        User user = userRepository.findById(id);
-        if (user == null) {
-            throw new NotFoundException("존재하지 않는 사용자입니다.");
-        }
+        User user = findUserOrThrow(id);
 
         deleteProfileImage(user);
         deleteAuthoredChannelData(id);
@@ -111,9 +102,9 @@ public class BasicUserService implements UserService {
         }
     }
 
-    private void validateUpdatedUsernameAndEmail(UUID userId, UpdateUserRequest userRequest) {
-        String newUsername = userRequest.newUsername();
-        String newEmail = userRequest.newEmail();
+    private void validateUpdatedUsernameAndEmail(UUID userId, UpdateUserCommand command) {
+        String newUsername = command.newUsername();
+        String newEmail = command.newEmail();
         if (newUsername == null && newEmail == null) {
             return;
         }
@@ -128,26 +119,31 @@ public class BasicUserService implements UserService {
         }
     }
 
-    private void saveUserWithProfileImage(User user, CreateBinaryContentRequest profileImageRequest) {
+    private void saveUserWithProfileImage(User user, BinaryContentCommand profileImageCommand) {
         userRepository.save(user);
-        if (profileImageRequest == null) {
+        if (profileImageCommand == null) {
             return;
         }
 
-        UUID profileImageId = saveProfileImage(user.getId(), profileImageRequest);
+        UUID profileImageId = saveProfileImage(user.getId(), profileImageCommand);
         user.update(null, null, null, profileImageId);
         userRepository.save(user);
     }
 
-    private UUID saveProfileImage(UUID userId, CreateBinaryContentRequest profileImageRequest) {
+    private UUID saveProfileImage(UUID userId, BinaryContentCommand profileImageCommand) {
         BinaryContent profileImage = new BinaryContent(
                 userId,
                 null,
-                profileImageRequest.fileName(),
-                profileImageRequest.contentType(),
-                profileImageRequest.bytes()
+                profileImageCommand.fileName(),
+                profileImageCommand.contentType(),
+                profileImageCommand.bytes()
         );
         return binaryContentRepository.save(profileImage).getId();
+    }
+
+    private User findUserOrThrow(UUID id) {
+        return Optional.ofNullable(userRepository.findById(id))
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 사용자입니다."));
     }
 
     private UserStatus createUserStatus(UUID userId) {

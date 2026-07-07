@@ -1,7 +1,8 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.request.CreateMessageRequest;
-import com.sprint.mission.discodeit.dto.request.UpdateMessageRequest;
+import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
+import com.sprint.mission.discodeit.dto.command.CreateMessageCommand;
+import com.sprint.mission.discodeit.dto.command.UpdateMessageCommand;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -17,7 +18,6 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequest;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import static org.mockito.Mockito.times;
 
@@ -55,7 +55,7 @@ class BasicMessageServiceTest {
     @DisplayName("메시지 생성 성공")
     void create_success() {
         // given
-        CreateMessageRequest request = new CreateMessageRequest(
+        CreateMessageCommand request = new CreateMessageCommand(
                 "안녕하세요.", channel.getId(), user.getId(), null);
         given(channelRepository.findById(channel.getId())).willReturn(channel);
         given(userRepository.findById(user.getId())).willReturn(user);
@@ -73,7 +73,7 @@ class BasicMessageServiceTest {
     @DisplayName("메시지 생성 실패 - 존재하지 않는 채널")
     void create_fail_channelNotFound() {
         // given
-        CreateMessageRequest request = new CreateMessageRequest(
+        CreateMessageCommand request = new CreateMessageCommand(
                 "안녕하세요.", channel.getId(), user.getId(), null);
         given(channelRepository.findById(any())).willReturn(null);
 
@@ -87,7 +87,7 @@ class BasicMessageServiceTest {
     @DisplayName("메시지 생성 실패 - 존재하지 않는 유저")
     void create_fail_userNotFound() {
         // given
-        CreateMessageRequest request = new CreateMessageRequest(
+        CreateMessageCommand request = new CreateMessageCommand(
                 "안녕하세요.", channel.getId(), user.getId(), null);
         given(channelRepository.findById(channel.getId())).willReturn(channel);
         given(userRepository.findById(any())).willReturn(null);
@@ -102,7 +102,7 @@ class BasicMessageServiceTest {
     @DisplayName("메시지 수정 성공")
     void update_success() {
         // given
-        UpdateMessageRequest request = new UpdateMessageRequest("수정된 내용");
+        UpdateMessageCommand request = new UpdateMessageCommand("수정된 내용");
         given(messageRepository.findById(message.getId())).willReturn(message);
         given(messageRepository.save(any())).willReturn(message);
 
@@ -118,7 +118,7 @@ class BasicMessageServiceTest {
     @DisplayName("메시지 수정 실패 - 존재하지 않는 메시지")
     void update_fail_notFound() {
         // given
-        UpdateMessageRequest request = new UpdateMessageRequest("수정된 내용");
+        UpdateMessageCommand request = new UpdateMessageCommand("수정된 내용");
         given(messageRepository.findById(any())).willReturn(null);
 
         // when & then
@@ -187,11 +187,11 @@ class BasicMessageServiceTest {
     @DisplayName("첨부파일과 함께 메시지 생성")
     void create_success_withAttachments() {
         // given
-        List<CreateBinaryContentRequest> attachments = List.of(
-                new CreateBinaryContentRequest("file1.png", "image/png", new byte[]{1, 2, 3}),
-                new CreateBinaryContentRequest("file2.png", "image/png", new byte[]{4, 5, 6})
+        List<BinaryContentCommand> attachments = List.of(
+                new BinaryContentCommand("file1.png", "image/png", new byte[]{1, 2, 3}),
+                new BinaryContentCommand("file2.png", "image/png", new byte[]{4, 5, 6})
         );
-        CreateMessageRequest request = new CreateMessageRequest(
+        CreateMessageCommand request = new CreateMessageCommand(
                 "파일 첨부!", channel.getId(), user.getId(), attachments);
 
         BinaryContent attachment = new BinaryContent(null, message.getId(),
