@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,18 +69,19 @@ public class MessageController {
     @RequestMapping(value = "/api/channels/{channelId}/messages", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
             @PathVariable UUID channelId,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(required = false) Instant cursor,
+            @RequestParam(defaultValue = "50") int size
     ) {
-        return findAllByChannelIdQuery(channelId, page);
+        return ResponseEntity.ok(messageService.findAllByChannelId(channelId, cursor, size));
     }
 
     @Operation(summary = "Channel의 Message 목록 조회")
     @RequestMapping(value = "/api/messages", method = RequestMethod.GET)
     public ResponseEntity<PageResponse<MessageDto>> findAllByChannelIdQuery(
             @RequestParam UUID channelId,
-            @RequestParam(defaultValue = "0") int page
+            @RequestParam(required = false) Instant cursor,
+            @RequestParam(defaultValue = "50") int size
     ) {
-        return ResponseEntity.ok(messageService.findAllByChannelId(channelId, page));
+        return ResponseEntity.ok(messageService.findAllByChannelId(channelId, cursor, size));
     }
-
 }

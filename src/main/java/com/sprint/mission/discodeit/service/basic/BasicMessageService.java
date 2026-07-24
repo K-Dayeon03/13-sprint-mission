@@ -26,6 +26,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -76,23 +77,42 @@ public class BasicMessageService implements MessageService {
 
     @Override
     public MessageDto findById(UUID id) {
-        return messageMapper.toDto(findMessageOrThrow(id));
+        Message message = findMessageOrThrow(id);
+        return messageMapper.toDto(message);
     }
 
     @Override
-    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, int page) {
+    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, int size) {
         findChannelOrThrow(channelId);
 
-        Pageable pageable = PageRequest.of(
-                page,
-                50,
-                Sort.by(Sort.Direction.DESC, "createdAt")
+        int pageSize = size <= 0 ? 50 : Math.min(size, 50);
+
+        List<Message> messages = messageRepository.findAllByChannelIdAndCursor(
+                channelId,
+                cursor,
+                PageRequest.of(0, pageSize + 1)
         );
 
-        Slice<MessageDto> messageSlice = messageRepository.findAllByChannel_Id(channelId, pageable)
-                .map(messageMapper::toDto);
+        boolean hasNext = messages.size() > pageSize;
 
-        return pageResponseMapper.fromSlice(messageSlice);
+        List<Message> pageContent = hasNext
+                ? messages.subList(0, pageSize)
+                : messages;
+
+        List<MessageDto> content = pageContent.stream()
+                .map(messageMapper::toDto)
+                .toList();
+
+        Instant nextCursor = hasNext && !pageContent.isEmpty()
+                ? pageContent.get(pageContent.size() - 1).getCreatedAt()
+                : null;
+
+        return pageResponseMapper.fromCursor(
+                content,
+                nextCursor,
+                pageSize,
+                hasNext
+        );
     }
     @Override
     @Transactional

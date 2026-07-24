@@ -7,7 +7,7 @@ public record PageResponse<T> (
     //Slice로 만들 때는 totalElements를 null로 넣기
     //page로 만들 때만 전체 개수를 넣기
     List<T> content,
-    int number,
+    Object nextCursor,
     int size,
     boolean hasNext,
     Long totalElements

@@ -3,45 +3,24 @@ package com.sprint.mission.discodeit.mapper;
 import com.sprint.mission.discodeit.dto.response.ChannelDto;
 import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
-import com.sprint.mission.discodeit.entity.ChannelType;
-import com.sprint.mission.discodeit.entity.Message;
-import com.sprint.mission.discodeit.entity.ReadStatus;
-import com.sprint.mission.discodeit.repository.MessageRepository;
-import com.sprint.mission.discodeit.repository.ReadStatusRepository;
-import lombok.RequiredArgsConstructor;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
+@Mapper(componentModel = "spring")
+public interface ChannelMapper {
 
-@Component
-@RequiredArgsConstructor
-public class ChannelMapper {
-    private final MessageRepository messageRepository;
-    private final ReadStatusRepository readStatusRepository;
-    private final UserMapper userMapper;
-
-    public ChannelDto toDto(Channel channel) {
-        Instant lastMessageAt = messageRepository.findByChannel_Id(channel.getId()).stream()
-                .map(Message::getCreatedAt)
-                .max(Instant::compareTo)
-                .orElse(null);
-
-        List<UserDto> participants = null;
-        if (channel.getType() == ChannelType.PRIVATE) {
-            participants = readStatusRepository.findAllByChannel_Id(channel.getId()).stream()
-                    .map(ReadStatus::getUser)
-                    .map(userMapper::toDto)
-                    .toList();
-        }
-
-        return new ChannelDto(
-                channel.getId(),
-                channel.getType(),
-                channel.getName(),
-                channel.getDescription(),
-                participants,
-                lastMessageAt
-        );
-    }
+    @Mapping(target = "id", source = "channel.id")
+    @Mapping(target = "type", source = "channel.type")
+    @Mapping(target = "name", source = "channel.name")
+    @Mapping(target = "description", source = "channel.description")
+    @Mapping(target = "participants", source = "participants")
+    @Mapping(target = "lastMessageAt", source = "lastMessageAt")
+    ChannelDto toDto(
+            Channel channel,
+            List<UserDto> participants,
+            Instant lastMessageAt
+    );
 }

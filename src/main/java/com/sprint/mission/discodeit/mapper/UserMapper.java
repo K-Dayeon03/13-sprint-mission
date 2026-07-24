@@ -4,27 +4,19 @@ import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import lombok.RequiredArgsConstructor;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.springframework.stereotype.Component;
+@Mapper(componentModel = "spring", uses = BinaryContentMapper.class)
+public interface UserMapper {
 
-@Component
-@RequiredArgsConstructor
-public class UserMapper {
-    private final BinaryContentMapper binaryContentMapper;
+    @Mapping(target = "online", expression = "java(user.getUserStatus() != null && user.getUserStatus().isOnline())")
+    UserDto toDto(User user);
 
-    public UserDto toDto(User user) {
-        return toDto(user, user != null ? user.getUserStatus() : null);
-    }
-
-    public UserDto toDto(User user, UserStatus userStatus) {
-        if (user == null) {
-            return null;
-        }
-        return new UserDto(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                binaryContentMapper.toDto(user.getProfile()),
-                userStatus != null && userStatus.isOnline()
-        );
-    }
+    @Mapping(target = "id", source = "user.id")
+    @Mapping(target = "username", source = "user.username")
+    @Mapping(target = "email", source = "user.email")
+    @Mapping(target = "profile", source = "user.profile")
+    @Mapping(target = "online", expression = "java(userStatus != null && userStatus.isOnline())")
+    UserDto toDto(User user, UserStatus userStatus);
 }
