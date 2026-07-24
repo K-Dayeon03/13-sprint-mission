@@ -1,7 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -31,42 +30,38 @@ public class BinaryContentController {
     @Operation(summary = "파일 다운로드")
     @RequestMapping(value = {"/api/binary-contents/{binaryContentId}", "/api/binaryContents/{binaryContentId}/download"}, method = RequestMethod.GET)
     public ResponseEntity<byte[]> download(@PathVariable UUID binaryContentId) {
-        BinaryContent binaryContent = binaryContentService.findById(binaryContentId);
+        BinaryContentDto binaryContent = binaryContentService.findById(binaryContentId);
 
         return ResponseEntity.ok()
-                .contentType(MediaType.parseMediaType(binaryContent.getContentType()))
+                .contentType(MediaType.parseMediaType(binaryContent.contentType()))
                 .header(HttpHeaders.CONTENT_DISPOSITION, ContentDisposition.attachment()
-                        .filename(binaryContent.getFileName(), StandardCharsets.UTF_8)
+                        .filename(binaryContent.fileName(), StandardCharsets.UTF_8)
                         .build()
                         .toString())
-                .body(binaryContent.getBytes());
+                .body(binaryContent.bytes());
     }
 
     @Operation(summary = "여러 첨부 파일 조회")
     @RequestMapping(value = "/api/binary-contents", method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContentResponse>> findAllByIdIn(@RequestParam List<UUID> ids) {
-        return ResponseEntity.ok(binaryContentService.findAllByIdIn(ids).stream()
-                .map(BinaryContentResponse::from)
-                .toList());
+    public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(@RequestParam List<UUID> ids) {
+        return ResponseEntity.ok(binaryContentService.findAllByIdIn(ids));
     }
 
     @Operation(summary = "여러 첨부 파일 조회")
     @RequestMapping(value = "/api/binaryContents", method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContentResponse>> findAllByIdInSpec(@RequestParam List<UUID> binaryContentIds) {
-        return ResponseEntity.ok(binaryContentService.findAllByIdIn(binaryContentIds).stream()
-                .map(BinaryContentResponse::from)
-                .toList());
+    public ResponseEntity<List<BinaryContentDto>> findAllByIdInSpec(@RequestParam List<UUID> binaryContentIds) {
+        return ResponseEntity.ok(binaryContentService.findAllByIdIn(binaryContentIds));
     }
 
     @Operation(summary = "첨부 파일 조회")
     @RequestMapping(value = "/api/binaryContents/{binaryContentId}", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContentResponse> findSpec(@PathVariable UUID binaryContentId) {
-        return ResponseEntity.ok(BinaryContentResponse.from(binaryContentService.findById(binaryContentId)));
+    public ResponseEntity<BinaryContentDto> findSpec(@PathVariable UUID binaryContentId) {
+        return ResponseEntity.ok(binaryContentService.findById(binaryContentId));
     }
 
     @Operation(summary = "첨부 파일 조회")
     @RequestMapping(value = "/api/binaryContent/find", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContentResponse> find(@RequestParam UUID binaryContentId) {
-        return ResponseEntity.ok(BinaryContentResponse.from(binaryContentService.findById(binaryContentId)));
+    public ResponseEntity<BinaryContentDto> find(@RequestParam UUID binaryContentId) {
+        return ResponseEntity.ok(binaryContentService.findById(binaryContentId));
     }
 }

@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.command.CreatePrivateChannelCommand;
 import com.sprint.mission.discodeit.dto.command.CreatePublicChannelCommand;
 import com.sprint.mission.discodeit.dto.command.UpdateChannelCommand;
-import com.sprint.mission.discodeit.dto.response.ChannelResponse;
+import com.sprint.mission.discodeit.dto.response.ChannelDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -59,7 +59,7 @@ class BasicChannelServiceTest {
     void createPublic_success() {
         given(channelRepository.save(any())).willReturn(publicChannel);
 
-        ChannelResponse response = channelService.createPublic(
+        ChannelDto response = channelService.createPublic(
                 new CreatePublicChannelCommand("공지", "공지 채널입니다."));
 
         assertThat(response.type()).isEqualTo(ChannelType.PUBLIC);
@@ -85,7 +85,7 @@ class BasicChannelServiceTest {
         given(userRepository.findById(user2.getId())).willReturn(user2);
         given(channelRepository.save(any())).willReturn(privateChannel);
 
-        ChannelResponse response = channelService.createPrivate(
+        ChannelDto response = channelService.createPrivate(
                 new CreatePrivateChannelCommand(participantIds));
 
         assertThat(response.type()).isEqualTo(ChannelType.PRIVATE);
@@ -177,7 +177,7 @@ class BasicChannelServiceTest {
         given(channelRepository.findById(publicChannel.getId())).willReturn(publicChannel);
         given(messageRepository.findByChannelId(publicChannel.getId())).willReturn(List.of());
 
-        ChannelResponse response = channelService.findById(publicChannel.getId());
+        ChannelDto response = channelService.findById(publicChannel.getId());
 
         assertThat(response).isNotNull();
         assertThat(response.id()).isEqualTo(publicChannel.getId());
@@ -223,7 +223,7 @@ class BasicChannelServiceTest {
                 .willReturn(List.of(myReadStatus));
         given(messageRepository.findByChannelId(myPrivateChannel.getId())).willReturn(List.of());
 
-        List<ChannelResponse> responses = channelService.findAllByUserId(userId);
+        List<ChannelDto> responses = channelService.findAllByUserId(userId);
 
         assertThat(responses).hasSize(2);
         assertThat(responses).extracting("type")

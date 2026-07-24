@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
 import com.sprint.mission.discodeit.dto.command.CreateUserCommand;
 import com.sprint.mission.discodeit.dto.command.UpdateUserCommand;
-import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
@@ -67,7 +67,7 @@ class BasicUserServiceTest {
         // given(userStatusRepository.findByUserId(any())).willReturn(Optional.of(userStatus)); ← 제거
 
         // when
-        UserResponse response = userService.create(request, null);
+        UserDto response = userService.create(request, null);
 
         // then
         assertThat(response).isNotNull();
@@ -110,7 +110,7 @@ class BasicUserServiceTest {
         given(userStatusRepository.findByUserId(user.getId())).willReturn(Optional.of(userStatus));
 
         // when
-        UserResponse response = userService.findById(user.getId());
+        UserDto response = userService.findById(user.getId());
 
         // then
         assertThat(response.id()).isEqualTo(user.getId());
@@ -139,7 +139,7 @@ class BasicUserServiceTest {
         given(userStatusRepository.findByUserId(user.getId())).willReturn(Optional.of(userStatus));
 
         // when
-        UserResponse response = userService.update(user.getId(), request, null);
+        UserDto response = userService.update(user.getId(), request, null);
 
         // then
         assertThat(response).isNotNull();
@@ -223,7 +223,7 @@ class BasicUserServiceTest {
         given(userStatusRepository.findByUserId(user2.getId())).willReturn(Optional.of(userStatus2));
 
         // when
-        List<UserResponse> responses = userService.findByAll();
+        List<UserDto> responses = userService.findByAll();
 
         // then
         assertThat(responses).hasSize(2);
@@ -305,7 +305,7 @@ class BasicUserServiceTest {
         given(userStatusRepository.save(any())).willReturn(userStatus);
 
         // when
-        UserResponse response = userService.create(userRequest, imageRequest);
+        UserDto response = userService.create(userRequest, imageRequest);
 
         // then
         assertThat(response).isNotNull();

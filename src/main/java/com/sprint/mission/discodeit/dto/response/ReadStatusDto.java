@@ -5,19 +5,16 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import java.time.Instant;
 import java.util.UUID;
 
-public record ReadStatusResponse(
+public record ReadStatusDto(
         UUID id,
-        Instant createdAt,
-        Instant updatedAt,
         UUID userId,
         UUID channelId,
         Instant lastReadAt
+
 ) {
-    public static ReadStatusResponse from(ReadStatus readStatus) {
-        return new ReadStatusResponse(
+    public static ReadStatusDto from(ReadStatus readStatus) {
+        return new ReadStatusDto(
                 readStatus.getId(),
-                readStatus.getCreatedAt(),
-                readStatus.getUpdatedAt(),
                 readStatus.getUserId(),
                 readStatus.getChannelId(),
                 readStatus.getLastReadAt()

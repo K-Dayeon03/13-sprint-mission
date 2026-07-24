@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.request.CreatePrivateChannelRequest;
 import com.sprint.mission.discodeit.dto.request.CreatePublicChannelRequest;
 import com.sprint.mission.discodeit.dto.request.UpdateChannelRequest;
-import com.sprint.mission.discodeit.dto.response.ChannelResponse;
+import com.sprint.mission.discodeit.dto.response.ChannelDto;
 import com.sprint.mission.discodeit.mapper.ChannelCommandMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -34,28 +34,28 @@ public class ChannelController {
 
     @Operation(summary = "Public Channel 생성")
     @RequestMapping(value = "/public", method = RequestMethod.POST)
-    public ResponseEntity<ChannelResponse> createPublic(@RequestBody CreatePublicChannelRequest request) {
-        ChannelResponse channel = channelService.createPublic(channelCommandMapper.toCreatePublicCommand(request));
+    public ResponseEntity<ChannelDto> createPublic(@RequestBody CreatePublicChannelRequest request) {
+        ChannelDto channel = channelService.createPublic(channelCommandMapper.toCreatePublicCommand(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
     @Operation(summary = "Private Channel 생성")
     @RequestMapping(value = "/private", method = RequestMethod.POST)
-    public ResponseEntity<ChannelResponse> createPrivate(@RequestBody CreatePrivateChannelRequest request) {
-        ChannelResponse channel = channelService.createPrivate(channelCommandMapper.toCreatePrivateCommand(request));
+    public ResponseEntity<ChannelDto> createPrivate(@RequestBody CreatePrivateChannelRequest request) {
+        ChannelDto channel = channelService.createPrivate(channelCommandMapper.toCreatePrivateCommand(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
     @Operation(summary = "User가 참여 중인 Channel 목록 조회")
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<ChannelResponse>> findAllByUserId(@RequestParam UUID userId) {
+    public ResponseEntity<List<ChannelDto>> findAllByUserId(@RequestParam UUID userId) {
         return ResponseEntity.ok(channelService.findAllByUserId(userId));
     }
 
     @Operation(summary = "Channel 정보 수정")
     @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
-    public ResponseEntity<ChannelResponse> update(@PathVariable UUID channelId,
-                                                  @RequestBody UpdateChannelRequest request) {
+    public ResponseEntity<ChannelDto> update(@PathVariable UUID channelId,
+                                             @RequestBody UpdateChannelRequest request) {
         return ResponseEntity.ok(channelService.update(channelId, channelCommandMapper.toUpdateCommand(request)));
     }
 

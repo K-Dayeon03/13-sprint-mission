@@ -2,7 +2,10 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.command.CreateReadStatusCommand;
 import com.sprint.mission.discodeit.dto.command.UpdateReadStatusCommand;
+import com.sprint.mission.discodeit.dto.response.ReadStatusDto;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.BadRequestException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -11,55 +14,72 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Instant;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
 
     @Override
-    public ReadStatus create(CreateReadStatusCommand command) {
-        Optional.ofNullable(userRepository.findById(command.userId()))
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
-        Optional.ofNullable(channelRepository.findById(command.channelId()))
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
-        readStatusRepository.findByUserIdAndChannelId(command.userId(), command.channelId())
+    @Transactional
+    public ReadStatusDto create(CreateReadStatusCommand command) {
+        User user = findUserOrThrow(command.userId());
+        Channel channel = findChannelOrThrow(command.channelId());
+        readStatusRepository.findByUser_IdAndChannel_Id(command.userId(), command.channelId())
                 .ifPresent(rs -> {
                     throw new BadRequestException("이미 존재하는 ReadStatus입니다.");
                 });
 
-        ReadStatus readStatus = new ReadStatus(command.userId(), command.channelId(), command.lastReadAt());
-        return readStatusRepository.save(readStatus);
+        ReadStatus readStatus = new ReadStatus(user, channel, command.lastReadAt());
+        return ReadStatusDto.from(readStatusRepository.save(readStatus));
     }
 
     @Override
-    public ReadStatus findById(UUID id) {
-        return Optional.ofNullable(readStatusRepository.findById(id))
+    public ReadStatusDto findById(UUID id) {
+        return ReadStatusDto.from(findEntityOrThrow(id));
+    }
+
+    @Override
+    public List<ReadStatusDto> findAllByUserId(UUID userId) {
+        return readStatusRepository.findAllByUser_Id(userId).stream()
+                .map(ReadStatusDto::from)
+                .toList();
+    }
+
+    @Override
+    @Transactional
+    public ReadStatusDto update(UUID id, UpdateReadStatusCommand command) {
+        ReadStatus readStatus = findEntityOrThrow(id);
+        readStatus.updateLastReadAt(command.newLastReadAt());
+        return ReadStatusDto.from(readStatus);
+    }
+
+    @Override
+    @Transactional
+    public void deleteById(UUID id) {
+        findEntityOrThrow(id);
+        readStatusRepository.deleteById(id);
+    }
+
+    private ReadStatus findEntityOrThrow(UUID id) {
+        return readStatusRepository.findById(id)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 ReadStatus입니다."));
     }
 
-    @Override
-    public List<ReadStatus> findAllByUserId(UUID userId) {
-        return readStatusRepository.findAllByUserId(userId);
+    private User findUserOrThrow(UUID userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
     }
 
-    @Override
-    public ReadStatus update(UUID id, UpdateReadStatusCommand command) {
-        ReadStatus readStatus = findById(id);
-        readStatus.updateLastReadAt(command.newLastReadAt());
-        return readStatusRepository.save(readStatus);
-    }
-
-    @Override
-    public void deleteById(UUID id) {
-        findById(id);
-        readStatusRepository.deleteById(id);
+    private Channel findChannelOrThrow(UUID channelId) {
+        return channelRepository.findById(channelId)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
     }
 }

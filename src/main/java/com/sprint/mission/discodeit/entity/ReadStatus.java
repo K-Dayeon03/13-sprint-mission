@@ -1,5 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
 
 import java.time.Instant;
@@ -11,10 +13,37 @@ import java.util.UUID;
  * PRIVATE 채널의 참여자 정보를 관리하기 위해 활용됩니다.
  */
 @Getter
-public class ReadStatus extends Entity{
-    private UUID userId;
-    private UUID channelId;
+@Entity
+@Table(name = "read_statuses")
+public class ReadStatus extends BaseUpdatableEntity {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "channel_id", nullable = false)
+    private Channel channel;
+    @Column(name = "last_read_at", nullable = false)
     private Instant lastReadAt;
+
+    @Transient
+    private UUID userId;
+
+    @Transient
+    private UUID channelId;
+
+    protected ReadStatus() {
+    }
+
+    public ReadStatus(User user, Channel channel, Instant lastReadAt) {
+        super();
+        if (user == null) throw new IllegalArgumentException("유저는 필수입니다.");
+        if (channel == null) throw new IllegalArgumentException("채널은 필수입니다.");
+        this.user = user;
+        this.channel = channel;
+        this.userId = user.getId();
+        this.channelId = channel.getId();
+        this.lastReadAt = lastReadAt != null ? lastReadAt : Instant.now();
+    }
 
     public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
         super();
@@ -24,8 +53,22 @@ public class ReadStatus extends Entity{
         this.channelId = channelId;
         this.lastReadAt = lastReadAt != null ? lastReadAt : Instant.now();
     }
+
+    public UUID getUserId() {
+        if (user != null) {
+            return user.getId();
+        }
+        return userId;
+    }
+
+    public UUID getChannelId() {
+        if (channel != null) {
+            return channel.getId();
+        }
+        return channelId;
+    }
+
     public void updateLastReadAt(Instant lastReadAt) {
         this.lastReadAt = lastReadAt;
-        makeUpdate();
     }
 }

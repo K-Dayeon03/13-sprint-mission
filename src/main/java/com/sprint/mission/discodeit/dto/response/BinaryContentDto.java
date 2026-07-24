@@ -5,7 +5,7 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import java.time.Instant;
 import java.util.UUID;
 
-public record BinaryContentResponse(
+public record BinaryContentDto(
         UUID id,
         Instant createdAt,
         String fileName,
@@ -14,8 +14,11 @@ public record BinaryContentResponse(
         byte[] bytes,
         String downloadUrl
 ) {
-    public static BinaryContentResponse from(BinaryContent binaryContent) {
-        return new BinaryContentResponse(
+    public static BinaryContentDto from(BinaryContent binaryContent) {
+        if (binaryContent == null) {
+            return null;
+        }
+        return new BinaryContentDto(
                 binaryContent.getId(),
                 binaryContent.getCreatedAt(),
                 binaryContent.getFileName(),

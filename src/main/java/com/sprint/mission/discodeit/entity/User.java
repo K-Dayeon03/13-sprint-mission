@@ -1,15 +1,35 @@
 package com.sprint.mission.discodeit.entity;
 
+import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.Setter;
 
 import java.util.UUID;
-@Getter
-public class User extends Entity {
 
+@Getter
+@Entity
+@Table(name = "users")
+public class User extends BaseUpdatableEntity {
+    @Column(name = "username", nullable = false, unique = true, length = 50)
     private String username;
+    @Column(name = "password", nullable = false, length = 60)
     private String password;
+    @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
+
+    protected User() {
+
+    }
+
+    //orphanRemoval는 부모와의 관계가 끊긴 자식 엔티티를 자동 삭제 옵션
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "profile_id")
+    private BinaryContent profile;
+
+    @OneToOne(mappedBy = "user", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private UserStatus userStatus;
+
+    @Transient
     private UUID profileImageId;
 
     public User(String username, String password, String email, UUID profileImageId) {
@@ -29,9 +49,9 @@ public class User extends Entity {
         this.profileImageId = profileImageId;
     }
 
-    public void update(String newUsername, String newPassword, String newEmail, UUID newProfileImageId) {
+    public void update(String newUsername, String newPassword, String newEmail, BinaryContent newProfile) {
         // profileImageId도 수정 조건에 포함
-        if (newUsername == null && newPassword == null && newEmail == null && newProfileImageId == null) {
+        if (newUsername == null && newPassword == null && newEmail == null && newProfile == null) {
             throw new IllegalArgumentException("수정할 내용이 없습니다.");
         }
         if (newUsername != null) {
@@ -52,11 +72,29 @@ public class User extends Entity {
             }
             this.email = newEmail;
         }
-        // null이면 기존값 유지, 값이 있으면 교체
+        if (newProfile != null) {
+            this.profile = newProfile;
+            this.profileImageId = newProfile.getId();
+        }
+
+    }
+
+    public void update(String newUsername, String newPassword, String newEmail, UUID newProfileImageId) {
+        if (newUsername == null && newPassword == null && newEmail == null && newProfileImageId == null) {
+            throw new IllegalArgumentException("수정할 내용이 없습니다.");
+        }
+        update(newUsername, newPassword, newEmail, (BinaryContent) null);
         if (newProfileImageId != null) {
             this.profileImageId = newProfileImageId;
+            this.profile = null;
         }
-        makeUpdate();
+    }
+
+    public UUID getProfileImageId() {
+        if (profile != null) {
+            return profile.getId();
+        }
+        return profileImageId;
     }
 
     // User.java
@@ -66,7 +104,7 @@ public class User extends Entity {
                 "ID=" + getId() +
                 ", 이름='" + username + '\'' +
                 ", 이메일='" + email + '\'' +
-                ", 프로필이미지ID=" + profileImageId +
+                ", 프로필이미지ID=" + getProfileImageId() +
                 ", 생성시간=" + getCreatedAt() +
                 ", 수정시간=" + getUpdatedAt() +
                 '}';

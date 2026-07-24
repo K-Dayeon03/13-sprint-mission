@@ -2,8 +2,11 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.command.CreateMessageCommand;
 import com.sprint.mission.discodeit.dto.command.UpdateMessageCommand;
+import com.sprint.mission.discodeit.dto.response.MessageDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
+import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -12,13 +15,14 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BasicMessageService implements MessageService {
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
@@ -26,64 +30,69 @@ public class BasicMessageService implements MessageService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public Message create(CreateMessageCommand command) {
-        validateChannelExists(command.channelId());
+    @Transactional
+    public MessageDto create(CreateMessageCommand command) {
+        Channel channel = findChannelOrThrow(command.channelId());
+        User author = findUserOrThrow(command.authorId());
 
-        findUserOrThrow(command.authorId());
-
-        Message message = new Message(command.content(), command.channelId(), command.authorId());
-        messageRepository.save(message);
+        Message message = new Message(command.content(), channel, author);
 
         if (command.attachments() != null && !command.attachments().isEmpty()) {
             command.attachments().forEach(attachmentCommand -> {
                 BinaryContent attachment = new BinaryContent(
                         null,
-                        message.getId(),
+                        null,
                         attachmentCommand.fileName(),
                         attachmentCommand.contentType(),
                         attachmentCommand.bytes()
                 );
-                BinaryContent savedAttachment = binaryContentRepository.save(attachment);
-                message.addAttachmentId(savedAttachment.getId());
+                message.getAttachments().add(attachment);
             });
-            messageRepository.save(message);
         }
 
-        return message;
+        return MessageDto.from(messageRepository.save(message));
     }
 
     @Override
-    public Message findById(UUID id) {
-        return Optional.ofNullable(messageRepository.findById(id))
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 메시지입니다."));
+    public MessageDto findById(UUID id) {
+        return MessageDto.from(findMessageOrThrow(id));
     }
 
     @Override
-    public List<Message> findAllByChannelId(UUID channelId) {
-        validateChannelExists(channelId);
-        return messageRepository.findByChannelId(channelId);
+    public List<MessageDto> findAllByChannelId(UUID channelId) {
+        findChannelOrThrow(channelId);
+        return messageRepository.findByChannel_Id(channelId).stream()
+                .map(MessageDto::from)
+                .toList();
     }
 
     @Override
-    public Message update(UUID id, UpdateMessageCommand command) {
-        Message message = findById(id);
+    @Transactional
+    public MessageDto update(UUID id, UpdateMessageCommand command) {
+        Message message = findMessageOrThrow(id);
         message.update(command.newContent());
-        return messageRepository.save(message);
+        return MessageDto.from(message);
     }
 
     @Override
+    @Transactional
     public void deleteById(UUID id) {
-        Message message = findById(id);
+        Message message = findMessageOrThrow(id);
         MessageDeletionSupport.deleteById(messageRepository, binaryContentRepository, message);
     }
 
-    private void validateChannelExists(UUID channelId) {
-        Optional.ofNullable(channelRepository.findById(channelId))
+    private Message findMessageOrThrow(UUID id) {
+        return messageRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 메시지입니다."));
+    }
+
+    private Channel findChannelOrThrow(UUID channelId) {
+        return channelRepository.findById(channelId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
     }
 
-    private void findUserOrThrow(UUID userId) {
-        Optional.ofNullable(userRepository.findById(userId))
+    private User findUserOrThrow(UUID userId) {
+        return userRepository.findById(userId)
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
     }
 }

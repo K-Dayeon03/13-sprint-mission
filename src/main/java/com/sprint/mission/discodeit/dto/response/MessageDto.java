@@ -6,24 +6,26 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
-public record MessageResponse(
+public record MessageDto(
         UUID id,
         Instant createdAt,
         Instant updatedAt,
         String content,
         UUID channelId,
-        UUID authorId,
-        List<UUID> attachmentIds
+        UserDto author,
+        List<BinaryContentDto> attachments
 ) {
-    public static MessageResponse from(Message message) {
-        return new MessageResponse(
+    public static MessageDto from(Message message) {
+        return new MessageDto(
                 message.getId(),
                 message.getCreatedAt(),
                 message.getUpdatedAt(),
                 message.getContent(),
                 message.getChannelId(),
-                message.getAuthorId(),
-                List.copyOf(message.getAttachmentIds())
+                UserDto.from(message.getAuthor(), message.getAuthor() != null ? message.getAuthor().getUserStatus() : null),
+                message.getAttachments().stream()
+                        .map(BinaryContentDto::from)
+                        .toList()
         );
     }
 }

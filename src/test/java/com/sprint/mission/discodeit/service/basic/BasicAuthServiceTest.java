@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.command.LoginCommand;
-import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -42,7 +42,7 @@ class BasicAuthServiceTest {
         given(userStatusRepository.findByUserId(user.getId())).willReturn(Optional.of(userStatus));
 
         // when
-        UserResponse response = authService.login(request);
+        UserDto response = authService.login(request);
 
         // then
         assertThat(response.username()).isEqualTo("woody");

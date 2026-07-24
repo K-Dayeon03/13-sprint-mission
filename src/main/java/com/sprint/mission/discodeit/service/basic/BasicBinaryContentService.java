@@ -1,25 +1,28 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
+import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.NotFoundException;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
 
     @Override
-    public BinaryContent create(BinaryContentCommand command) {
+    @Transactional
+    public BinaryContentDto create(BinaryContentCommand command) {
         BinaryContent binaryContent = new BinaryContent(
                 null,
                 null,
@@ -27,27 +30,34 @@ public class BasicBinaryContentService implements BinaryContentService {
                 command.contentType(),
                 command.bytes()
         );
-        return binaryContentRepository.save(binaryContent);
+        return BinaryContentDto.from(binaryContentRepository.save(binaryContent));
     }
 
     @Override
-    public BinaryContent findById(UUID id) {
-        return Optional.ofNullable(binaryContentRepository.findById(id))
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 파일입니다."));
+    public BinaryContentDto findById(UUID id) {
+        return BinaryContentDto.from(findEntityOrThrow(id));
     }
 
     @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+    public List<BinaryContentDto> findAllByIdIn(List<UUID> ids) {
         if (ids == null || ids.isEmpty()) {
             return Collections.emptyList();
         }
         // 리포지토리에 대량 조회를 위임합니다.
-        return binaryContentRepository.findAllByIdIn(ids);
+        return binaryContentRepository.findAllById(ids).stream()
+                .map(BinaryContentDto::from)
+                .toList();
     }
 
     @Override
+    @Transactional
     public void deleteById(UUID id) {
-        findById(id);
+        findEntityOrThrow(id);
         binaryContentRepository.deleteById(id);
+    }
+
+    private BinaryContent findEntityOrThrow(UUID id) {
+        return binaryContentRepository.findById(id)
+                .orElseThrow(() -> new NotFoundException("존재하지 않는 파일입니다."));
     }
 }

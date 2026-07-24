@@ -5,7 +5,6 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.UUID;
 
 final class MessageDeletionSupport {
@@ -17,7 +16,6 @@ final class MessageDeletionSupport {
             BinaryContentRepository binaryContentRepository,
             Message message
     ) {
-        deleteAttachments(binaryContentRepository, List.of(message));
         messageRepository.deleteById(message.getId());
     }
 
@@ -26,9 +24,8 @@ final class MessageDeletionSupport {
             BinaryContentRepository binaryContentRepository,
             UUID channelId
     ) {
-        List<Message> messages = messageRepository.findByChannelId(channelId);
-        deleteAttachments(binaryContentRepository, messages);
-        messageRepository.deleteByChannelId(channelId);
+        List<Message> messages = messageRepository.findByChannel_Id(channelId);
+        messageRepository.deleteAll(messages);
     }
 
     static void deleteByAuthorId(
@@ -36,14 +33,9 @@ final class MessageDeletionSupport {
             BinaryContentRepository binaryContentRepository,
             UUID authorId
     ) {
-        List<Message> messages = messageRepository.findByAll().stream()
-                .filter(message -> Objects.equals(message.getAuthorId(), authorId))
+        List<Message> messages = messageRepository.findAll().stream()
+                .filter(message -> authorId.equals(message.getAuthorId()))
                 .toList();
-        deleteAttachments(binaryContentRepository, messages);
-        messageRepository.deleteByAuthorId(authorId);
-    }
-
-    private static void deleteAttachments(BinaryContentRepository binaryContentRepository, List<Message> messages) {
-        messages.forEach(message -> binaryContentRepository.deleteAllByMessageId(message.getId()));
+        messageRepository.deleteAll(messages);
     }
 }
