@@ -1,8 +1,5 @@
 package com.sprint.mission.discodeit.dto.response;
 
-import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.entity.UserStatus;
-
 import java.util.UUID;
 
 /*
@@ -16,17 +13,4 @@ public record UserDto(
         BinaryContentDto profile,
         Boolean online
 
-) {
-    public static UserDto from(User user, UserStatus userStatus) {
-        if (user == null) {
-            return null;
-        }
-        return new UserDto(
-                user.getId(),
-                user.getUsername(),
-                user.getEmail(),
-                BinaryContentDto.from(user.getProfile()),
-                userStatus != null && userStatus.isOnline()
-        );
-    }
-}
+) {}

@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.BadRequestException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
@@ -26,6 +27,7 @@ public class BasicReadStatusService implements ReadStatusService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final ChannelRepository channelRepository;
+    private final ReadStatusMapper readStatusMapper;
 
     @Override
     @Transactional
@@ -38,18 +40,18 @@ public class BasicReadStatusService implements ReadStatusService {
                 });
 
         ReadStatus readStatus = new ReadStatus(user, channel, command.lastReadAt());
-        return ReadStatusDto.from(readStatusRepository.save(readStatus));
+        return readStatusMapper.toDto(readStatusRepository.save(readStatus));
     }
 
     @Override
     public ReadStatusDto findById(UUID id) {
-        return ReadStatusDto.from(findEntityOrThrow(id));
+        return readStatusMapper.toDto(findEntityOrThrow(id));
     }
 
     @Override
     public List<ReadStatusDto> findAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUser_Id(userId).stream()
-                .map(ReadStatusDto::from)
+                .map(readStatusMapper::toDto)
                 .toList();
     }
 
@@ -58,7 +60,7 @@ public class BasicReadStatusService implements ReadStatusService {
     public ReadStatusDto update(UUID id, UpdateReadStatusCommand command) {
         ReadStatus readStatus = findEntityOrThrow(id);
         readStatus.updateLastReadAt(command.newLastReadAt());
-        return ReadStatusDto.from(readStatus);
+        return readStatusMapper.toDto(readStatus);
     }
 
     @Override

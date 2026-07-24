@@ -1,19 +1,28 @@
 package com.sprint.mission.discodeit.service.basic;
 
+import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
 import com.sprint.mission.discodeit.dto.command.CreateMessageCommand;
 import com.sprint.mission.discodeit.dto.command.UpdateMessageCommand;
 import com.sprint.mission.discodeit.dto.response.MessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.mapper.MessageMapper;
+import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Slice;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,7 +37,9 @@ public class BasicMessageService implements MessageService {
     private final ChannelRepository channelRepository;
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
-
+    private final MessageMapper messageMapper;
+    private final BinaryContentStorage binaryContentStorage;
+    private final PageResponseMapper pageResponseMapper;
     @Override
     @Transactional
     public MessageDto create(CreateMessageCommand command) {
@@ -37,41 +48,58 @@ public class BasicMessageService implements MessageService {
 
         Message message = new Message(command.content(), channel, author);
 
-        if (command.attachments() != null && !command.attachments().isEmpty()) {
-            command.attachments().forEach(attachmentCommand -> {
+        List<BinaryContentCommand> attachmentCommands = command.attachments() == null
+                ? List.of()
+                : command.attachments();
+
+        if (!attachmentCommands.isEmpty()) {
+            attachmentCommands.forEach(attachmentCommand -> {
                 BinaryContent attachment = new BinaryContent(
                         null,
                         null,
                         attachmentCommand.fileName(),
                         attachmentCommand.contentType(),
-                        attachmentCommand.bytes()
+                        (long) attachmentCommand.bytes().length
                 );
                 message.getAttachments().add(attachment);
             });
         }
 
-        return MessageDto.from(messageRepository.save(message));
+        Message saved = messageRepository.saveAndFlush(message);
+        for (int i = 0; i < attachmentCommands.size(); i++) {
+            BinaryContent attachment = saved.getAttachments().get(i);
+            binaryContentStorage.put(attachment.getId(), attachmentCommands.get(i).bytes());
+        }
+
+        return messageMapper.toDto(saved);
     }
 
     @Override
     public MessageDto findById(UUID id) {
-        return MessageDto.from(findMessageOrThrow(id));
+        return messageMapper.toDto(findMessageOrThrow(id));
     }
 
     @Override
-    public List<MessageDto> findAllByChannelId(UUID channelId) {
+    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, int page) {
         findChannelOrThrow(channelId);
-        return messageRepository.findByChannel_Id(channelId).stream()
-                .map(MessageDto::from)
-                .toList();
-    }
 
+        Pageable pageable = PageRequest.of(
+                page,
+                50,
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+
+        Slice<MessageDto> messageSlice = messageRepository.findAllByChannel_Id(channelId, pageable)
+                .map(messageMapper::toDto);
+
+        return pageResponseMapper.fromSlice(messageSlice);
+    }
     @Override
     @Transactional
     public MessageDto update(UUID id, UpdateMessageCommand command) {
         Message message = findMessageOrThrow(id);
         message.update(command.newContent());
-        return MessageDto.from(message);
+        return messageMapper.toDto(message);
     }
 
     @Override

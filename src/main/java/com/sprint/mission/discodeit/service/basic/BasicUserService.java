@@ -10,8 +10,10 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.BadRequestException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -26,10 +28,12 @@ import java.util.UUID;
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
     private final UserStatusRepository userStatusRepository;
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final UserMapper userMapper;
 
 
     @Override
@@ -38,10 +42,12 @@ public class BasicUserService implements UserService {
         validateUsernameAndEmail(command.username(), command.email());
 
         User user = new User(command.username(), command.password(), command.email(), null);
-        saveUserWithProfileImage(user, profileImageCommand);
+        applyProfileImage(user, profileImageCommand);
+        User saved = userRepository.saveAndFlush(user);
+        saveProfileImageBytes(saved, profileImageCommand);
 
         UserStatus userStatus = createUserStatus(user);
-        return UserDto.from(user, userStatus);
+        return userMapper.toDto(saved, userStatus);
     }
 
     @Override
@@ -49,7 +55,7 @@ public class BasicUserService implements UserService {
     public UserDto findById(UUID id) {
         User user = findUserOrThrow(id);
         UserStatus userStatus = getOrCreateUserStatus(id);
-        return UserDto.from(user, userStatus);
+        return userMapper.toDto(user, userStatus);
     }
     @Override
     @Transactional
@@ -57,7 +63,7 @@ public class BasicUserService implements UserService {
         return userRepository.findAll().stream()
                 .map(user -> {
                     UserStatus userStatus = getOrCreateUserStatus(user.getId());
-                    return UserDto.from(user, userStatus);
+                    return userMapper.toDto(user, userStatus);
                 })
                 .toList();
     }
@@ -69,22 +75,16 @@ public class BasicUserService implements UserService {
         User user = findUserOrThrow(id);
         validateUpdatedUsernameAndEmail(id, command);
 
-        BinaryContent newProfileImage = null;
-        if (profileImageCommand != null) {
-            newProfileImage = new BinaryContent(
-                    null,
-                    null,
-                    profileImageCommand.fileName(),
-                    profileImageCommand.contentType(),
-                    profileImageCommand.bytes()
-            );
-        }
-
+        BinaryContent newProfileImage = createProfileImage(profileImageCommand);
         user.update(command.newUsername(), command.newPassword(),
                 command.newEmail(), newProfileImage);
+        if (profileImageCommand != null) {
+            userRepository.saveAndFlush(user);
+            saveProfileImageBytes(user, profileImageCommand);
+        }
 
         UserStatus userStatus = getOrCreateUserStatus(id);
-        return UserDto.from(user, userStatus);
+        return userMapper.toDto(user, userStatus);
     }
 
     @Override
@@ -116,18 +116,30 @@ public class BasicUserService implements UserService {
         }
     }
 
-    private void saveUserWithProfileImage(User user, BinaryContentCommand profileImageCommand) {
+    private void applyProfileImage(User user, BinaryContentCommand profileImageCommand) {
+        BinaryContent profileImage = createProfileImage(profileImageCommand);
+        if (profileImage != null) {
+            user.update(null, null, null, profileImage);
+        }
+    }
+
+    private BinaryContent createProfileImage(BinaryContentCommand profileImageCommand) {
         if (profileImageCommand != null) {
-            BinaryContent profileImage = new BinaryContent(
+            return new BinaryContent(
                     null,
                     null,
                     profileImageCommand.fileName(),
                     profileImageCommand.contentType(),
-                    profileImageCommand.bytes()
+                    (long) profileImageCommand.bytes().length
             );
-            user.update(null, null, null, profileImage);
         }
-        userRepository.save(user);
+        return null;
+    }
+
+    private void saveProfileImageBytes(User user, BinaryContentCommand profileImageCommand) {
+        if (profileImageCommand != null && user.getProfile() != null) {
+            binaryContentStorage.put(user.getProfile().getId(), profileImageCommand.bytes());
+        }
     }
 
     private User findUserOrThrow(UUID id) {

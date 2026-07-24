@@ -3,6 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.request.CreateMessageRequest;
 import com.sprint.mission.discodeit.dto.request.UpdateMessageRequest;
 import com.sprint.mission.discodeit.dto.response.MessageDto;
+import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.mapper.MessageCommandMapper;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -65,14 +66,20 @@ public class MessageController {
 
     @Operation(summary = "Channel의 Message 목록 조회")
     @RequestMapping(value = "/api/channels/{channelId}/messages", method = RequestMethod.GET)
-    public ResponseEntity<List<MessageDto>> findAllByChannelId(@PathVariable UUID channelId) {
-        return findAllByChannelIdQuery(channelId);
+    public ResponseEntity<PageResponse<MessageDto>> findAllByChannelId(
+            @PathVariable UUID channelId,
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        return findAllByChannelIdQuery(channelId, page);
     }
 
     @Operation(summary = "Channel의 Message 목록 조회")
     @RequestMapping(value = "/api/messages", method = RequestMethod.GET)
-    public ResponseEntity<List<MessageDto>> findAllByChannelIdQuery(@RequestParam UUID channelId) {
-        return ResponseEntity.ok(messageService.findAllByChannelId(channelId));
+    public ResponseEntity<PageResponse<MessageDto>> findAllByChannelIdQuery(
+            @RequestParam UUID channelId,
+            @RequestParam(defaultValue = "0") int page
+    ) {
+        return ResponseEntity.ok(messageService.findAllByChannelId(channelId, page));
     }
 
 }

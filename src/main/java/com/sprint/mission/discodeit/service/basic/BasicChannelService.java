@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.response.ChannelDto;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.BadRequestException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.MessageRepository;
@@ -33,6 +34,7 @@ public class BasicChannelService implements ChannelService {
     private final ReadStatusRepository readStatusRepository;
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final ChannelMapper channelMapper;
 
     @Override
     @Transactional
@@ -43,7 +45,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = new Channel(ChannelType.PUBLIC, command.name(),
                 command.description(), null);
         channelRepository.save(channel);
-        return ChannelDto.from(channel, null, null);
+        return channelMapper.toDto(channel);
     }
 
     @Override
@@ -58,7 +60,7 @@ public class BasicChannelService implements ChannelService {
             ReadStatus readStatus = new ReadStatus(user, channel, Instant.now());
             readStatusRepository.save(readStatus);
         });
-        return ChannelDto.from(channel, participants, null);
+        return channelMapper.toDto(channel);
     }
 
     @Override
@@ -68,21 +70,7 @@ public class BasicChannelService implements ChannelService {
 
     //채널 -> ChannelDto 변환 공통 메서드
     private ChannelDto toResponse(Channel channel) {
-        //가장 최근 메세지 시간 조회
-        Instant lastMessageAt = messageRepository.findByChannel_Id(channel.getId())
-                .stream()
-                .map(Message::getCreatedAt)
-                .max(Instant::compareTo)
-                .orElse(null);
-        //private 채널인 경우 참여자 id 목록 조회
-        List<User> participants = null;
-        if (channel.getType() == ChannelType.PRIVATE) {
-            participants = readStatusRepository.findAllByChannel_Id(channel.getId())
-                    .stream()
-                    .map(ReadStatus::getUser)
-                    .toList();
-        }
-        return ChannelDto.from(channel, participants, lastMessageAt);
+        return channelMapper.toDto(channel);
     }
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {

@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.BadRequestException;
 import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
 import com.sprint.mission.discodeit.service.UserStatusService;
@@ -23,6 +24,7 @@ import java.util.UUID;
 public class BasicUserStatusService implements UserStatusService {
     private final UserStatusRepository userStatusRepository;
     private final UserRepository userRepository;
+    private final UserStatusMapper userStatusMapper;
 
     @Override
     @Transactional
@@ -34,12 +36,12 @@ public class BasicUserStatusService implements UserStatusService {
                 });
 
         UserStatus userStatus = new UserStatus(user, Instant.now());
-        return UserStatusDto.from(userStatusRepository.save(userStatus));
+        return userStatusMapper.toDto(userStatusRepository.save(userStatus));
     }
 
     @Override
     public UserStatusDto findById(UUID id) {
-        return UserStatusDto.from(findEntityOrThrow(id));
+        return userStatusMapper.toDto(findEntityOrThrow(id));
     }
 //
 //    @Override
@@ -53,7 +55,7 @@ public class BasicUserStatusService implements UserStatusService {
         UserStatus userStatus = findEntityOrThrow(id);
         validateUpdateCommand(command);
         userStatus.updateLastActiveAt(command.newLastActiveAt());
-        return UserStatusDto.from(userStatus);
+        return userStatusMapper.toDto(userStatus);
     }
 
     @Override
@@ -63,7 +65,7 @@ public class BasicUserStatusService implements UserStatusService {
                 .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
         validateUpdateCommand(command);
         userStatus.updateLastActiveAt(command.newLastActiveAt());
-        return UserStatusDto.from(userStatus);
+        return userStatusMapper.toDto(userStatus);
     }
 
     @Override

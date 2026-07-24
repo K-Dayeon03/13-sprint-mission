@@ -20,6 +20,13 @@ spring:
     properties:
       hibernate:
         format_sql: true
+
+discodeit:
+  storage:
+    type: local
+    local:
+      root-path: .discodeit/binary-contents
+
 server:
   port: ${PORT:8081}
   servlet:
@@ -33,6 +40,7 @@ springdoc:
     version: openapi_3_1
   swagger-ui:
     path: /swagger-ui.html
+
 logging:
   level:
     org.hibernate.SQL: debug
