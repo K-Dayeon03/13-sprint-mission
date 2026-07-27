@@ -10,6 +10,8 @@ import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.exception.InvalidRequestException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
@@ -163,6 +165,28 @@ class BasicChannelServiceTest {
     }
 
     @Test
+    @DisplayName("채널 수정 실패 - 존재하지 않는 채널")
+    void update_fail_notFound() {
+        UUID channelId = UUID.randomUUID();
+        given(channelRepository.findById(channelId)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> channelService.update(channelId, new UpdateChannelCommand("새이름", "새설명")))
+                .isInstanceOf(ChannelNotFoundException.class)
+                .hasMessageContaining("존재하지 않는 채널");
+    }
+
+    @Test
+    @DisplayName("채널 수정 실패 - PRIVATE 채널 수정 불가")
+    void update_fail_privateChannel() {
+        given(channelRepository.findById(privateChannel.getId())).willReturn(Optional.of(privateChannel));
+
+        assertThatThrownBy(() -> channelService.update(privateChannel.getId(), new UpdateChannelCommand("새이름", "새설명")))
+                .isInstanceOf(PrivateChannelUpdateException.class)
+                .hasMessageContaining("PRIVATE 채널");
+        verify(channelRepository, never()).save(any());
+    }
+
+    @Test
     @DisplayName("userId로 채널 목록 조회는 bulk 조회로 N+1을 줄인다")
     void findAllByUserId_usesBulkQueries() {
         UUID userId = UUID.randomUUID();
@@ -193,6 +217,20 @@ class BasicChannelServiceTest {
     }
 
     @Test
+    @DisplayName("userId로 채널 목록 조회 성공 - 조회 가능한 채널이 없으면 빈 목록 반환")
+    void findAllByUserId_success_empty() {
+        UUID userId = UUID.randomUUID();
+
+        given(readStatusRepository.findAllByUser_Id(userId)).willReturn(List.of());
+        given(channelRepository.findAll()).willReturn(List.of());
+
+        List<ChannelDto> result = channelService.findAllByUserId(userId);
+
+        assertThat(result).isEmpty();
+        verify(messageRepository, never()).findLastMessageAtByChannelIdIn(anyList());
+    }
+
+    @Test
     @DisplayName("채널 삭제 성공")
     void deleteById_success() {
         given(channelRepository.findById(publicChannel.getId())).willReturn(Optional.of(publicChannel));
@@ -203,6 +241,18 @@ class BasicChannelServiceTest {
         verify(messageRepository).deleteAll(List.of());
         verify(readStatusRepository).deleteByChannel_Id(publicChannel.getId());
         verify(channelRepository).deleteById(publicChannel.getId());
+    }
+
+    @Test
+    @DisplayName("채널 삭제 실패 - 존재하지 않는 채널")
+    void deleteById_fail_notFound() {
+        UUID channelId = UUID.randomUUID();
+        given(channelRepository.findById(channelId)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> channelService.deleteById(channelId))
+                .isInstanceOf(ChannelNotFoundException.class)
+                .hasMessageContaining("존재하지 않는 채널");
+        verify(channelRepository, never()).deleteById(any());
     }
 
     private static MessageRepository.ChannelLastMessageAt lastMessage(UUID channelId, Instant lastMessageAt) {

@@ -193,6 +193,33 @@ class BasicUserServiceTest {
     }
 
     @Test
+    @DisplayName("유저 수정 실패 - email 중복")
+    void update_fail_duplicateEmail() {
+        UpdateUserCommand command = new UpdateUserCommand(null, "buzz@codeit.com", null);
+
+        given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
+        given(userRepository.existsByEmailAndIdNot("buzz@codeit.com", user.getId())).willReturn(true);
+
+        assertThatThrownBy(() -> userService.update(user.getId(), command, null))
+                .isInstanceOf(UserAlreadyExistsException.class)
+                .hasMessageContaining("이미 사용 중");
+    }
+
+    @Test
+    @DisplayName("유저 수정 실패 - 존재하지 않는 유저")
+    void update_fail_notFound() {
+        UUID userId = UUID.randomUUID();
+        UpdateUserCommand command = new UpdateUserCommand("newWoody", null, null);
+
+        given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.update(userId, command, null))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessageContaining("존재하지 않는 사용자");
+        verify(userRepository, never()).existsByUsernameAndIdNot(any(), any());
+    }
+
+    @Test
     @DisplayName("유저 삭제 성공")
     void deleteById_success() {
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
@@ -223,6 +250,18 @@ class BasicUserServiceTest {
         verify(readStatusRepository).deleteByChannel_Id(authoredChannel.getId());
         verify(readStatusRepository).deleteByUser_Id(user.getId());
         verify(userRepository).deleteById(user.getId());
+    }
+
+    @Test
+    @DisplayName("유저 삭제 실패 - 존재하지 않는 유저")
+    void deleteById_fail_notFound() {
+        UUID userId = UUID.randomUUID();
+        given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> userService.deleteById(userId))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessageContaining("존재하지 않는 사용자");
+        verify(userRepository, never()).deleteById(any());
     }
 
     private static void setId(Object entity, UUID id) {

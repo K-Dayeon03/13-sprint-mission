@@ -10,7 +10,9 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -130,6 +132,33 @@ class BasicMessageServiceTest {
     }
 
     @Test
+    @DisplayName("메시지 생성 실패 - 존재하지 않는 채널")
+    void create_fail_channelNotFound() {
+        CreateMessageCommand command = new CreateMessageCommand("안녕하세요.", channel.getId(), user.getId(), null);
+
+        given(channelRepository.findById(channel.getId())).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> messageService.create(command))
+                .isInstanceOf(ChannelNotFoundException.class)
+                .hasMessageContaining("존재하지 않는 채널");
+        verify(messageRepository, never()).saveAndFlush(any());
+    }
+
+    @Test
+    @DisplayName("메시지 생성 실패 - 존재하지 않는 작성자")
+    void create_fail_authorNotFound() {
+        CreateMessageCommand command = new CreateMessageCommand("안녕하세요.", channel.getId(), user.getId(), null);
+
+        given(channelRepository.findById(channel.getId())).willReturn(Optional.of(channel));
+        given(userRepository.findById(user.getId())).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> messageService.create(command))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessageContaining("존재하지 않는 사용자");
+        verify(messageRepository, never()).saveAndFlush(any());
+    }
+
+    @Test
     @DisplayName("커서 기반 메시지 목록 조회")
     void findAllByChannelId_cursorPagination() {
         Message olderMessage = new Message("이전 메시지", channel, user);
@@ -160,6 +189,18 @@ class BasicMessageServiceTest {
     }
 
     @Test
+    @DisplayName("채널 메시지 목록 조회 실패 - 존재하지 않는 채널")
+    void findAllByChannelId_fail_channelNotFound() {
+        UUID channelId = UUID.randomUUID();
+        given(channelRepository.findById(channelId)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> messageService.findAllByChannelId(channelId, null, 50))
+                .isInstanceOf(ChannelNotFoundException.class)
+                .hasMessageContaining("존재하지 않는 채널");
+        verify(messageRepository, never()).findAllByChannelIdAndCursor(any(), any(), any());
+    }
+
+    @Test
     @DisplayName("메시지 수정은 변경 감지로 처리하고 DTO를 반환한다")
     void update_success() {
         UpdateMessageCommand command = new UpdateMessageCommand("수정된 내용");
@@ -183,6 +224,17 @@ class BasicMessageServiceTest {
     }
 
     @Test
+    @DisplayName("메시지 수정 실패 - 존재하지 않는 메시지")
+    void update_fail_notFound() {
+        UUID messageId = UUID.randomUUID();
+        given(messageRepository.findById(messageId)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> messageService.update(messageId, new UpdateMessageCommand("수정된 내용")))
+                .isInstanceOf(MessageNotFoundException.class)
+                .hasMessageContaining("존재하지 않는 메시지");
+    }
+
+    @Test
     @DisplayName("메시지 조회 실패 - 존재하지 않는 메시지")
     void findById_fail_notFound() {
         UUID messageId = UUID.randomUUID();
@@ -201,6 +253,18 @@ class BasicMessageServiceTest {
         messageService.deleteById(message.getId());
 
         verify(messageRepository).deleteById(message.getId());
+    }
+
+    @Test
+    @DisplayName("메시지 삭제 실패 - 존재하지 않는 메시지")
+    void deleteById_fail_notFound() {
+        UUID messageId = UUID.randomUUID();
+        given(messageRepository.findById(messageId)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> messageService.deleteById(messageId))
+                .isInstanceOf(MessageNotFoundException.class)
+                .hasMessageContaining("존재하지 않는 메시지");
+        verify(messageRepository, never()).deleteById(any());
     }
 
     private static void setId(Object entity, UUID id) {

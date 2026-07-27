@@ -23,6 +23,7 @@ repositories {
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
@@ -36,7 +37,7 @@ dependencies {
     runtimeOnly 'org.postgresql:postgresql'
     //H2 인메모리 데이터베이스(테스트 전용 DB)
     //테스트는 빠르고 독립적으로 돌아야하므로 가벼운 인메모리 H2를 사용, 개발 및 운영은 postgres 사용
-    runtimeOnly 'com.h2database:h2'
+    testRuntimeOnly 'com.h2database:h2'
 
     //JPA(표준) 위에 추상화 객체를 얹어서 JPA를 좀 더 편하게 사용할 수 있는 라이브러라
     //구현체 Hibernate가 포함되어있다.
