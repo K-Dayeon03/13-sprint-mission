@@ -9,8 +9,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.BadRequestException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.InvalidRequestException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -88,8 +88,8 @@ class BasicChannelServiceTest {
     @DisplayName("PUBLIC 채널 생성 실패 - 채널명 없음")
     void createPublic_fail_emptyName() {
         assertThatThrownBy(() -> channelService.createPublic(new CreatePublicChannelCommand("", "설명")))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("채널명");
+                .isInstanceOf(InvalidRequestException.class)
+                .hasMessageContaining("잘못된 요청");
         verify(channelRepository, never()).save(any());
     }
 
@@ -126,8 +126,8 @@ class BasicChannelServiceTest {
         given(userRepository.findById(participantId)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> channelService.createPrivate(new CreatePrivateChannelCommand(List.of(participantId))))
-                .isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("존재하지 않는 유저");
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessageContaining("존재하지 않는 사용자");
         verify(channelRepository, never()).save(any());
     }
 

@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.mapper;
 
 import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
 import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequest;
-import com.sprint.mission.discodeit.exception.BadRequestException;
+import com.sprint.mission.discodeit.exception.InvalidRequestException;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -30,7 +30,7 @@ public class BinaryContentCommandMapper {
             String contentType = resolveContentType(file);
             return new BinaryContentCommand(fileName, contentType, file.getBytes());
         } catch (IOException e) {
-            throw new BadRequestException("파일을 읽을 수 없습니다.", e);
+            throw new InvalidRequestException("파일을 읽을 수 없습니다.", e);
         }
     }
 

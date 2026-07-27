@@ -8,8 +8,8 @@ import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.BadRequestException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
@@ -108,7 +108,7 @@ public class BasicUserService implements UserService {
     private void validateUsernameAndEmail(String username, String email) {
         if (userRepository.existsByUsernameOrEmail(username, email)) {
             log.warn("User creation failed. duplicated username or email. username={}", username);
-            throw new BadRequestException("이미 사용 중인 유저 이름 또는 이메일 입니다.");
+            throw new UserAlreadyExistsException(username);
         }
     }
 
@@ -120,10 +120,10 @@ public class BasicUserService implements UserService {
         }
 
         if (newUsername != null && userRepository.existsByUsernameAndIdNot(newUsername, userId)) {
-            throw new BadRequestException("이미 사용 중인 유저 이름입니다.");
+            throw new UserAlreadyExistsException(newUsername);
         }
         if (newEmail != null && userRepository.existsByEmailAndIdNot(newEmail, userId)) {
-            throw new BadRequestException("이미 사용 중인 이메일입니다.");
+            throw UserAlreadyExistsException.byEmail(newEmail);
         }
     }
 
@@ -155,7 +155,7 @@ public class BasicUserService implements UserService {
 
     private User findUserOrThrow(UUID id) {
         return userRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 사용자입니다."));
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 
     private UserStatus createUserStatus(User user) {

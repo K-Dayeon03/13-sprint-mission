@@ -4,8 +4,8 @@ import com.sprint.mission.discodeit.dto.command.LoginCommand;
 import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.BadRequestException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.auth.AuthenticationFailedException;
+import com.sprint.mission.discodeit.exception.userstatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -30,10 +30,10 @@ public class BasicAuthService implements AuthService {
     public UserDto login(LoginCommand command) {
         User user = userRepository.findByUsername(command.username())
                 .filter(u -> u.getPassword().equals(command.password()))
-                .orElseThrow(() -> new BadRequestException("유저 이름 또는 비밀번호가 일치하지 않습니다."));
+                .orElseThrow(() -> new AuthenticationFailedException(command.username()));
 
         UserStatus userStatus = userStatusRepository.findByUser_Id(user.getId())
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
+                .orElseThrow(() -> UserStatusNotFoundException.byUserId(user.getId()));
 
         userStatus.updateLastActiveAt(Instant.now());
 

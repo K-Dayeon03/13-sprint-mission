@@ -10,7 +10,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.mapper.MessageMapper;
 import com.sprint.mission.discodeit.mapper.PageResponseMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -189,7 +189,7 @@ class BasicMessageServiceTest {
         given(messageRepository.findById(messageId)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> messageService.findById(messageId))
-                .isInstanceOf(NotFoundException.class)
+                .isInstanceOf(MessageNotFoundException.class)
                 .hasMessageContaining("존재하지 않는 메시지");
     }
 

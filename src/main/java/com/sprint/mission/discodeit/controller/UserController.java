@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -53,7 +54,7 @@ public class UserController {
 
     @Operation(summary = "User 등록")
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> create(@RequestBody CreateUserRequest request) {
+    public ResponseEntity<UserDto> create(@Valid @RequestBody CreateUserRequest request) {
         UserDto user = userService.create(userCommandMapper.toCreateCommand(request), null);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
@@ -61,7 +62,7 @@ public class UserController {
     @Operation(summary = "User 등록")
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> createWithProfileImage(
-            @RequestPart(value = "userCreateRequest", required = false) CreateUserRequest userCreateRequest,
+            @Valid @RequestPart(value = "userCreateRequest", required = false) CreateUserRequest userCreateRequest,
             @RequestParam(required = false) String username,
             @RequestParam(required = false) String email,
             @RequestParam(required = false) String password,
@@ -89,7 +90,7 @@ public class UserController {
 
     @Operation(summary = "User 정보 수정")
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> update(@PathVariable UUID userId, @RequestBody UpdateUserRequest request) {
+    public ResponseEntity<UserDto> update(@PathVariable UUID userId, @Valid @RequestBody UpdateUserRequest request) {
         return ResponseEntity.ok(userService.update(userId, userCommandMapper.toUpdateCommand(request), null));
     }
 
@@ -97,7 +98,7 @@ public class UserController {
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> updateWithProfileImage(
             @PathVariable UUID userId,
-            @RequestPart(value = "userUpdateRequest", required = false) UpdateUserRequest userUpdateRequest,
+            @Valid @RequestPart(value = "userUpdateRequest", required = false) UpdateUserRequest userUpdateRequest,
             @RequestParam(required = false) String newUsername,
             @RequestParam(required = false) String newEmail,
             @RequestParam(required = false) String newPassword,
@@ -122,7 +123,7 @@ public class UserController {
     @Operation(summary = "User 온라인 상태 업데이트")
     @RequestMapping(value = {"/{userId}/status", "/{userId}/userStatus"}, method = RequestMethod.PATCH)
     public ResponseEntity<UserStatusDto> updateStatus(@PathVariable UUID userId,
-                                                      @RequestBody UpdateUserStatusRequest request) {
+                                                      @Valid @RequestBody UpdateUserStatusRequest request) {
         return ResponseEntity.ok(userStatusService.updateByUserId(userId, userStatusCommandMapper.toUpdateCommand(request)));
     }
 }

@@ -1,7 +1,10 @@
 package com.sprint.mission.discodeit.storage;
 
 import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentDataNotFoundException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentReadFailedException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentStorageInitFailedException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentWriteFailedException;
 import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
@@ -34,7 +37,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         try {
             Files.createDirectories(root);
         } catch (IOException e) {
-            throw new RuntimeException("파일 저장소 초기화에 실패했습니다.", e);
+            throw new BinaryContentStorageInitFailedException(root.toString(), e);
         }
     }
 
@@ -48,7 +51,7 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
             Files.write(resolvePath(id), bytes);
             return id;
         } catch (IOException e) {
-            throw new RuntimeException("파일 저장에 실패했습니다.", e);
+            throw new BinaryContentWriteFailedException(id, e);
         }
     }
 
@@ -57,11 +60,11 @@ public class LocalBinaryContentStorage implements BinaryContentStorage {
         try {
             Path path = resolvePath(id);
             if (!Files.exists(path)) {
-                throw new NotFoundException("파일 데이터를 찾을 수 없습니다.");
+                throw new BinaryContentDataNotFoundException(id);
             }
             return Files.newInputStream(path);
         } catch (IOException e) {
-            throw new RuntimeException("파일 읽기에 실패했습니다.", e);
+            throw new BinaryContentReadFailedException(id, e);
         }
     }
 

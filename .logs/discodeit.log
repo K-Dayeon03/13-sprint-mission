@@ -1,0 +1,1694 @@
+26-07-27 17:27:26.607 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
+26-07-27 17:27:26.630 [Test worker] INFO  c.s.m.d.DiscodeitApplicationTests - Starting DiscodeitApplicationTests using Java 17.0.19 with PID 33645 (started by apple in /Users/apple/Desktop/codeit-13th-develop/13-sprint-mission)
+26-07-27 17:27:26.631 [Test worker] INFO  c.s.m.d.DiscodeitApplicationTests - No active profile set, falling back to 1 default profile: "default"
+26-07-27 17:27:27.191 [Test worker] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+26-07-27 17:27:27.247 [Test worker] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 46 ms. Found 6 JPA repository interfaces.
+26-07-27 17:27:27.660 [Test worker] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+26-07-27 17:27:27.695 [Test worker] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.49.Final
+26-07-27 17:27:27.716 [Test worker] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+26-07-27 17:27:27.939 [Test worker] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+26-07-27 17:27:27.963 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+26-07-27 17:27:28.079 [Test worker] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:discodeit-test user=SA
+26-07-27 17:27:28.080 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+26-07-27 17:27:28.125 [Test worker] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'p6SpyDataSourceDecorator [com.p6spy.engine.spy.P6DataSource] -> dataSource [com.zaxxer.hikari.HikariDataSource]']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+26-07-27 17:27:28.737 [Test worker] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+26-07-27 17:27:28.746 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists binary_contents cascade 
+26-07-27 17:27:28.749 [Test worker] INFO  p6spy - #1785140848749 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists binary_contents cascade 
+
+    drop table if exists binary_contents cascade ;
+26-07-27 17:27:28.750 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists channels cascade 
+26-07-27 17:27:28.750 [Test worker] INFO  p6spy - #1785140848750 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists channels cascade 
+
+    drop table if exists channels cascade ;
+26-07-27 17:27:28.751 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists message_attachments cascade 
+26-07-27 17:27:28.753 [Test worker] INFO  p6spy - #1785140848753 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists message_attachments cascade 
+
+    drop table if exists message_attachments cascade ;
+26-07-27 17:27:28.754 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists messages cascade 
+26-07-27 17:27:28.754 [Test worker] INFO  p6spy - #1785140848754 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists messages cascade 
+
+    drop table if exists messages cascade ;
+26-07-27 17:27:28.754 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists read_statuses cascade 
+26-07-27 17:27:28.754 [Test worker] INFO  p6spy - #1785140848754 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists read_statuses cascade 
+
+    drop table if exists read_statuses cascade ;
+26-07-27 17:27:28.755 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists user_statuses cascade 
+26-07-27 17:27:28.755 [Test worker] INFO  p6spy - #1785140848755 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists user_statuses cascade 
+
+    drop table if exists user_statuses cascade ;
+26-07-27 17:27:28.755 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists users cascade 
+26-07-27 17:27:28.755 [Test worker] INFO  p6spy - #1785140848755 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists users cascade 
+
+    drop table if exists users cascade ;
+26-07-27 17:27:28.759 [Test worker] DEBUG org.hibernate.SQL - 
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+26-07-27 17:27:28.763 [Test worker] INFO  p6spy - #1785140848763 | took 3ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    );
+26-07-27 17:27:28.764 [Test worker] DEBUG org.hibernate.SQL - 
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type enum ('PRIVATE','PUBLIC') not null,
+        primary key (id)
+    )
+26-07-27 17:27:28.765 [Test worker] INFO  p6spy - #1785140848765 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type enum ('PRIVATE','PUBLIC') not null,
+        primary key (id)
+    )
+
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type enum ('PRIVATE','PUBLIC') not null,
+        primary key (id)
+    );
+26-07-27 17:27:28.767 [Test worker] DEBUG org.hibernate.SQL - 
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    )
+26-07-27 17:27:28.769 [Test worker] INFO  p6spy - #1785140848769 | took 1ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    )
+
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    );
+26-07-27 17:27:28.770 [Test worker] DEBUG org.hibernate.SQL - 
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text,
+        primary key (id)
+    )
+26-07-27 17:27:28.770 [Test worker] INFO  p6spy - #1785140848770 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text,
+        primary key (id)
+    )
+
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text,
+        primary key (id)
+    );
+26-07-27 17:27:28.771 [Test worker] DEBUG org.hibernate.SQL - 
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+26-07-27 17:27:28.772 [Test worker] INFO  p6spy - #1785140848772 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    );
+26-07-27 17:27:28.772 [Test worker] DEBUG org.hibernate.SQL - 
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+26-07-27 17:27:28.774 [Test worker] INFO  p6spy - #1785140848774 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    );
+26-07-27 17:27:28.774 [Test worker] DEBUG org.hibernate.SQL - 
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+26-07-27 17:27:28.779 [Test worker] INFO  p6spy - #1785140848779 | took 4ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    );
+26-07-27 17:27:28.780 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents
+26-07-27 17:27:28.792 [Test worker] INFO  p6spy - #1785140848792 | took 11ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents
+
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents;
+26-07-27 17:27:28.792 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages
+26-07-27 17:27:28.793 [Test worker] INFO  p6spy - #1785140848793 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages
+
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages;
+26-07-27 17:27:28.793 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users
+26-07-27 17:27:28.794 [Test worker] INFO  p6spy - #1785140848794 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users
+
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users;
+26-07-27 17:27:28.794 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels
+26-07-27 17:27:28.795 [Test worker] INFO  p6spy - #1785140848795 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels
+
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels;
+26-07-27 17:27:28.795 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels
+26-07-27 17:27:28.796 [Test worker] INFO  p6spy - #1785140848796 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels
+
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels;
+26-07-27 17:27:28.796 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users
+26-07-27 17:27:28.797 [Test worker] INFO  p6spy - #1785140848797 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users
+
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users;
+26-07-27 17:27:28.797 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users
+26-07-27 17:27:28.798 [Test worker] INFO  p6spy - #1785140848798 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users
+
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users;
+26-07-27 17:27:28.799 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents
+26-07-27 17:27:28.800 [Test worker] INFO  p6spy - #1785140848800 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents
+
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents;
+26-07-27 17:27:28.803 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+26-07-27 17:27:29.050 [Test worker] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+26-07-27 17:27:29.621 [Test worker] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+26-07-27 17:27:29.909 [Test worker] INFO  c.s.m.d.DiscodeitApplicationTests - Started DiscodeitApplicationTests in 3.518 seconds (process running for 4.254)
+26-07-27 17:27:30.404 [Test worker] INFO  c.s.m.d.c.BinaryContentController - Binary content download requested. binaryContentId=57d3210a-a509-41db-8a26-4de4149192bb, fileName=요청서.png, size=3
+26-07-27 17:27:30.860 [Test worker] INFO  c.s.m.d.s.basic.BasicChannelService - Channel deleted. channelId=ecf83fc5-4003-4e2e-9dd7-82c4b8545411
+26-07-27 17:27:30.893 [Test worker] INFO  c.s.m.d.s.basic.BasicChannelService - Public channel created. channelId=6aefa131-ce51-4fdd-8d61-d5d85cb8320b, name=공지
+26-07-27 17:27:30.898 [Test worker] INFO  c.s.m.d.s.basic.BasicChannelService - Private channel created. channelId=ca67b2a7-07da-401d-85be-0ea6c3d9e033, participantCount=1
+26-07-27 17:27:30.912 [Test worker] INFO  c.s.m.d.s.basic.BasicChannelService - Channel updated. channelId=2a5cab75-ff60-488c-85d8-e4dafac06fc5
+26-07-27 17:27:31.005 [Test worker] INFO  c.s.m.d.s.basic.BasicMessageService - Message created. messageId=47f0f03a-aa42-43c7-8759-9f0e02c834a5, channelId=c888ebde-42f3-4a90-ab59-6dc6326870ba, authorId=9b47e9c0-0c17-47dd-805e-9a83bbc6c1c6, attachmentCount=1
+26-07-27 17:27:31.022 [Test worker] INFO  c.s.m.d.s.basic.BasicMessageService - Message deleted. messageId=921028b2-44c1-4d10-a054-471d98ccfe06
+26-07-27 17:27:31.029 [Test worker] INFO  c.s.m.d.s.basic.BasicMessageService - Message updated. messageId=65d3772d-a3ef-4ad3-bba2-9137877aa7ef
+26-07-27 17:27:31.041 [Test worker] INFO  c.s.m.d.s.basic.BasicMessageService - Message created. messageId=24c26b35-7e5f-4ecc-9745-cbcd3057a87b, channelId=601349e7-4463-477b-af49-06c4f762e2a3, authorId=cabaa8f6-1a92-4a97-a41a-8496ac06e5a7, attachmentCount=0
+26-07-27 17:27:31.071 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService - User deleted. userId=73a70665-f4e8-40ee-ab4b-99cd973fcc1d
+26-07-27 17:27:31.090 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService - User updated. userId=95061445-2f01-46e3-8cb5-71d1357605e1
+26-07-27 17:27:31.096 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService - User created. userId=b2c00e3b-904b-4607-bc8e-5a6d96c530a8, username=woody
+26-07-27 17:27:31.101 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService - User deleted. userId=be8dff0d-7012-4894-805e-2e5031b58103
+26-07-27 17:27:31.105 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService - User created. userId=5e540308-39f7-4d80-b130-130dee90ffc7, username=woody
+26-07-27 17:27:31.109 [Test worker] WARN  c.s.m.d.s.basic.BasicUserService - User creation failed. duplicated username or email. username=woody
+26-07-27 17:27:31.145 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+26-07-27 17:27:31.147 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists binary_contents cascade 
+26-07-27 17:27:31.151 [SpringApplicationShutdownHook] INFO  p6spy - #1785140851151 | took 3ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists binary_contents cascade 
+
+    drop table if exists binary_contents cascade ;
+26-07-27 17:27:31.151 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists channels cascade 
+26-07-27 17:27:31.154 [SpringApplicationShutdownHook] INFO  p6spy - #1785140851154 | took 2ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists channels cascade 
+
+    drop table if exists channels cascade ;
+26-07-27 17:27:31.155 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists message_attachments cascade 
+26-07-27 17:27:31.156 [SpringApplicationShutdownHook] INFO  p6spy - #1785140851156 | took 1ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists message_attachments cascade 
+
+    drop table if exists message_attachments cascade ;
+26-07-27 17:27:31.157 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists messages cascade 
+26-07-27 17:27:31.158 [SpringApplicationShutdownHook] INFO  p6spy - #1785140851158 | took 1ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists messages cascade 
+
+    drop table if exists messages cascade ;
+26-07-27 17:27:31.159 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists read_statuses cascade 
+26-07-27 17:27:31.160 [SpringApplicationShutdownHook] INFO  p6spy - #1785140851160 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists read_statuses cascade 
+
+    drop table if exists read_statuses cascade ;
+26-07-27 17:27:31.160 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists user_statuses cascade 
+26-07-27 17:27:31.161 [SpringApplicationShutdownHook] INFO  p6spy - #1785140851161 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists user_statuses cascade 
+
+    drop table if exists user_statuses cascade ;
+26-07-27 17:27:31.161 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists users cascade 
+26-07-27 17:27:31.163 [SpringApplicationShutdownHook] INFO  p6spy - #1785140851163 | took 1ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists users cascade 
+
+    drop table if exists users cascade ;
+26-07-27 17:27:31.169 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+26-07-27 17:27:31.171 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+26-07-27 17:38:37.873 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
+26-07-27 17:38:37.899 [Test worker] INFO  c.s.m.d.DiscodeitApplicationTests - Starting DiscodeitApplicationTests using Java 17.0.19 with PID 35136 (started by apple in /Users/apple/Desktop/codeit-13th-develop/13-sprint-mission)
+26-07-27 17:38:37.900 [Test worker] INFO  c.s.m.d.DiscodeitApplicationTests - No active profile set, falling back to 1 default profile: "default"
+26-07-27 17:38:38.444 [Test worker] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+26-07-27 17:38:38.488 [Test worker] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 38 ms. Found 6 JPA repository interfaces.
+26-07-27 17:38:38.871 [Test worker] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+26-07-27 17:38:38.907 [Test worker] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.49.Final
+26-07-27 17:38:38.927 [Test worker] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+26-07-27 17:38:39.081 [Test worker] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+26-07-27 17:38:39.103 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+26-07-27 17:38:39.225 [Test worker] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:discodeit-test user=SA
+26-07-27 17:38:39.226 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+26-07-27 17:38:39.269 [Test worker] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'p6SpyDataSourceDecorator [com.p6spy.engine.spy.P6DataSource] -> dataSource [com.zaxxer.hikari.HikariDataSource]']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+26-07-27 17:38:39.872 [Test worker] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+26-07-27 17:38:39.879 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists binary_contents cascade 
+26-07-27 17:38:39.881 [Test worker] INFO  p6spy - #1785141519881 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists binary_contents cascade 
+
+    drop table if exists binary_contents cascade ;
+26-07-27 17:38:39.882 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists channels cascade 
+26-07-27 17:38:39.882 [Test worker] INFO  p6spy - #1785141519882 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists channels cascade 
+
+    drop table if exists channels cascade ;
+26-07-27 17:38:39.882 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists message_attachments cascade 
+26-07-27 17:38:39.882 [Test worker] INFO  p6spy - #1785141519882 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists message_attachments cascade 
+
+    drop table if exists message_attachments cascade ;
+26-07-27 17:38:39.882 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists messages cascade 
+26-07-27 17:38:39.882 [Test worker] INFO  p6spy - #1785141519882 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists messages cascade 
+
+    drop table if exists messages cascade ;
+26-07-27 17:38:39.882 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists read_statuses cascade 
+26-07-27 17:38:39.882 [Test worker] INFO  p6spy - #1785141519882 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists read_statuses cascade 
+
+    drop table if exists read_statuses cascade ;
+26-07-27 17:38:39.883 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists user_statuses cascade 
+26-07-27 17:38:39.883 [Test worker] INFO  p6spy - #1785141519883 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists user_statuses cascade 
+
+    drop table if exists user_statuses cascade ;
+26-07-27 17:38:39.883 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists users cascade 
+26-07-27 17:38:39.883 [Test worker] INFO  p6spy - #1785141519883 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists users cascade 
+
+    drop table if exists users cascade ;
+26-07-27 17:38:39.886 [Test worker] DEBUG org.hibernate.SQL - 
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+26-07-27 17:38:39.893 [Test worker] INFO  p6spy - #1785141519893 | took 6ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    );
+26-07-27 17:38:39.894 [Test worker] DEBUG org.hibernate.SQL - 
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type enum ('PRIVATE','PUBLIC') not null,
+        primary key (id)
+    )
+26-07-27 17:38:39.895 [Test worker] INFO  p6spy - #1785141519895 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type enum ('PRIVATE','PUBLIC') not null,
+        primary key (id)
+    )
+
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type enum ('PRIVATE','PUBLIC') not null,
+        primary key (id)
+    );
+26-07-27 17:38:39.897 [Test worker] DEBUG org.hibernate.SQL - 
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    )
+26-07-27 17:38:39.898 [Test worker] INFO  p6spy - #1785141519898 | took 1ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    )
+
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    );
+26-07-27 17:38:39.898 [Test worker] DEBUG org.hibernate.SQL - 
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text,
+        primary key (id)
+    )
+26-07-27 17:38:39.901 [Test worker] INFO  p6spy - #1785141519901 | took 1ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text,
+        primary key (id)
+    )
+
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text,
+        primary key (id)
+    );
+26-07-27 17:38:39.902 [Test worker] DEBUG org.hibernate.SQL - 
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+26-07-27 17:38:39.903 [Test worker] INFO  p6spy - #1785141519903 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    );
+26-07-27 17:38:39.904 [Test worker] DEBUG org.hibernate.SQL - 
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+26-07-27 17:38:39.905 [Test worker] INFO  p6spy - #1785141519905 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    );
+26-07-27 17:38:39.905 [Test worker] DEBUG org.hibernate.SQL - 
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+26-07-27 17:38:39.907 [Test worker] INFO  p6spy - #1785141519907 | took 1ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    );
+26-07-27 17:38:39.907 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents
+26-07-27 17:38:39.915 [Test worker] INFO  p6spy - #1785141519915 | took 7ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents
+
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents;
+26-07-27 17:38:39.916 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages
+26-07-27 17:38:39.917 [Test worker] INFO  p6spy - #1785141519917 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages
+
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages;
+26-07-27 17:38:39.917 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users
+26-07-27 17:38:39.920 [Test worker] INFO  p6spy - #1785141519920 | took 2ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users
+
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users;
+26-07-27 17:38:39.920 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels
+26-07-27 17:38:39.922 [Test worker] INFO  p6spy - #1785141519922 | took 1ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels
+
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels;
+26-07-27 17:38:39.922 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels
+26-07-27 17:38:39.923 [Test worker] INFO  p6spy - #1785141519923 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels
+
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels;
+26-07-27 17:38:39.923 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users
+26-07-27 17:38:39.924 [Test worker] INFO  p6spy - #1785141519924 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users
+
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users;
+26-07-27 17:38:39.924 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users
+26-07-27 17:38:39.925 [Test worker] INFO  p6spy - #1785141519925 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users
+
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users;
+26-07-27 17:38:39.925 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents
+26-07-27 17:38:39.926 [Test worker] INFO  p6spy - #1785141519926 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents
+
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents;
+26-07-27 17:38:39.929 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+26-07-27 17:38:40.169 [Test worker] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+26-07-27 17:38:40.727 [Test worker] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+26-07-27 17:38:40.901 [Test worker] WARN  o.s.w.c.s.GenericWebApplicationContext - Exception encountered during context initialization - cancelling refresh attempt: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'handlerExceptionResolver' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Failed to instantiate [org.springframework.web.servlet.HandlerExceptionResolver]: Factory method 'handlerExceptionResolver' threw exception with message: Ambiguous @ExceptionHandler method mapped for [ExceptionHandler{exceptionType=org.springframework.web.bind.MethodArgumentNotValidException, mediaType=*/*}]: {public org.springframework.http.ResponseEntity com.sprint.mission.discodeit.global.GlobalExceptionHandler.handleInvalidRequest(java.lang.Exception), public org.springframework.http.ResponseEntity com.sprint.mission.discodeit.global.GlobalExceptionHandler.handleValidationFailed(org.springframework.web.bind.MethodArgumentNotValidException)}
+26-07-27 17:38:40.903 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+26-07-27 17:38:40.903 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists binary_contents cascade 
+26-07-27 17:38:40.904 [Test worker] INFO  p6spy - #1785141520904 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists binary_contents cascade 
+
+    drop table if exists binary_contents cascade ;
+26-07-27 17:38:40.904 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists channels cascade 
+26-07-27 17:38:40.905 [Test worker] INFO  p6spy - #1785141520905 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists channels cascade 
+
+    drop table if exists channels cascade ;
+26-07-27 17:38:40.906 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists message_attachments cascade 
+26-07-27 17:38:40.906 [Test worker] INFO  p6spy - #1785141520906 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists message_attachments cascade 
+
+    drop table if exists message_attachments cascade ;
+26-07-27 17:38:40.906 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists messages cascade 
+26-07-27 17:38:40.906 [Test worker] INFO  p6spy - #1785141520906 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists messages cascade 
+
+    drop table if exists messages cascade ;
+26-07-27 17:38:40.906 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists read_statuses cascade 
+26-07-27 17:38:40.907 [Test worker] INFO  p6spy - #1785141520907 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists read_statuses cascade 
+
+    drop table if exists read_statuses cascade ;
+26-07-27 17:38:40.907 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists user_statuses cascade 
+26-07-27 17:38:40.907 [Test worker] INFO  p6spy - #1785141520907 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists user_statuses cascade 
+
+    drop table if exists user_statuses cascade ;
+26-07-27 17:38:40.907 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists users cascade 
+26-07-27 17:38:40.908 [Test worker] INFO  p6spy - #1785141520908 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists users cascade 
+
+    drop table if exists users cascade ;
+26-07-27 17:38:40.909 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+26-07-27 17:38:40.911 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.
+26-07-27 17:38:40.932 [Test worker] INFO  o.s.b.a.l.ConditionEvaluationReportLogger - 
+
+Error starting ApplicationContext. To display the condition evaluation report re-run your application with 'debug' enabled.
+26-07-27 17:38:40.942 [Test worker] ERROR o.s.boot.SpringApplication - Application run failed
+org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'handlerExceptionResolver' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Failed to instantiate [org.springframework.web.servlet.HandlerExceptionResolver]: Factory method 'handlerExceptionResolver' threw exception with message: Ambiguous @ExceptionHandler method mapped for [ExceptionHandler{exceptionType=org.springframework.web.bind.MethodArgumentNotValidException, mediaType=*/*}]: {public org.springframework.http.ResponseEntity com.sprint.mission.discodeit.global.GlobalExceptionHandler.handleInvalidRequest(java.lang.Exception), public org.springframework.http.ResponseEntity com.sprint.mission.discodeit.global.GlobalExceptionHandler.handleValidationFailed(org.springframework.web.bind.MethodArgumentNotValidException)}
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:657)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:645)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1375)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1205)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1228)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1194)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1130)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:991)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:628)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:151)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46)
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1461)
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:590)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:151)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:110)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152)
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130)
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:200)
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:139)
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:159)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$10(ClassBasedTestDescriptor.java:383)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:388)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:382)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1625)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:382)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$6(ClassBasedTestDescriptor.java:293)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:292)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$4(ClassBasedTestDescriptor.java:281)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:280)
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:27)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$0(TestMethodTestDescriptor.java:112)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:111)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:201)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:170)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:94)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:59)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:142)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$1(InterceptingLauncher.java:39)
+	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)
+	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:38)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestDefinitionProcessor$CollectThenExecuteTestDefinitionConsumer.processAllTestClasses(JUnitPlatformTestDefinitionProcessor.java:172)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestDefinitionProcessor$CollectThenExecuteTestDefinitionConsumer.access$000(JUnitPlatformTestDefinitionProcessor.java:121)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestDefinitionProcessor.stop(JUnitPlatformTestDefinitionProcessor.java:114)
+	at org.gradle.api.internal.tasks.testing.SuiteTestDefinitionProcessor.stop(SuiteTestDefinitionProcessor.java:64)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.gradle.internal.dispatch.MethodInvocation.invokeOn(MethodInvocation.java:77)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:28)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:19)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:88)
+	at jdk.proxy1/jdk.proxy1.$Proxy4.stop(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:195)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:126)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)
+	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:122)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:72)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.web.servlet.HandlerExceptionResolver]: Factory method 'handlerExceptionResolver' threw exception with message: Ambiguous @ExceptionHandler method mapped for [ExceptionHandler{exceptionType=org.springframework.web.bind.MethodArgumentNotValidException, mediaType=*/*}]: {public org.springframework.http.ResponseEntity com.sprint.mission.discodeit.global.GlobalExceptionHandler.handleInvalidRequest(java.lang.Exception), public org.springframework.http.ResponseEntity com.sprint.mission.discodeit.global.GlobalExceptionHandler.handleValidationFailed(org.springframework.web.bind.MethodArgumentNotValidException)}
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:200)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiateWithFactoryMethod(SimpleInstantiationStrategy.java:89)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:169)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:653)
+	... 120 common frames omitted
+Caused by: java.lang.IllegalStateException: Ambiguous @ExceptionHandler method mapped for [ExceptionHandler{exceptionType=org.springframework.web.bind.MethodArgumentNotValidException, mediaType=*/*}]: {public org.springframework.http.ResponseEntity com.sprint.mission.discodeit.global.GlobalExceptionHandler.handleInvalidRequest(java.lang.Exception), public org.springframework.http.ResponseEntity com.sprint.mission.discodeit.global.GlobalExceptionHandler.handleValidationFailed(org.springframework.web.bind.MethodArgumentNotValidException)}
+	at org.springframework.web.method.annotation.ExceptionHandlerMethodResolver.addExceptionMapping(ExceptionHandlerMethodResolver.java:146)
+	at org.springframework.web.method.annotation.ExceptionHandlerMethodResolver.<init>(ExceptionHandlerMethodResolver.java:99)
+	at org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver.initExceptionHandlerAdviceCache(ExceptionHandlerExceptionResolver.java:320)
+	at org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver.afterPropertiesSet(ExceptionHandlerExceptionResolver.java:287)
+	at org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport.addDefaultHandlerExceptionResolvers(WebMvcConfigurationSupport.java:1084)
+	at org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport.handlerExceptionResolver(WebMvcConfigurationSupport.java:1025)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:172)
+	... 123 common frames omitted
+26-07-27 17:38:40.946 [Test worker] WARN  o.s.test.context.TestContextManager - Caught exception while allowing TestExecutionListener [org.springframework.test.context.web.ServletTestExecutionListener] to prepare test instance [com.sprint.mission.discodeit.DiscodeitApplicationTests@2e826bd1]
+java.lang.IllegalStateException: Failed to load ApplicationContext for [WebMergedContextConfiguration@6d8c1584 testClass = com.sprint.mission.discodeit.DiscodeitApplicationTests, locations = [], classes = [com.sprint.mission.discodeit.DiscodeitApplication], contextInitializerClasses = [], activeProfiles = [], propertySourceDescriptors = [], propertySourceProperties = ["spring.datasource.url=jdbc:h2:mem:discodeit-test;MODE=PostgreSQL;DATABASE_TO_LOWER=TRUE;DB_CLOSE_DELAY=-1", "spring.datasource.driver-class-name=org.h2.Driver", "spring.datasource.username=sa", "spring.datasource.password=", "spring.sql.init.mode=never", "spring.jpa.hibernate.ddl-auto=create-drop", "discodeit.storage.type=local", "discodeit.storage.local.root-path=${java.io.tmpdir}/discodeit-test-binary-contents", "org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true"], contextCustomizers = [org.springframework.boot.test.autoconfigure.OnFailureConditionReportContextCustomizerFactory$OnFailureConditionReportContextCustomizer@65fe9e33, org.springframework.boot.test.autoconfigure.actuate.observability.ObservabilityContextCustomizerFactory$DisableObservabilityContextCustomizer@1f, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizer@4bff64c2, org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@4566d049, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@7f6f61c8, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@3c9bfddc, org.springframework.boot.test.web.reactor.netty.DisableReactorResourceFactoryGlobalResourcesContextCustomizerFactory$DisableReactorResourceFactoryGlobalResourcesContextCustomizerCustomizer@58fb7731, org.springframework.test.context.support.DynamicPropertiesContextCustomizer@0, org.springframework.boot.test.context.SpringBootTestAnnotation@441461bc], resourceBasePath = "src/main/webapp", contextLoader = org.springframework.boot.test.context.SpringBootContextLoader, parent = null]
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:180)
+	at org.springframework.test.context.support.DefaultTestContext.getApplicationContext(DefaultTestContext.java:130)
+	at org.springframework.test.context.web.ServletTestExecutionListener.setUpRequestContextIfNecessary(ServletTestExecutionListener.java:200)
+	at org.springframework.test.context.web.ServletTestExecutionListener.prepareTestInstance(ServletTestExecutionListener.java:139)
+	at org.springframework.test.context.TestContextManager.prepareTestInstance(TestContextManager.java:260)
+	at org.springframework.test.context.junit.jupiter.SpringExtension.postProcessTestInstance(SpringExtension.java:159)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$10(ClassBasedTestDescriptor.java:383)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.executeAndMaskThrowable(ClassBasedTestDescriptor.java:388)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$invokeTestInstancePostProcessors$11(ClassBasedTestDescriptor.java:382)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.accept(ForEachOps.java:183)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.stream.ReferencePipeline$2$1.accept(ReferencePipeline.java:179)
+	at java.base/java.util.stream.ReferencePipeline$3$1.accept(ReferencePipeline.java:197)
+	at java.base/java.util.ArrayList$ArrayListSpliterator.forEachRemaining(ArrayList.java:1625)
+	at java.base/java.util.stream.AbstractPipeline.copyInto(AbstractPipeline.java:509)
+	at java.base/java.util.stream.AbstractPipeline.wrapAndCopyInto(AbstractPipeline.java:499)
+	at java.base/java.util.stream.ForEachOps$ForEachOp.evaluateSequential(ForEachOps.java:150)
+	at java.base/java.util.stream.ForEachOps$ForEachOp$OfRef.evaluateSequential(ForEachOps.java:173)
+	at java.base/java.util.stream.AbstractPipeline.evaluate(AbstractPipeline.java:234)
+	at java.base/java.util.stream.ReferencePipeline.forEach(ReferencePipeline.java:596)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.invokeTestInstancePostProcessors(ClassBasedTestDescriptor.java:382)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$instantiateAndPostProcessTestInstance$6(ClassBasedTestDescriptor.java:293)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.instantiateAndPostProcessTestInstance(ClassBasedTestDescriptor.java:292)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$4(ClassBasedTestDescriptor.java:281)
+	at java.base/java.util.Optional.orElseGet(Optional.java:364)
+	at org.junit.jupiter.engine.descriptor.ClassBasedTestDescriptor.lambda$testInstancesProvider$5(ClassBasedTestDescriptor.java:280)
+	at org.junit.jupiter.engine.execution.TestInstancesProvider.getTestInstances(TestInstancesProvider.java:27)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.lambda$prepare$0(TestMethodTestDescriptor.java:112)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:111)
+	at org.junit.jupiter.engine.descriptor.TestMethodTestDescriptor.prepare(TestMethodTestDescriptor.java:69)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$prepare$2(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.prepare(NodeTestTask.java:128)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:95)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at java.base/java.util.ArrayList.forEach(ArrayList.java:1511)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.invokeAll(SameThreadHierarchicalTestExecutorService.java:41)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$6(NodeTestTask.java:160)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$8(NodeTestTask.java:146)
+	at org.junit.platform.engine.support.hierarchical.Node.around(Node.java:137)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.lambda$executeRecursively$9(NodeTestTask.java:144)
+	at org.junit.platform.engine.support.hierarchical.ThrowableCollector.execute(ThrowableCollector.java:73)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.executeRecursively(NodeTestTask.java:143)
+	at org.junit.platform.engine.support.hierarchical.NodeTestTask.execute(NodeTestTask.java:100)
+	at org.junit.platform.engine.support.hierarchical.SameThreadHierarchicalTestExecutorService.submit(SameThreadHierarchicalTestExecutorService.java:35)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestExecutor.execute(HierarchicalTestExecutor.java:57)
+	at org.junit.platform.engine.support.hierarchical.HierarchicalTestEngine.execute(HierarchicalTestEngine.java:54)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:201)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:170)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:94)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.lambda$execute$0(EngineExecutionOrchestrator.java:59)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.withInterceptedStreams(EngineExecutionOrchestrator.java:142)
+	at org.junit.platform.launcher.core.EngineExecutionOrchestrator.execute(EngineExecutionOrchestrator.java:58)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:103)
+	at org.junit.platform.launcher.core.DefaultLauncher.execute(DefaultLauncher.java:85)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.junit.platform.launcher.core.InterceptingLauncher.lambda$execute$1(InterceptingLauncher.java:39)
+	at org.junit.platform.launcher.core.ClasspathAlignmentCheckingLauncherInterceptor.intercept(ClasspathAlignmentCheckingLauncherInterceptor.java:25)
+	at org.junit.platform.launcher.core.InterceptingLauncher.execute(InterceptingLauncher.java:38)
+	at org.junit.platform.launcher.core.DelegatingLauncher.execute(DelegatingLauncher.java:47)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestDefinitionProcessor$CollectThenExecuteTestDefinitionConsumer.processAllTestClasses(JUnitPlatformTestDefinitionProcessor.java:172)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestDefinitionProcessor$CollectThenExecuteTestDefinitionConsumer.access$000(JUnitPlatformTestDefinitionProcessor.java:121)
+	at org.gradle.api.internal.tasks.testing.junitplatform.JUnitPlatformTestDefinitionProcessor.stop(JUnitPlatformTestDefinitionProcessor.java:114)
+	at org.gradle.api.internal.tasks.testing.SuiteTestDefinitionProcessor.stop(SuiteTestDefinitionProcessor.java:64)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.gradle.internal.dispatch.MethodInvocation.invokeOn(MethodInvocation.java:77)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:28)
+	at org.gradle.internal.dispatch.ReflectionDispatch.dispatch(ReflectionDispatch.java:19)
+	at org.gradle.internal.dispatch.ContextClassLoaderDispatch.dispatch(ContextClassLoaderDispatch.java:33)
+	at org.gradle.internal.dispatch.ProxyDispatchAdapter$DispatchingInvocationHandler.invoke(ProxyDispatchAdapter.java:88)
+	at jdk.proxy1/jdk.proxy1.$Proxy4.stop(Unknown Source)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker$3.run(TestWorker.java:195)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.executeAndMaintainThreadName(TestWorker.java:126)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:103)
+	at org.gradle.api.internal.tasks.testing.worker.TestWorker.execute(TestWorker.java:63)
+	at org.gradle.process.internal.worker.child.ActionExecutionWorker.execute(ActionExecutionWorker.java:56)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:122)
+	at org.gradle.process.internal.worker.child.SystemApplicationClassLoaderWorker.call(SystemApplicationClassLoaderWorker.java:72)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.run(GradleWorkerMain.java:69)
+	at worker.org.gradle.process.internal.worker.GradleWorkerMain.main(GradleWorkerMain.java:74)
+Caused by: org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'handlerExceptionResolver' defined in class path resource [org/springframework/boot/autoconfigure/web/servlet/WebMvcAutoConfiguration$EnableWebMvcConfiguration.class]: Failed to instantiate [org.springframework.web.servlet.HandlerExceptionResolver]: Factory method 'handlerExceptionResolver' threw exception with message: Ambiguous @ExceptionHandler method mapped for [ExceptionHandler{exceptionType=org.springframework.web.bind.MethodArgumentNotValidException, mediaType=*/*}]: {public org.springframework.http.ResponseEntity com.sprint.mission.discodeit.global.GlobalExceptionHandler.handleInvalidRequest(java.lang.Exception), public org.springframework.http.ResponseEntity com.sprint.mission.discodeit.global.GlobalExceptionHandler.handleValidationFailed(org.springframework.web.bind.MethodArgumentNotValidException)}
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:657)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiateUsingFactoryMethod(ConstructorResolver.java:645)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.instantiateUsingFactoryMethod(AbstractAutowireCapableBeanFactory.java:1375)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBeanInstance(AbstractAutowireCapableBeanFactory.java:1205)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.doCreateBean(AbstractAutowireCapableBeanFactory.java:569)
+	at org.springframework.beans.factory.support.AbstractAutowireCapableBeanFactory.createBean(AbstractAutowireCapableBeanFactory.java:529)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.lambda$doGetBean$0(AbstractBeanFactory.java:339)
+	at org.springframework.beans.factory.support.DefaultSingletonBeanRegistry.getSingleton(DefaultSingletonBeanRegistry.java:373)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.doGetBean(AbstractBeanFactory.java:337)
+	at org.springframework.beans.factory.support.AbstractBeanFactory.getBean(AbstractBeanFactory.java:202)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.instantiateSingleton(DefaultListableBeanFactory.java:1228)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingleton(DefaultListableBeanFactory.java:1194)
+	at org.springframework.beans.factory.support.DefaultListableBeanFactory.preInstantiateSingletons(DefaultListableBeanFactory.java:1130)
+	at org.springframework.context.support.AbstractApplicationContext.finishBeanFactoryInitialization(AbstractApplicationContext.java:991)
+	at org.springframework.context.support.AbstractApplicationContext.refresh(AbstractApplicationContext.java:628)
+	at org.springframework.boot.SpringApplication.refresh(SpringApplication.java:752)
+	at org.springframework.boot.SpringApplication.refreshContext(SpringApplication.java:439)
+	at org.springframework.boot.SpringApplication.run(SpringApplication.java:318)
+	at org.springframework.boot.test.context.SpringBootContextLoader.lambda$loadContext$3(SpringBootContextLoader.java:151)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:58)
+	at org.springframework.util.function.ThrowingSupplier.get(ThrowingSupplier.java:46)
+	at org.springframework.boot.SpringApplication.withHook(SpringApplication.java:1461)
+	at org.springframework.boot.test.context.SpringBootContextLoader$ContextLoaderHook.run(SpringBootContextLoader.java:590)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:151)
+	at org.springframework.boot.test.context.SpringBootContextLoader.loadContext(SpringBootContextLoader.java:110)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContextInternal(DefaultCacheAwareContextLoaderDelegate.java:225)
+	at org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate.loadContext(DefaultCacheAwareContextLoaderDelegate.java:152)
+	... 94 common frames omitted
+Caused by: org.springframework.beans.BeanInstantiationException: Failed to instantiate [org.springframework.web.servlet.HandlerExceptionResolver]: Factory method 'handlerExceptionResolver' threw exception with message: Ambiguous @ExceptionHandler method mapped for [ExceptionHandler{exceptionType=org.springframework.web.bind.MethodArgumentNotValidException, mediaType=*/*}]: {public org.springframework.http.ResponseEntity com.sprint.mission.discodeit.global.GlobalExceptionHandler.handleInvalidRequest(java.lang.Exception), public org.springframework.http.ResponseEntity com.sprint.mission.discodeit.global.GlobalExceptionHandler.handleValidationFailed(org.springframework.web.bind.MethodArgumentNotValidException)}
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:200)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiateWithFactoryMethod(SimpleInstantiationStrategy.java:89)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.instantiate(SimpleInstantiationStrategy.java:169)
+	at org.springframework.beans.factory.support.ConstructorResolver.instantiate(ConstructorResolver.java:653)
+	... 120 common frames omitted
+Caused by: java.lang.IllegalStateException: Ambiguous @ExceptionHandler method mapped for [ExceptionHandler{exceptionType=org.springframework.web.bind.MethodArgumentNotValidException, mediaType=*/*}]: {public org.springframework.http.ResponseEntity com.sprint.mission.discodeit.global.GlobalExceptionHandler.handleInvalidRequest(java.lang.Exception), public org.springframework.http.ResponseEntity com.sprint.mission.discodeit.global.GlobalExceptionHandler.handleValidationFailed(org.springframework.web.bind.MethodArgumentNotValidException)}
+	at org.springframework.web.method.annotation.ExceptionHandlerMethodResolver.addExceptionMapping(ExceptionHandlerMethodResolver.java:146)
+	at org.springframework.web.method.annotation.ExceptionHandlerMethodResolver.<init>(ExceptionHandlerMethodResolver.java:99)
+	at org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver.initExceptionHandlerAdviceCache(ExceptionHandlerExceptionResolver.java:320)
+	at org.springframework.web.servlet.mvc.method.annotation.ExceptionHandlerExceptionResolver.afterPropertiesSet(ExceptionHandlerExceptionResolver.java:287)
+	at org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport.addDefaultHandlerExceptionResolvers(WebMvcConfigurationSupport.java:1084)
+	at org.springframework.web.servlet.config.annotation.WebMvcConfigurationSupport.handlerExceptionResolver(WebMvcConfigurationSupport.java:1025)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke0(Native Method)
+	at java.base/jdk.internal.reflect.NativeMethodAccessorImpl.invoke(NativeMethodAccessorImpl.java:77)
+	at java.base/jdk.internal.reflect.DelegatingMethodAccessorImpl.invoke(DelegatingMethodAccessorImpl.java:43)
+	at java.base/java.lang.reflect.Method.invoke(Method.java:569)
+	at org.springframework.beans.factory.support.SimpleInstantiationStrategy.lambda$instantiate$0(SimpleInstantiationStrategy.java:172)
+	... 123 common frames omitted
+26-07-27 17:38:41.382 [Test worker] INFO  c.s.m.d.c.BinaryContentController - Binary content download requested. binaryContentId=a3fff1bf-a7e3-41bb-b999-02f9ad757cdc, fileName=요청서.png, size=3
+26-07-27 17:38:41.780 [Test worker] INFO  c.s.m.d.s.basic.BasicChannelService - Channel deleted. channelId=9b9922b0-5480-409e-a233-7acf7d9ee8e8
+26-07-27 17:38:41.805 [Test worker] INFO  c.s.m.d.s.basic.BasicChannelService - Public channel created. channelId=25b69568-c7cf-463b-8084-bc716064dee9, name=공지
+26-07-27 17:38:41.809 [Test worker] INFO  c.s.m.d.s.basic.BasicChannelService - Private channel created. channelId=845b6bc9-3aed-4b96-8ca9-8d515943be0d, participantCount=1
+26-07-27 17:38:41.817 [Test worker] INFO  c.s.m.d.s.basic.BasicChannelService - Channel updated. channelId=7a71e3d7-cfab-4730-a678-c81195d8af69
+26-07-27 17:38:41.883 [Test worker] INFO  c.s.m.d.s.basic.BasicMessageService - Message created. messageId=ba3b8be6-8de0-4a8e-8265-df21d08dcdc1, channelId=eda15334-098e-4656-8a6d-c35f920006f4, authorId=dfec2c4c-4466-42bf-9e83-39064551439a, attachmentCount=1
+26-07-27 17:38:41.894 [Test worker] INFO  c.s.m.d.s.basic.BasicMessageService - Message deleted. messageId=2c52c15a-b511-4916-a8e2-e884e2168309
+26-07-27 17:38:41.903 [Test worker] INFO  c.s.m.d.s.basic.BasicMessageService - Message updated. messageId=85106244-3713-4696-bcb7-eff099ad62b7
+26-07-27 17:38:41.912 [Test worker] INFO  c.s.m.d.s.basic.BasicMessageService - Message created. messageId=0555ed4a-c10f-4f58-9c8c-8aaa4bfcacb7, channelId=994e8923-9073-41d7-b73e-f852b6aa07a1, authorId=4f0f2d80-9dca-45e5-9528-7aa76e138403, attachmentCount=0
+26-07-27 17:38:41.934 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService - User deleted. userId=508cdc2b-a405-45b9-873d-d60dd3f0902a
+26-07-27 17:38:41.947 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService - User updated. userId=5b21d94e-cea6-4fa8-b572-947487179e88
+26-07-27 17:38:41.951 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService - User created. userId=28e6b225-4b86-408a-a99f-860e53b7b4be, username=woody
+26-07-27 17:38:41.955 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService - User deleted. userId=de2717d2-56e5-467c-94c2-0bb354623caf
+26-07-27 17:38:41.960 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService - User created. userId=a1179ece-b716-4124-9ae6-effbd317795b, username=woody
+26-07-27 17:38:41.964 [Test worker] WARN  c.s.m.d.s.basic.BasicUserService - User creation failed. duplicated username or email. username=woody
+26-07-27 17:40:15.736 [background-preinit] INFO  o.h.validator.internal.util.Version - HV000001: Hibernate Validator 8.0.3.Final
+26-07-27 17:40:15.766 [Test worker] INFO  c.s.m.d.DiscodeitApplicationTests - Starting DiscodeitApplicationTests using Java 17.0.19 with PID 35506 (started by apple in /Users/apple/Desktop/codeit-13th-develop/13-sprint-mission)
+26-07-27 17:40:15.770 [Test worker] INFO  c.s.m.d.DiscodeitApplicationTests - No active profile set, falling back to 1 default profile: "default"
+26-07-27 17:40:16.845 [Test worker] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+26-07-27 17:40:16.900 [Test worker] INFO  o.s.d.r.c.RepositoryConfigurationDelegate - Finished Spring Data repository scanning in 40 ms. Found 6 JPA repository interfaces.
+26-07-27 17:40:17.323 [Test worker] INFO  o.h.jpa.internal.util.LogHelper - HHH000204: Processing PersistenceUnitInfo [name: default]
+26-07-27 17:40:17.363 [Test worker] INFO  org.hibernate.Version - HHH000412: Hibernate ORM core version 6.6.49.Final
+26-07-27 17:40:17.386 [Test worker] INFO  o.h.c.i.RegionFactoryInitiator - HHH000026: Second-level cache disabled
+26-07-27 17:40:17.551 [Test worker] INFO  o.s.o.j.p.SpringPersistenceUnitInfo - No LoadTimeWeaver setup: ignoring JPA class transformer
+26-07-27 17:40:17.574 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Starting...
+26-07-27 17:40:17.842 [Test worker] INFO  com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection conn0: url=jdbc:h2:mem:discodeit-test user=SA
+26-07-27 17:40:17.844 [Test worker] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Start completed.
+26-07-27 17:40:17.896 [Test worker] INFO  o.hibernate.orm.connections.pooling - HHH10001005: Database info:
+	Database JDBC URL [Connecting through datasource 'p6SpyDataSourceDecorator [com.p6spy.engine.spy.P6DataSource] -> dataSource [com.zaxxer.hikari.HikariDataSource]']
+	Database driver: undefined/unknown
+	Database version: 2.3.232
+	Autocommit mode: undefined/unknown
+	Isolation level: undefined/unknown
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+26-07-27 17:40:18.593 [Test worker] INFO  o.h.e.t.j.p.i.JtaPlatformInitiator - HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+26-07-27 17:40:18.627 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists binary_contents cascade 
+26-07-27 17:40:18.630 [Test worker] INFO  p6spy - #1785141618630 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists binary_contents cascade 
+
+    drop table if exists binary_contents cascade ;
+26-07-27 17:40:18.631 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists channels cascade 
+26-07-27 17:40:18.631 [Test worker] INFO  p6spy - #1785141618631 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists channels cascade 
+
+    drop table if exists channels cascade ;
+26-07-27 17:40:18.632 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists message_attachments cascade 
+26-07-27 17:40:18.633 [Test worker] INFO  p6spy - #1785141618633 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists message_attachments cascade 
+
+    drop table if exists message_attachments cascade ;
+26-07-27 17:40:18.634 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists messages cascade 
+26-07-27 17:40:18.634 [Test worker] INFO  p6spy - #1785141618634 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists messages cascade 
+
+    drop table if exists messages cascade ;
+26-07-27 17:40:18.634 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists read_statuses cascade 
+26-07-27 17:40:18.634 [Test worker] INFO  p6spy - #1785141618634 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists read_statuses cascade 
+
+    drop table if exists read_statuses cascade ;
+26-07-27 17:40:18.634 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists user_statuses cascade 
+26-07-27 17:40:18.635 [Test worker] INFO  p6spy - #1785141618635 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists user_statuses cascade 
+
+    drop table if exists user_statuses cascade ;
+26-07-27 17:40:18.635 [Test worker] DEBUG org.hibernate.SQL - 
+    drop table if exists users cascade 
+26-07-27 17:40:18.635 [Test worker] INFO  p6spy - #1785141618635 | took 0ms | statement | connection 1| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists users cascade 
+
+    drop table if exists users cascade ;
+26-07-27 17:40:18.638 [Test worker] DEBUG org.hibernate.SQL - 
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+26-07-27 17:40:18.641 [Test worker] INFO  p6spy - #1785141618641 | took 3ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    )
+
+    create table binary_contents (
+        created_at timestamp(6) with time zone not null,
+        size bigint not null,
+        id uuid not null,
+        content_type varchar(100) not null,
+        file_name varchar(255) not null,
+        primary key (id)
+    );
+26-07-27 17:40:18.643 [Test worker] DEBUG org.hibernate.SQL - 
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type enum ('PRIVATE','PUBLIC') not null,
+        primary key (id)
+    )
+26-07-27 17:40:18.643 [Test worker] INFO  p6spy - #1785141618643 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type enum ('PRIVATE','PUBLIC') not null,
+        primary key (id)
+    )
+
+    create table channels (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        name varchar(100),
+        description varchar(500),
+        type enum ('PRIVATE','PUBLIC') not null,
+        primary key (id)
+    );
+26-07-27 17:40:18.644 [Test worker] DEBUG org.hibernate.SQL - 
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    )
+26-07-27 17:40:18.645 [Test worker] INFO  p6spy - #1785141618645 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    )
+
+    create table message_attachments (
+        attachment_id uuid not null unique,
+        message_id uuid not null
+    );
+26-07-27 17:40:18.645 [Test worker] DEBUG org.hibernate.SQL - 
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text,
+        primary key (id)
+    )
+26-07-27 17:40:18.646 [Test worker] INFO  p6spy - #1785141618646 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text,
+        primary key (id)
+    )
+
+    create table messages (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        author_id uuid,
+        channel_id uuid not null,
+        id uuid not null,
+        content text,
+        primary key (id)
+    );
+26-07-27 17:40:18.646 [Test worker] DEBUG org.hibernate.SQL - 
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+26-07-27 17:40:18.647 [Test worker] INFO  p6spy - #1785141618647 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    )
+
+    create table read_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_read_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        channel_id uuid not null,
+        id uuid not null,
+        user_id uuid not null,
+        primary key (id)
+    );
+26-07-27 17:40:18.648 [Test worker] DEBUG org.hibernate.SQL - 
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+26-07-27 17:40:18.652 [Test worker] INFO  p6spy - #1785141618652 | took 3ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    )
+
+    create table user_statuses (
+        created_at timestamp(6) with time zone not null,
+        last_active_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        user_id uuid not null unique,
+        primary key (id)
+    );
+26-07-27 17:40:18.655 [Test worker] DEBUG org.hibernate.SQL - 
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+26-07-27 17:40:18.663 [Test worker] INFO  p6spy - #1785141618663 | took 6ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    )
+
+    create table users (
+        created_at timestamp(6) with time zone not null,
+        updated_at timestamp(6) with time zone,
+        id uuid not null,
+        profile_id uuid unique,
+        username varchar(50) not null unique,
+        password varchar(60) not null,
+        email varchar(100) not null unique,
+        primary key (id)
+    );
+26-07-27 17:40:18.664 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents
+26-07-27 17:40:18.685 [Test worker] INFO  p6spy - #1785141618685 | took 20ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents
+
+    alter table if exists message_attachments 
+       add constraint FKsd1m8rb8jcpbcnb7rpdue7ctc 
+       foreign key (attachment_id) 
+       references binary_contents;
+26-07-27 17:40:18.686 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages
+26-07-27 17:40:18.694 [Test worker] INFO  p6spy - #1785141618694 | took 6ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages
+
+    alter table if exists message_attachments 
+       add constraint FKj7twd218e2gqw9cmlhwvo1rth 
+       foreign key (message_id) 
+       references messages;
+26-07-27 17:40:18.695 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users
+26-07-27 17:40:18.696 [Test worker] INFO  p6spy - #1785141618696 | took 1ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users
+
+    alter table if exists messages 
+       add constraint FKowtlim26svclkatusptbgi7u1 
+       foreign key (author_id) 
+       references users;
+26-07-27 17:40:18.696 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels
+26-07-27 17:40:18.698 [Test worker] INFO  p6spy - #1785141618698 | took 1ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels
+
+    alter table if exists messages 
+       add constraint FK3u3ckbhwq9se1cmopk2pq05b2 
+       foreign key (channel_id) 
+       references channels;
+26-07-27 17:40:18.698 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels
+26-07-27 17:40:18.701 [Test worker] INFO  p6spy - #1785141618701 | took 2ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels
+
+    alter table if exists read_statuses 
+       add constraint FKa38ri44ml4gfdpklx4ahqr8gd 
+       foreign key (channel_id) 
+       references channels;
+26-07-27 17:40:18.701 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users
+26-07-27 17:40:18.704 [Test worker] INFO  p6spy - #1785141618704 | took 2ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users
+
+    alter table if exists read_statuses 
+       add constraint FKml3k4wr9sj5yxrmj6d0aoib2e 
+       foreign key (user_id) 
+       references users;
+26-07-27 17:40:18.704 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users
+26-07-27 17:40:18.705 [Test worker] INFO  p6spy - #1785141618705 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users
+
+    alter table if exists user_statuses 
+       add constraint FK4lfl3ei2ubchgcxrrpo3pw4mm 
+       foreign key (user_id) 
+       references users;
+26-07-27 17:40:18.705 [Test worker] DEBUG org.hibernate.SQL - 
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents
+26-07-27 17:40:18.706 [Test worker] INFO  p6spy - #1785141618706 | took 0ms | statement | connection 2| url jdbc:h2:mem:discodeit-test
+
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents
+
+    alter table if exists users 
+       add constraint FKtbudycgrip49xdptogmhfqnso 
+       foreign key (profile_id) 
+       references binary_contents;
+26-07-27 17:40:18.709 [Test worker] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Initialized JPA EntityManagerFactory for persistence unit 'default'
+26-07-27 17:40:19.060 [Test worker] INFO  o.s.d.j.r.query.QueryEnhancerFactory - Hibernate is in classpath; If applicable, HQL parser will be used.
+26-07-27 17:40:19.666 [Test worker] INFO  o.s.b.a.w.s.WelcomePageHandlerMapping - Adding welcome page: class path resource [static/index.html]
+26-07-27 17:40:19.965 [Test worker] INFO  c.s.m.d.DiscodeitApplicationTests - Started DiscodeitApplicationTests in 4.482 seconds (process running for 5.434)
+26-07-27 17:40:20.439 [Test worker] INFO  c.s.m.d.c.BinaryContentController - Binary content download requested. binaryContentId=177a7b28-d917-4f2a-b674-0dbee612925f, fileName=요청서.png, size=3
+26-07-27 17:40:20.780 [Test worker] INFO  c.s.m.d.s.basic.BasicChannelService - Channel deleted. channelId=196aaf81-8cc6-496f-aeed-4bad3a9be649
+26-07-27 17:40:20.806 [Test worker] INFO  c.s.m.d.s.basic.BasicChannelService - Public channel created. channelId=766d0819-0408-4b11-b983-22232fb7b2e5, name=공지
+26-07-27 17:40:20.811 [Test worker] INFO  c.s.m.d.s.basic.BasicChannelService - Private channel created. channelId=89da2628-e5d7-4ac4-94b2-ae3fb5888b6c, participantCount=1
+26-07-27 17:40:20.824 [Test worker] INFO  c.s.m.d.s.basic.BasicChannelService - Channel updated. channelId=686fb2f1-9784-4030-9b5f-43e07b954efe
+26-07-27 17:40:20.874 [Test worker] INFO  c.s.m.d.s.basic.BasicMessageService - Message created. messageId=0cb8e55b-87b6-4fd3-b487-bf879ccde210, channelId=73cb4837-ede1-4597-8968-fa21fd10d733, authorId=fac7dfcc-61af-4e7f-9f3d-8f1cb2f1b7e7, attachmentCount=1
+26-07-27 17:40:20.881 [Test worker] INFO  c.s.m.d.s.basic.BasicMessageService - Message deleted. messageId=09421f09-faa4-4826-911b-adda64cec6bc
+26-07-27 17:40:20.891 [Test worker] INFO  c.s.m.d.s.basic.BasicMessageService - Message updated. messageId=624d285c-efaa-40d3-b0fd-bfe806f794c9
+26-07-27 17:40:20.896 [Test worker] INFO  c.s.m.d.s.basic.BasicMessageService - Message created. messageId=cb4f56de-f4b5-4684-ae6e-c333ff680d51, channelId=9c3b26f5-9e1a-4cbc-8e1c-03a976bba60b, authorId=fd8b8795-b9b7-47b5-a3ea-605afa6754e5, attachmentCount=0
+26-07-27 17:40:20.911 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService - User deleted. userId=39c385cb-bb0a-4ffd-8e3a-2905cf6f67aa
+26-07-27 17:40:20.927 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService - User updated. userId=a0d84ef9-4048-4427-bb65-fe195e8f62b0
+26-07-27 17:40:20.930 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService - User created. userId=f93dfefb-1105-4d03-8152-fb79c03b8fa0, username=woody
+26-07-27 17:40:20.934 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService - User deleted. userId=716459db-87a3-4b7a-9710-42e847face1c
+26-07-27 17:40:20.938 [Test worker] INFO  c.s.m.d.s.basic.BasicUserService - User created. userId=aae0ddd7-ea06-486f-a6d2-8cfcc86b4e2b, username=woody
+26-07-27 17:40:20.941 [Test worker] WARN  c.s.m.d.s.basic.BasicUserService - User creation failed. duplicated username or email. username=woody
+26-07-27 17:40:20.958 [SpringApplicationShutdownHook] INFO  o.s.o.j.LocalContainerEntityManagerFactoryBean - Closing JPA EntityManagerFactory for persistence unit 'default'
+26-07-27 17:40:20.958 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists binary_contents cascade 
+26-07-27 17:40:20.959 [SpringApplicationShutdownHook] INFO  p6spy - #1785141620959 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists binary_contents cascade 
+
+    drop table if exists binary_contents cascade ;
+26-07-27 17:40:20.959 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists channels cascade 
+26-07-27 17:40:20.960 [SpringApplicationShutdownHook] INFO  p6spy - #1785141620960 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists channels cascade 
+
+    drop table if exists channels cascade ;
+26-07-27 17:40:20.960 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists message_attachments cascade 
+26-07-27 17:40:20.960 [SpringApplicationShutdownHook] INFO  p6spy - #1785141620960 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists message_attachments cascade 
+
+    drop table if exists message_attachments cascade ;
+26-07-27 17:40:20.960 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists messages cascade 
+26-07-27 17:40:20.961 [SpringApplicationShutdownHook] INFO  p6spy - #1785141620961 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists messages cascade 
+
+    drop table if exists messages cascade ;
+26-07-27 17:40:20.961 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists read_statuses cascade 
+26-07-27 17:40:20.961 [SpringApplicationShutdownHook] INFO  p6spy - #1785141620961 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists read_statuses cascade 
+
+    drop table if exists read_statuses cascade ;
+26-07-27 17:40:20.961 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists user_statuses cascade 
+26-07-27 17:40:20.962 [SpringApplicationShutdownHook] INFO  p6spy - #1785141620962 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists user_statuses cascade 
+
+    drop table if exists user_statuses cascade ;
+26-07-27 17:40:20.962 [SpringApplicationShutdownHook] DEBUG org.hibernate.SQL - 
+    drop table if exists users cascade 
+26-07-27 17:40:20.962 [SpringApplicationShutdownHook] INFO  p6spy - #1785141620962 | took 0ms | statement | connection 3| url jdbc:h2:mem:discodeit-test
+
+    drop table if exists users cascade 
+
+    drop table if exists users cascade ;
+26-07-27 17:40:20.964 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown initiated...
+26-07-27 17:40:20.965 [SpringApplicationShutdownHook] INFO  com.zaxxer.hikari.HikariDataSource - HikariPool-1 - Shutdown completed.

@@ -3,11 +3,13 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.request.CreateReadStatusRequest;
 import com.sprint.mission.discodeit.dto.request.UpdateReadStatusRequest;
 import com.sprint.mission.discodeit.dto.response.ReadStatusDto;
-import com.sprint.mission.discodeit.exception.BadRequestException;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusChannelMismatchException;
 import com.sprint.mission.discodeit.mapper.ReadStatusCommandMapper;
 import com.sprint.mission.discodeit.service.ReadStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -35,7 +37,7 @@ public class ReadStatusController {
 
     @Operation(summary = "Message 읽음 상태 생성")
     @RequestMapping(value = {"/api/read-statuses", "/api/readStatuses"}, method = RequestMethod.POST)
-    public ResponseEntity<ReadStatusDto> create(@RequestBody CreateReadStatusRequest request) {
+    public ResponseEntity<ReadStatusDto> create(@Valid @RequestBody CreateReadStatusRequest request) {
         ReadStatusDto readStatus = readStatusService.create(readStatusCommandMapper.toCreateCommand(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
     }
@@ -43,7 +45,7 @@ public class ReadStatusController {
     @Operation(summary = "Message 읽음 상태 생성")
     @RequestMapping(value = "/api/channels/{channelId}/read-statuses", method = RequestMethod.POST)
     public ResponseEntity<ReadStatusDto> createByChannelId(@PathVariable UUID channelId,
-                                                           @RequestBody CreateChannelReadStatusRequest request) {
+                                                           @Valid @RequestBody CreateChannelReadStatusRequest request) {
         ReadStatusDto readStatus = readStatusService.create(readStatusCommandMapper.toCreateCommand(request.userId(), channelId));
         return ResponseEntity.status(HttpStatus.CREATED).body(readStatus);
     }
@@ -51,7 +53,7 @@ public class ReadStatusController {
     @Operation(summary = "Message 읽음 상태 수정")
     @RequestMapping(value = {"/api/read-statuses/{readStatusId}", "/api/readStatuses/{readStatusId}"}, method = RequestMethod.PATCH)
     public ResponseEntity<ReadStatusDto> update(@PathVariable UUID readStatusId,
-                                                @RequestBody UpdateReadStatusRequest request) {
+                                                @Valid @RequestBody UpdateReadStatusRequest request) {
         return ResponseEntity.ok(readStatusService.update(readStatusId, readStatusCommandMapper.toUpdateCommand(request)));
     }
 
@@ -59,10 +61,10 @@ public class ReadStatusController {
     @RequestMapping(value = "/api/channels/{channelId}/read-statuses/{readStatusId}", method = RequestMethod.PATCH)
     public ResponseEntity<ReadStatusDto> updateByChannelId(@PathVariable UUID channelId,
                                                            @PathVariable UUID readStatusId,
-                                                           @RequestBody UpdateReadStatusRequest request) {
+                                                           @Valid @RequestBody UpdateReadStatusRequest request) {
         ReadStatusDto readStatus = readStatusService.findById(readStatusId);
         if (!channelId.equals(readStatus.channelId())) {
-            throw new BadRequestException("채널에 해당하는 ReadStatus가 아닙니다.");
+            throw new ReadStatusChannelMismatchException(channelId, readStatusId);
         }
         return ResponseEntity.ok(readStatusService.update(readStatusId, readStatusCommandMapper.toUpdateCommand(request)));
     }
@@ -79,6 +81,9 @@ public class ReadStatusController {
         return ResponseEntity.ok(readStatusService.findAllByUserId(userId));
     }
 
-    public record CreateChannelReadStatusRequest(UUID userId) {
+    public record CreateChannelReadStatusRequest(
+            @NotNull(message = "사용자 ID는 필수입니다.")
+            UUID userId
+    ) {
     }
 }

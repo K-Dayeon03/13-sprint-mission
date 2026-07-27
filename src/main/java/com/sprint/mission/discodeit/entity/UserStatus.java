@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.exception.InvalidRequestException;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -35,7 +36,7 @@ public class UserStatus extends BaseUpdatableEntity {
     public UserStatus(User user, Instant lastActiveAt) {
         super();
         if (user == null) {
-            throw new IllegalArgumentException("유저는 필수입니다.");
+            throw new InvalidRequestException("유저는 필수입니다.");
         }
         this.user = user;
         this.userId = user.getId();
@@ -46,7 +47,7 @@ public class UserStatus extends BaseUpdatableEntity {
     public UserStatus(UUID userId, Instant lastActiveAt) {
         super();
         if (userId == null) {
-            throw new IllegalArgumentException("유저 아이디는 필수 입니다.");
+            throw new InvalidRequestException("유저 아이디는 필수 입니다.");
         }
         this.userId = userId;
         this.lastActiveAt = lastActiveAt != null ? lastActiveAt : Instant.now();
@@ -69,7 +70,7 @@ public class UserStatus extends BaseUpdatableEntity {
 
     public void updateLastActiveAt(Instant lastActiveAt) {
         if (lastActiveAt == null) {
-            throw new IllegalArgumentException("마지막 활동 시간은 필수입니다.");
+            throw new InvalidRequestException("마지막 활동 시간은 필수입니다.");
         }
         this.lastActiveAt = lastActiveAt;
     }

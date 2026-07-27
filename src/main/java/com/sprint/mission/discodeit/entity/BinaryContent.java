@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseEntity;
+import com.sprint.mission.discodeit.exception.InvalidRequestException;
 import jakarta.persistence.*;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -37,17 +38,17 @@ public class BinaryContent extends BaseEntity {
                          String fileName, String contentType, Long size) {
 
         if (userId != null && messageId != null) {
-            throw new IllegalArgumentException("유저 아이디와 메세지 아이디는 동시에 설정될 수 없습니다.");
+            throw new InvalidRequestException("유저 아이디와 메세지 아이디는 동시에 설정될 수 없습니다.");
         }
 
         if (fileName == null || fileName.isBlank()) {
-            throw new IllegalArgumentException("파일명은 필수입니다.");
+            throw new InvalidRequestException("파일명은 필수입니다.");
         }
         if (contentType == null || contentType.isBlank()) {
-            throw new IllegalArgumentException("콘텐츠 타입은 필수입니다.");
+            throw new InvalidRequestException("콘텐츠 타입은 필수입니다.");
         }
         if (size == null || size <= 0) {
-            throw new IllegalArgumentException("파일 크기는 필수입니다.");
+            throw new InvalidRequestException("파일 크기는 필수입니다.");
         }
 
         this.userId = userId;

@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
 import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
@@ -70,6 +70,6 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     private BinaryContent findEntityOrThrow(UUID id) {
         return binaryContentRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 파일입니다."));
+                .orElseThrow(() -> new BinaryContentNotFoundException(id));
     }
 }

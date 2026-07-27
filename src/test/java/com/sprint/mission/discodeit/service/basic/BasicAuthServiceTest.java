@@ -4,7 +4,7 @@ import com.sprint.mission.discodeit.dto.command.LoginCommand;
 import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.BadRequestException;
+import com.sprint.mission.discodeit.exception.auth.AuthenticationFailedException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -64,7 +64,7 @@ class BasicAuthServiceTest {
         given(userRepository.findByUsername("woody")).willReturn(Optional.of(user));
 
         assertThatThrownBy(() -> authService.login(command))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(AuthenticationFailedException.class)
                 .hasMessageContaining("유저 이름 또는 비밀번호");
         verify(userStatusRepository, never()).findByUser_Id(org.mockito.ArgumentMatchers.any());
     }

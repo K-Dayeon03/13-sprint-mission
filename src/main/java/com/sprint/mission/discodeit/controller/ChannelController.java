@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.mapper.ChannelCommandMapper;
 import com.sprint.mission.discodeit.service.ChannelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -36,14 +37,14 @@ public class ChannelController {
 
     @Operation(summary = "Public Channel 생성")
     @RequestMapping(value = "/public", method = RequestMethod.POST)
-    public ResponseEntity<ChannelDto> createPublic(@RequestBody CreatePublicChannelRequest request) {
+    public ResponseEntity<ChannelDto> createPublic(@Valid @RequestBody CreatePublicChannelRequest request) {
         ChannelDto channel = channelService.createPublic(channelCommandMapper.toCreatePublicCommand(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
 
     @Operation(summary = "Private Channel 생성")
     @RequestMapping(value = "/private", method = RequestMethod.POST)
-    public ResponseEntity<ChannelDto> createPrivate(@RequestBody CreatePrivateChannelRequest request) {
+    public ResponseEntity<ChannelDto> createPrivate(@Valid @RequestBody CreatePrivateChannelRequest request) {
         ChannelDto channel = channelService.createPrivate(channelCommandMapper.toCreatePrivateCommand(request));
         return ResponseEntity.status(HttpStatus.CREATED).body(channel);
     }
@@ -57,7 +58,7 @@ public class ChannelController {
     @Operation(summary = "Channel 정보 수정")
     @RequestMapping(value = "/{channelId}", method = RequestMethod.PATCH)
     public ResponseEntity<ChannelDto> update(@PathVariable UUID channelId,
-                                             @RequestBody UpdateChannelRequest request) {
+                                             @Valid @RequestBody UpdateChannelRequest request) {
         return ResponseEntity.ok(channelService.update(channelId, channelCommandMapper.toUpdateCommand(request)));
     }
 

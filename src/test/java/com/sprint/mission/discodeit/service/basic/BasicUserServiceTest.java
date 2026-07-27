@@ -9,8 +9,8 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.BadRequestException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
@@ -97,7 +97,7 @@ class BasicUserServiceTest {
         given(userRepository.existsByUsernameOrEmail("woody", "woody@codeit.com")).willReturn(true);
 
         assertThatThrownBy(() -> userService.create(command, null))
-                .isInstanceOf(BadRequestException.class)
+                .isInstanceOf(UserAlreadyExistsException.class)
                 .hasMessageContaining("이미 사용 중");
         verify(userRepository, never()).saveAndFlush(any());
     }
@@ -145,7 +145,7 @@ class BasicUserServiceTest {
         given(userRepository.findById(userId)).willReturn(Optional.empty());
 
         assertThatThrownBy(() -> userService.findById(userId))
-                .isInstanceOf(NotFoundException.class)
+                .isInstanceOf(UserNotFoundException.class)
                 .hasMessageContaining("존재하지 않는 사용자");
     }
 
@@ -188,8 +188,8 @@ class BasicUserServiceTest {
         given(userRepository.existsByUsernameAndIdNot("buzz", user.getId())).willReturn(true);
 
         assertThatThrownBy(() -> userService.update(user.getId(), command, null))
-                .isInstanceOf(BadRequestException.class)
-                .hasMessageContaining("이미 사용 중인 유저 이름");
+                .isInstanceOf(UserAlreadyExistsException.class)
+                .hasMessageContaining("이미 사용 중");
     }
 
     @Test

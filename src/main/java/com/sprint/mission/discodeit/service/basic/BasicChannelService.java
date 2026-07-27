@@ -6,8 +6,10 @@ import com.sprint.mission.discodeit.dto.command.UpdateChannelCommand;
 import com.sprint.mission.discodeit.dto.response.ChannelDto;
 import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.*;
-import com.sprint.mission.discodeit.exception.BadRequestException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.InvalidRequestException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ChannelMapper;
 import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
@@ -46,7 +48,7 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     public ChannelDto createPublic(CreatePublicChannelCommand command) {
         if (!StringUtils.hasText(command.name())) {
-            throw new BadRequestException("채널명을 입력해주세요.");
+            throw new InvalidRequestException("채널명을 입력해주세요.");
         }
         log.debug("Creating public channel. name={}", command.name());
         Channel channel = new Channel(ChannelType.PUBLIC, command.name(),
@@ -157,7 +159,7 @@ public class BasicChannelService implements ChannelService {
         Channel channel = findChannelOrThrow(id);
         if (channel.getType() == ChannelType.PRIVATE) {
             log.warn("Private channel update rejected. channelId={}", id);
-            throw new BadRequestException("PRIVATE 채널은 수정할 수 없습니다.");
+            throw new PrivateChannelUpdateException(id);
         }
         log.debug("Updating channel. channelId={}", id);
 
@@ -186,19 +188,19 @@ public class BasicChannelService implements ChannelService {
 
     private List<User> validateParticipantIds(List<UUID> participantIds) {
         if (participantIds == null || participantIds.isEmpty()) {
-            throw new BadRequestException("PRIVATE 채널 참여자는 1명 이상이어야 합니다.");
+            throw new InvalidRequestException("PRIVATE 채널 참여자는 1명 이상이어야 합니다.");
         }
         if (participantIds.stream().anyMatch(Objects::isNull)) {
-            throw new BadRequestException("참여자 ID는 필수입니다.");
+            throw new InvalidRequestException("참여자 ID는 필수입니다.");
         }
         return participantIds.stream()
                 .map(participantId -> userRepository.findById(participantId)
-                        .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다.")))
+                        .orElseThrow(() -> new UserNotFoundException(participantId)))
                 .toList();
     }
 
     private Channel findChannelOrThrow(UUID id) {
         return channelRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
+                .orElseThrow(() -> new ChannelNotFoundException(id));
     }
 }

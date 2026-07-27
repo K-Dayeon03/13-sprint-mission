@@ -6,8 +6,10 @@ import com.sprint.mission.discodeit.dto.response.ReadStatusDto;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
-import com.sprint.mission.discodeit.exception.BadRequestException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.readstatus.ReadStatusNotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
 import com.sprint.mission.discodeit.mapper.ReadStatusMapper;
 import com.sprint.mission.discodeit.repository.ChannelRepository;
 import com.sprint.mission.discodeit.repository.ReadStatusRepository;
@@ -37,7 +39,7 @@ public class BasicReadStatusService implements ReadStatusService {
         Channel channel = findChannelOrThrow(command.channelId());
         readStatusRepository.findByUser_IdAndChannel_Id(command.userId(), command.channelId())
                 .ifPresent(rs -> {
-                    throw new BadRequestException("이미 존재하는 ReadStatus입니다.");
+                    throw new ReadStatusAlreadyExistsException(command.userId(), command.channelId());
                 });
 
         ReadStatus readStatus = new ReadStatus(user, channel, command.lastReadAt());
@@ -73,16 +75,16 @@ public class BasicReadStatusService implements ReadStatusService {
 
     private ReadStatus findEntityOrThrow(UUID id) {
         return readStatusRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 ReadStatus입니다."));
+                .orElseThrow(() -> new ReadStatusNotFoundException(id));
     }
 
     private User findUserOrThrow(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
     private Channel findChannelOrThrow(UUID channelId) {
         return channelRepository.findById(channelId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 채널입니다."));
+                .orElseThrow(() -> new ChannelNotFoundException(channelId));
     }
 }

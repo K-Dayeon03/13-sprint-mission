@@ -1,6 +1,7 @@
 package com.sprint.mission.discodeit.entity;
 
 import com.sprint.mission.discodeit.entity.base.BaseUpdatableEntity;
+import com.sprint.mission.discodeit.exception.InvalidRequestException;
 import jakarta.persistence.*;
 import lombok.Getter;
 
@@ -36,8 +37,8 @@ public class ReadStatus extends BaseUpdatableEntity {
 
     public ReadStatus(User user, Channel channel, Instant lastReadAt) {
         super();
-        if (user == null) throw new IllegalArgumentException("유저는 필수입니다.");
-        if (channel == null) throw new IllegalArgumentException("채널은 필수입니다.");
+        if (user == null) throw new InvalidRequestException("유저는 필수입니다.");
+        if (channel == null) throw new InvalidRequestException("채널은 필수입니다.");
         this.user = user;
         this.channel = channel;
         this.userId = user.getId();
@@ -47,8 +48,8 @@ public class ReadStatus extends BaseUpdatableEntity {
 
     public ReadStatus(UUID userId, UUID channelId, Instant lastReadAt) {
         super();
-        if (userId == null) throw new IllegalArgumentException("유저 아이디는 필수입니다.");
-        if (channelId == null) throw new IllegalArgumentException("채널 아이디는 필수입니다.");
+        if (userId == null) throw new InvalidRequestException("유저 아이디는 필수입니다.");
+        if (channelId == null) throw new InvalidRequestException("채널 아이디는 필수입니다.");
         this.userId = userId;
         this.channelId = channelId;
         this.lastReadAt = lastReadAt != null ? lastReadAt : Instant.now();

@@ -5,8 +5,10 @@ import com.sprint.mission.discodeit.dto.command.UpdateUserStatusCommand;
 import com.sprint.mission.discodeit.dto.response.UserStatusDto;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.BadRequestException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.InvalidRequestException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.exception.userstatus.UserStatusAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.userstatus.UserStatusNotFoundException;
 import com.sprint.mission.discodeit.mapper.UserStatusMapper;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.repository.UserStatusRepository;
@@ -33,7 +35,7 @@ public class BasicUserStatusService implements UserStatusService {
         User user = findUserOrThrow(command.userId());
         userStatusRepository.findByUser_Id(command.userId())
                 .ifPresent(us -> {
-                    throw new BadRequestException("이미 존재하는 UserStatus입니다.");
+                    throw new UserStatusAlreadyExistsException(command.userId());
                 });
 
         UserStatus userStatus = new UserStatus(user, Instant.now());
@@ -63,7 +65,7 @@ public class BasicUserStatusService implements UserStatusService {
     @Transactional
     public UserStatusDto updateByUserId(UUID userId, UpdateUserStatusCommand command) {
         UserStatus userStatus = userStatusRepository.findByUser_Id(userId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
+                .orElseThrow(() -> UserStatusNotFoundException.byUserId(userId));
         validateUpdateCommand(command);
         userStatus.updateLastActiveAt(command.newLastActiveAt());
         return userStatusMapper.toDto(userStatus);
@@ -78,17 +80,17 @@ public class BasicUserStatusService implements UserStatusService {
 
     private void validateUpdateCommand(UpdateUserStatusCommand command) {
         if (command == null || command.newLastActiveAt() == null) {
-            throw new BadRequestException("마지막 활동 시간은 필수입니다.");
+            throw new InvalidRequestException("마지막 활동 시간은 필수입니다.");
         }
     }
 
     private User findUserOrThrow(UUID userId) {
         return userRepository.findById(userId)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 유저입니다."));
+                .orElseThrow(() -> new UserNotFoundException(userId));
     }
 
     private UserStatus findEntityOrThrow(UUID id) {
         return userStatusRepository.findById(id)
-                .orElseThrow(() -> new NotFoundException("존재하지 않는 UserStatus입니다."));
+                .orElseThrow(() -> new UserStatusNotFoundException(id));
     }
 }
