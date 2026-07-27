@@ -7,3 +7,7 @@ spring:
 
 server:
   port: ${PORT:8080}
+
+logging:
+  level:
+    com.sprint.mission.discodeit: info

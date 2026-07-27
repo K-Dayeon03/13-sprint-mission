@@ -17,6 +17,7 @@ import com.sprint.mission.discodeit.repository.ReadStatusRepository;
 import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -28,6 +29,7 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -46,16 +48,20 @@ public class BasicChannelService implements ChannelService {
         if (!StringUtils.hasText(command.name())) {
             throw new BadRequestException("채널명을 입력해주세요.");
         }
+        log.debug("Creating public channel. name={}", command.name());
         Channel channel = new Channel(ChannelType.PUBLIC, command.name(),
                 command.description(), null);
-        channelRepository.save(channel);
-        return toResponse(channel);
+        Channel saved = channelRepository.save(channel);
+
+        log.info("Public channel created. channelId={}, name={}", saved.getId(), saved.getName());
+        return toResponse(saved);
     }
 
     @Override
     @Transactional
     public ChannelDto createPrivate(CreatePrivateChannelCommand command) {
         List<User> participants = validateParticipantIds(command.participantIds());
+        log.debug("Creating private channel. participantCount={}", command.participantIds().size());
 
         Channel channel = new Channel(ChannelType.PRIVATE, null, null, null);
         channelRepository.save(channel);
@@ -64,6 +70,8 @@ public class BasicChannelService implements ChannelService {
             ReadStatus readStatus = new ReadStatus(user, channel, Instant.now());
             readStatusRepository.save(readStatus);
         });
+        log.info("Private channel created. channelId={}, participantCount={}",
+                channel.getId(), participants.size());
         return toResponse(channel);
     }
 
@@ -148,13 +156,17 @@ public class BasicChannelService implements ChannelService {
     public ChannelDto update(UUID id, UpdateChannelCommand command) {
         Channel channel = findChannelOrThrow(id);
         if (channel.getType() == ChannelType.PRIVATE) {
+            log.warn("Private channel update rejected. channelId={}", id);
             throw new BadRequestException("PRIVATE 채널은 수정할 수 없습니다.");
         }
+        log.debug("Updating channel. channelId={}", id);
+
         channel.update(
                 channel.getType(),
                 command.newName() != null ? command.newName() : channel.getName(),
                 command.newDescription() != null ? command.newDescription() : channel.getDescription()
         );
+        log.info("Channel updated. channelId={}", id);
         return toResponse(channel);
     }
 
@@ -164,9 +176,12 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     public void deleteById(UUID id) {
         findChannelOrThrow(id);
+        log.debug("Deleting channel. channelId={}", id);
+
         MessageDeletionSupport.deleteByChannelId(messageRepository, binaryContentRepository, id);
         readStatusRepository.deleteByChannel_Id(id);
         channelRepository.deleteById(id);
+        log.info("Channel deleted. channelId={}", id);
     }
 
     private List<User> validateParticipantIds(List<UUID> participantIds) {

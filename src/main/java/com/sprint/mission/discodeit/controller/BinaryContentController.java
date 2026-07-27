@@ -5,6 +5,7 @@ import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -16,6 +17,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "BinaryContent")
+@Slf4j
 @RestController
 public class BinaryContentController {
     //기존에는 DTO나 엔티티에서 직접 bytes를 꺼냈다면, 이제 Storage에 위임합니다.
@@ -33,7 +35,13 @@ public class BinaryContentController {
             method = RequestMethod.GET
     )
     public ResponseEntity<?> download(@PathVariable UUID binaryContentId) {
+        log.debug("Downloading binary content. binaryContentId={}", binaryContentId);
+
         BinaryContentDto binaryContent = binaryContentService.findById(binaryContentId);
+
+        log.info("Binary content download requested. binaryContentId={}, fileName={}, size={}",
+                binaryContent.id(), binaryContent.fileName(), binaryContent.size());
+
         return binaryContentStorage.download(binaryContent);
     }
 

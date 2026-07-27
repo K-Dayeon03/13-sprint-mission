@@ -8,6 +8,7 @@ import com.sprint.mission.discodeit.mapper.MessageCommandMapper;
 import com.sprint.mission.discodeit.service.MessageService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "Message")
+@Slf4j
 @RestController
 public class MessageController {
     private final MessageService messageService;

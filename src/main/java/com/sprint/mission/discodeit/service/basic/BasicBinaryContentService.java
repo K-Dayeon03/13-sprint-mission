@@ -9,13 +9,14 @@ import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -36,7 +37,11 @@ public class BasicBinaryContentService implements BinaryContentService {
         );
 
         BinaryContent saved = binaryContentRepository.save(binaryContent);
+        log.debug("Uploading binary content. fileName={}, contentType={}, size={}",
+                command.fileName(), command.contentType(), command.bytes().length);
         binaryContentStorage.put(saved.getId(), command.bytes());
+        log.info("Binary content uploaded. binaryContentId={}, fileName={}, size={}",
+                saved.getId(), saved.getFileName(), saved.getSize());
         return binaryContentMapper.toDto(saved);
     }
 

@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.service.UserStatusService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Tag(name = "User")
+@Slf4j
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -65,6 +67,11 @@ public class UserController {
             @RequestParam(required = false) String password,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
+        log.debug("Received user create request. username={}, email={}, hasProfileImage={}",
+                userCreateRequest != null ? userCreateRequest.username() : username,
+                userCreateRequest != null ? userCreateRequest.email() : email,
+                profile != null && !profile.isEmpty());
+
         UserDto user = userService.create(
                 userCreateRequest != null
                         ? userCommandMapper.toCreateCommand(userCreateRequest)

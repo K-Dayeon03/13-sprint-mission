@@ -15,13 +15,14 @@ import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -39,14 +40,18 @@ public class BasicUserService implements UserService {
     @Override
     @Transactional
     public UserDto create(CreateUserCommand command, BinaryContentCommand profileImageCommand) {
-        validateUsernameAndEmail(command.username(), command.email());
+        log.debug("Creating user. username={}, email={}, hasProfileImage={}",
+                command.username(), command.email(), profileImageCommand != null);
 
+        validateUsernameAndEmail(command.username(), command.email());
         User user = new User(command.username(), command.password(), command.email(), null);
         applyProfileImage(user, profileImageCommand);
         User saved = userRepository.saveAndFlush(user);
         saveProfileImageBytes(saved, profileImageCommand);
 
         UserStatus userStatus = createUserStatus(user);
+        log.info("User created. userId={}, username={}", saved.getId(), saved.getUsername());
+
         return userMapper.toDto(saved, userStatus);
     }
 
@@ -73,9 +78,11 @@ public class BasicUserService implements UserService {
     public UserDto update(UUID id, UpdateUserCommand command,
                           BinaryContentCommand profileImageCommand) {
         User user = findUserOrThrow(id);
+        log.debug("Updating user. userId={}, hasProfileImage={}", id, profileImageCommand != null);
         validateUpdatedUsernameAndEmail(id, command);
 
         BinaryContent newProfileImage = createProfileImage(profileImageCommand);
+
         user.update(command.newUsername(), command.newPassword(),
                 command.newEmail(), newProfileImage);
         if (profileImageCommand != null) {
@@ -84,6 +91,7 @@ public class BasicUserService implements UserService {
         }
 
         UserStatus userStatus = getOrCreateUserStatus(id);
+        log.info("User updated. userId={}", id);
         return userMapper.toDto(user, userStatus);
     }
 
@@ -91,12 +99,15 @@ public class BasicUserService implements UserService {
     @Transactional
     public void deleteById(UUID id) {
         findUserOrThrow(id);
+        log.debug("Deleting user. userId={}", id);
         deleteAuthoredChannelData(id);
         deleteUserData(id);
+        log.info("User deleted. userId={}", id);
     }
 
     private void validateUsernameAndEmail(String username, String email) {
         if (userRepository.existsByUsernameOrEmail(username, email)) {
+            log.warn("User creation failed. duplicated username or email. username={}", username);
             throw new BadRequestException("이미 사용 중인 유저 이름 또는 이메일 입니다.");
         }
     }

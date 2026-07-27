@@ -19,10 +19,8 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.MessageService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Slice;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -30,6 +28,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
@@ -44,6 +43,12 @@ public class BasicMessageService implements MessageService {
     @Override
     @Transactional
     public MessageDto create(CreateMessageCommand command) {
+        int attachmentCount = command.attachments() == null ? 0 : command.attachments().size();
+        log.debug("Creating message. channelId={}, authorId={}, attachmentCount={}",
+                command.channelId(),
+                command.authorId(),
+                attachmentCount);
+
         Channel channel = findChannelOrThrow(command.channelId());
         User author = findUserOrThrow(command.authorId());
 
@@ -72,6 +77,8 @@ public class BasicMessageService implements MessageService {
             binaryContentStorage.put(attachment.getId(), attachmentCommands.get(i).bytes());
         }
 
+        log.info("Message created. messageId={}, channelId={}, authorId={}, attachmentCount={}",
+                saved.getId(), saved.getChannelId(), saved.getAuthorId(), attachmentCount);
         return messageMapper.toDto(saved);
     }
 
@@ -117,16 +124,24 @@ public class BasicMessageService implements MessageService {
     @Override
     @Transactional
     public MessageDto update(UUID id, UpdateMessageCommand command) {
+        log.debug("Updating message. messageId={}", id);
+
         Message message = findMessageOrThrow(id);
         message.update(command.newContent());
+
+        log.info("Message updated. messageId={}", id);
         return messageMapper.toDto(message);
     }
 
     @Override
     @Transactional
     public void deleteById(UUID id) {
+        log.debug("Deleting message. messageId={}", id);
+
         Message message = findMessageOrThrow(id);
         MessageDeletionSupport.deleteById(messageRepository, binaryContentRepository, message);
+
+        log.info("Message deleted. messageId={}", id);
     }
 
     private Message findMessageOrThrow(UUID id) {
