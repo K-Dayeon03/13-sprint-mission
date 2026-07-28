@@ -5,6 +5,11 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 20MB
+  boot:
+    admin:
+      client:
+        instance:
+          name: discodeit
   sql:
     init:
       mode: never

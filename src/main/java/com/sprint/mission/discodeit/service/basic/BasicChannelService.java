@@ -101,6 +101,8 @@ public class BasicChannelService implements ChannelService {
     }
     @Override
     public List<ChannelDto> findAllByUserId(UUID userId) {
+        findUserOrThrow(userId);
+
         Set<UUID> participatedPrivateChannelIds = readStatusRepository.findAllByUser_Id(userId).stream()
                 .map(ReadStatus::getChannelId)
                 .collect(Collectors.toSet());
@@ -202,5 +204,10 @@ public class BasicChannelService implements ChannelService {
     private Channel findChannelOrThrow(UUID id) {
         return channelRepository.findById(id)
                 .orElseThrow(() -> new ChannelNotFoundException(id));
+    }
+
+    private User findUserOrThrow(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
     }
 }

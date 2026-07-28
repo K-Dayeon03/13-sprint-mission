@@ -198,6 +198,7 @@ class BasicChannelServiceTest {
         ChannelDto publicDto = new ChannelDto(publicChannel.getId(), ChannelType.PUBLIC, "공지", "공지 채널입니다.", null, lastMessageAt);
         ChannelDto privateDto = new ChannelDto(privateChannel.getId(), ChannelType.PRIVATE, null, null, List.of(participantDto), null);
 
+        given(userRepository.findById(userId)).willReturn(Optional.of(participant));
         given(readStatusRepository.findAllByUser_Id(userId)).willReturn(List.of(myReadStatus));
         given(channelRepository.findAll()).willReturn(List.of(publicChannel, privateChannel));
         given(messageRepository.findLastMessageAtByChannelIdIn(anyList()))
@@ -220,7 +221,10 @@ class BasicChannelServiceTest {
     @DisplayName("userId로 채널 목록 조회 성공 - 조회 가능한 채널이 없으면 빈 목록 반환")
     void findAllByUserId_success_empty() {
         UUID userId = UUID.randomUUID();
+        User user = new User("user1", "password1", "user1@codeit.com", null);
+        setId(user, userId);
 
+        given(userRepository.findById(userId)).willReturn(Optional.of(user));
         given(readStatusRepository.findAllByUser_Id(userId)).willReturn(List.of());
         given(channelRepository.findAll()).willReturn(List.of());
 
@@ -228,6 +232,18 @@ class BasicChannelServiceTest {
 
         assertThat(result).isEmpty();
         verify(messageRepository, never()).findLastMessageAtByChannelIdIn(anyList());
+    }
+
+    @Test
+    @DisplayName("userId로 채널 목록 조회 실패 - 존재하지 않는 유저")
+    void findAllByUserId_fail_userNotFound() {
+        UUID userId = UUID.randomUUID();
+        given(userRepository.findById(userId)).willReturn(Optional.empty());
+
+        assertThatThrownBy(() -> channelService.findAllByUserId(userId))
+                .isInstanceOf(UserNotFoundException.class)
+                .hasMessageContaining("존재하지 않는 사용자");
+        verify(channelRepository, never()).findAll();
     }
 
     @Test
