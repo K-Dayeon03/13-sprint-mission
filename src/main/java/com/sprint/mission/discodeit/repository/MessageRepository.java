@@ -25,12 +25,12 @@ public interface MessageRepository extends JpaRepository<Message, UUID> {
     Slice<Message> findAllByChannel_Id(UUID channelId, Pageable pageable);
 
     @Query("""
-    select m
-    from Message m
-    where m.channel.id = :channelId
-      and (:cursor is null or m.createdAt < :cursor)
-    order by m.createdAt desc
-""")
+            select m
+            from Message m
+            where m.channel.id = :channelId
+              and m.createdAt < :cursor
+            order by m.createdAt desc
+            """)
     @EntityGraph(attributePaths = {"author", "author.profile"})
     List<Message> findAllByChannelIdAndCursor(
             @Param("channelId") UUID channelId,

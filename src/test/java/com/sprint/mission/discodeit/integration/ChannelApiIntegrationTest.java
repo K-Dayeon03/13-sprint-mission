@@ -56,9 +56,15 @@ class ChannelApiIntegrationTest {
 
         mockMvc.perform(post("/api/channels/private")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(Map.of("participantIds", List.of(userId)))))
+                        .content(objectMapper.writeValueAsString(Map.of(
+                                "name", "family",
+                                "description", "family channel",
+                                "participantIds", List.of(userId)
+                        ))))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.type").value("PRIVATE"))
+                .andExpect(jsonPath("$.name").value("family"))
+                .andExpect(jsonPath("$.description").value("family channel"))
                 .andExpect(jsonPath("$.participants[0].id").value(userId.toString()));
     }
 

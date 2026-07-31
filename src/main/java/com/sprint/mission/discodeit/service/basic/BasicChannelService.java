@@ -63,17 +63,19 @@ public class BasicChannelService implements ChannelService {
     @Transactional
     public ChannelDto createPrivate(CreatePrivateChannelCommand command) {
         List<User> participants = validateParticipantIds(command.participantIds());
-        log.debug("Creating private channel. participantCount={}", command.participantIds().size());
+        String name = StringUtils.hasText(command.name()) ? command.name() : null;
+        String description = StringUtils.hasText(command.description()) ? command.description() : null;
+        log.debug("Creating private channel. name={}, participantCount={}", name, command.participantIds().size());
 
-        Channel channel = new Channel(ChannelType.PRIVATE, null, null, null);
+        Channel channel = new Channel(ChannelType.PRIVATE, name, description, null);
         channelRepository.save(channel);
 
         participants.forEach(user -> {
             ReadStatus readStatus = new ReadStatus(user, channel, Instant.now());
             readStatusRepository.save(readStatus);
         });
-        log.info("Private channel created. channelId={}, participantCount={}",
-                channel.getId(), participants.size());
+        log.info("Private channel created. channelId={}, name={}, participantCount={}",
+                channel.getId(), name, participants.size());
         return toResponse(channel);
     }
 
@@ -194,6 +196,9 @@ public class BasicChannelService implements ChannelService {
         }
         if (participantIds.stream().anyMatch(Objects::isNull)) {
             throw new InvalidRequestException("참여자 ID는 필수입니다.");
+        }
+        if (participantIds.stream().distinct().count() != participantIds.size()) {
+            throw new InvalidRequestException("PRIVATE 채널 참여자는 중복될 수 없습니다.");
         }
         return participantIds.stream()
                 .map(participantId -> userRepository.findById(participantId)

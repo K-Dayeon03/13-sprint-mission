@@ -37,14 +37,13 @@ class MessageRepositoryTest {
 
     @Test
     @DisplayName("채널 ID로 메시지 목록을 조회한다")
-    void findAllByChannelIdAndCursor_success() {
+    void findAllByChannelId_success() {
         TestData data = saveTestData();
 
-        List<Message> result = messageRepository.findAllByChannelIdAndCursor(
+        List<Message> result = messageRepository.findAllByChannel_Id(
                 data.channel().getId(),
-                null,
-                PageRequest.of(0, 10)
-        );
+                PageRequest.of(0, 10, Sort.by(Sort.Direction.DESC, "createdAt"))
+        ).getContent();
 
         assertThat(result).extracting(Message::getContent)
                 .containsExactly("third", "second", "first");

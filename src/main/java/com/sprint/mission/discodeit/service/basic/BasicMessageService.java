@@ -23,6 +23,7 @@ import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -96,11 +97,10 @@ public class BasicMessageService implements MessageService {
 
         int pageSize = size <= 0 ? 50 : Math.min(size, 50);
 
-        List<Message> messages = messageRepository.findAllByChannelIdAndCursor(
-                channelId,
-                cursor,
-                PageRequest.of(0, pageSize + 1)
-        );
+        PageRequest pageRequest = PageRequest.of(0, pageSize + 1, Sort.by(Sort.Direction.DESC, "createdAt"));
+        List<Message> messages = cursor == null
+                ? messageRepository.findAllByChannel_Id(channelId, pageRequest).getContent()
+                : messageRepository.findAllByChannelIdAndCursor(channelId, cursor, pageRequest);
 
         boolean hasNext = messages.size() > pageSize;
 

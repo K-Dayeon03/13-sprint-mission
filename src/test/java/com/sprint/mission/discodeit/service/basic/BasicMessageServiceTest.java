@@ -28,6 +28,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.data.domain.SliceImpl;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
@@ -176,8 +177,8 @@ class BasicMessageServiceTest {
         );
 
         given(channelRepository.findById(channel.getId())).willReturn(Optional.of(channel));
-        given(messageRepository.findAllByChannelIdAndCursor(eq(channel.getId()), eq(null), any()))
-                .willReturn(List.of(message, olderMessage));
+        given(messageRepository.findAllByChannel_Id(eq(channel.getId()), any()))
+                .willReturn(new SliceImpl<>(List.of(message, olderMessage)));
         given(messageMapper.toDto(message)).willReturn(messageDto);
 
         PageResponse<MessageDto> result = messageService.findAllByChannelId(channel.getId(), null, 1);
@@ -197,6 +198,7 @@ class BasicMessageServiceTest {
         assertThatThrownBy(() -> messageService.findAllByChannelId(channelId, null, 50))
                 .isInstanceOf(ChannelNotFoundException.class)
                 .hasMessageContaining("존재하지 않는 채널");
+        verify(messageRepository, never()).findAllByChannel_Id(any(), any());
         verify(messageRepository, never()).findAllByChannelIdAndCursor(any(), any(), any());
     }
 

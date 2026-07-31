@@ -62,7 +62,7 @@ class BasicChannelServiceTest {
     @BeforeEach
     void setUp() {
         publicChannel = new Channel(ChannelType.PUBLIC, "공지", "공지 채널입니다.", null);
-        privateChannel = new Channel(ChannelType.PRIVATE, null, null, null);
+        privateChannel = new Channel(ChannelType.PRIVATE, "가족", "가족 채널입니다.", null);
         setId(publicChannel, UUID.randomUUID());
         setId(privateChannel, UUID.randomUUID());
     }
@@ -102,7 +102,7 @@ class BasicChannelServiceTest {
         setId(user, UUID.randomUUID());
         ReadStatus readStatus = new ReadStatus(user, privateChannel, Instant.now());
         UserDto userDto = new UserDto(user.getId(), user.getUsername(), user.getEmail(), null, true);
-        ChannelDto dto = new ChannelDto(privateChannel.getId(), ChannelType.PRIVATE, null, null, List.of(userDto), null);
+        ChannelDto dto = new ChannelDto(privateChannel.getId(), ChannelType.PRIVATE, "가족", "가족 채널입니다.", List.of(userDto), null);
 
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
         given(channelRepository.save(any(Channel.class))).willAnswer(invocation -> {
@@ -115,7 +115,7 @@ class BasicChannelServiceTest {
         given(userMapper.toDto(user)).willReturn(userDto);
         given(channelMapper.toDto(any(Channel.class), anyList(), eq(null))).willReturn(dto);
 
-        ChannelDto result = channelService.createPrivate(new CreatePrivateChannelCommand(List.of(user.getId())));
+        ChannelDto result = channelService.createPrivate(new CreatePrivateChannelCommand("가족", "가족 채널입니다.", List.of(user.getId())));
 
         assertThat(result).isEqualTo(dto);
         verify(readStatusRepository).save(any(ReadStatus.class));
@@ -127,9 +127,23 @@ class BasicChannelServiceTest {
         UUID participantId = UUID.randomUUID();
         given(userRepository.findById(participantId)).willReturn(Optional.empty());
 
-        assertThatThrownBy(() -> channelService.createPrivate(new CreatePrivateChannelCommand(List.of(participantId))))
+        assertThatThrownBy(() -> channelService.createPrivate(new CreatePrivateChannelCommand("가족", "가족 채널입니다.", List.of(participantId))))
                 .isInstanceOf(UserNotFoundException.class)
                 .hasMessageContaining("존재하지 않는 사용자");
+        verify(channelRepository, never()).save(any());
+    }
+
+    @Test
+    @DisplayName("PRIVATE 채널 생성 실패 - 중복 참여자")
+    void createPrivate_fail_duplicateParticipant() {
+        UUID participantId = UUID.randomUUID();
+
+        assertThatThrownBy(() -> channelService.createPrivate(
+                new CreatePrivateChannelCommand("가족", "가족 채널입니다.", List.of(participantId, participantId))))
+                .isInstanceOf(InvalidRequestException.class)
+                .satisfies(exception -> assertThat(((InvalidRequestException) exception).getDetails())
+                        .containsEntry("reason", "PRIVATE 채널 참여자는 중복될 수 없습니다."));
+        verify(userRepository, never()).findById(any());
         verify(channelRepository, never()).save(any());
     }
 
@@ -196,7 +210,7 @@ class BasicChannelServiceTest {
         Instant lastMessageAt = Instant.parse("2026-07-24T10:00:00Z");
         UserDto participantDto = new UserDto(userId, "user1", "user1@codeit.com", null, true);
         ChannelDto publicDto = new ChannelDto(publicChannel.getId(), ChannelType.PUBLIC, "공지", "공지 채널입니다.", null, lastMessageAt);
-        ChannelDto privateDto = new ChannelDto(privateChannel.getId(), ChannelType.PRIVATE, null, null, List.of(participantDto), null);
+        ChannelDto privateDto = new ChannelDto(privateChannel.getId(), ChannelType.PRIVATE, "가족", "가족 채널입니다.", List.of(participantDto), null);
 
         given(userRepository.findById(userId)).willReturn(Optional.of(participant));
         given(readStatusRepository.findAllByUser_Id(userId)).willReturn(List.of(myReadStatus));

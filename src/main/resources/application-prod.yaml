@@ -6,6 +6,9 @@ spring:
     username: ${DB_USERNAME:discodeit_user}
     password: ${DB_PASSWORD:discodeit1234}
     driver-class-name: org.postgresql.Driver
+  jpa:
+    hibernate:
+      ddl-auto: validate
   boot:
     admin:
       client:

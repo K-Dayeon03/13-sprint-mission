@@ -16,7 +16,7 @@ public class ChannelCommandMapper {
     }
 
     public CreatePrivateChannelCommand toCreatePrivateCommand(CreatePrivateChannelRequest request) {
-        return new CreatePrivateChannelCommand(request.participantIds());
+        return new CreatePrivateChannelCommand(request.name(), request.description(), request.participantIds());
     }
 
     public UpdateChannelCommand toUpdateCommand(UpdateChannelRequest request) {

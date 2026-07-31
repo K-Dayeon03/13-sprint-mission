@@ -15,8 +15,6 @@ spring:
       mode: never
   jpa:
     open-in-view: false
-    hibernate:
-      ddl-auto: create
     properties:
       hibernate:
         format_sql: true
@@ -68,7 +66,7 @@ info:
       url: ${spring.datasource.url}
       driver-class-name: ${spring.datasource.driver-class-name}
     jpa:
-      ddl-auto: ${spring.jpa.hibernate.ddl-auto}
+      ddl-auto: ${spring.jpa.hibernate.ddl-auto:}
     storage:
       type: ${discodeit.storage.type}
       path: ${discodeit.storage.local.root-path}
