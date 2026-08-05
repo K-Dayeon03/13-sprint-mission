@@ -1,178 +1,179 @@
 package com.sprint.mission.discodeit.service.basic;
-import com.sprint.mission.discodeit.dto.request.UpdateUserRequest;
-import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequest;
-import com.sprint.mission.discodeit.dto.request.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.response.UserResponse;
+
+import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
+import com.sprint.mission.discodeit.dto.command.CreateUserCommand;
+import com.sprint.mission.discodeit.dto.command.UpdateUserCommand;
+import com.sprint.mission.discodeit.dto.response.UserDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
-import com.sprint.mission.discodeit.exception.BadRequestException;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
+import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
+import com.sprint.mission.discodeit.mapper.UserMapper;
 import com.sprint.mission.discodeit.repository.*;
 import com.sprint.mission.discodeit.service.UserService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BasicUserService implements UserService {
     private final UserRepository userRepository;
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentStorage binaryContentStorage;
     private final UserStatusRepository userStatusRepository;
     private final MessageRepository messageRepository;
     private final ChannelRepository channelRepository;
     private final ReadStatusRepository readStatusRepository;
+    private final UserMapper userMapper;
 
 
     @Override
-    public UserResponse create(CreateUserRequest userRequest, CreateBinaryContentRequest profileImageRequest) {
-        validateUsernameAndEmail(userRequest.username(), userRequest.email());
+    @Transactional
+    public UserDto create(CreateUserCommand command, BinaryContentCommand profileImageCommand) {
+        log.debug("Creating user. username={}, email={}, hasProfileImage={}",
+                command.username(), command.email(), profileImageCommand != null);
 
-        User user = new User(userRequest.username(), userRequest.password(),
-                userRequest.email(), null);
-        saveUserWithProfileImage(user, profileImageRequest);
+        validateUsernameAndEmail(command.username(), command.email());
+        User user = new User(command.username(), command.password(), command.email(), null);
+        applyProfileImage(user, profileImageCommand);
+        User saved = userRepository.saveAndFlush(user);
+        saveProfileImageBytes(saved, profileImageCommand);
 
-        UserStatus userStatus = createUserStatus(user.getId());
-        return UserResponse.from(user, userStatus);
+        UserStatus userStatus = createUserStatus(user);
+        log.info("User created. userId={}, username={}", saved.getId(), saved.getUsername());
+
+        return userMapper.toDto(saved, userStatus);
     }
 
     @Override
-    public UserResponse findById(UUID id) {
-        User user = userRepository.findById(id);
-        if (user == null) {
-            throw new NotFoundException("존재하지 않는 사용자입니다.");
-        }
+    @Transactional
+    public UserDto findById(UUID id) {
+        User user = findUserOrThrow(id);
         UserStatus userStatus = getOrCreateUserStatus(id);
-        return UserResponse.from(user, userStatus);
+        return userMapper.toDto(user, userStatus);
     }
     @Override
-    public List<UserResponse> findByAll() {
-        return userRepository.findByAll().stream()
+    @Transactional
+    public List<UserDto> findByAll() {
+        return userRepository.findAll().stream()
                 .map(user -> {
                     UserStatus userStatus = getOrCreateUserStatus(user.getId());
-                    return UserResponse.from(user, userStatus);
+                    return userMapper.toDto(user, userStatus);
                 })
                 .toList();
     }
 
     @Override
-    public UserResponse update(UUID id, UpdateUserRequest userRequest,
-                               CreateBinaryContentRequest profileImageRequest) {
-        User user = userRepository.findById(id);
-        if (user == null) {
-            throw new NotFoundException("존재하지 않는 사용자입니다.");
-        }
-        validateUpdatedUsernameAndEmail(id, userRequest);
+    @Transactional
+    public UserDto update(UUID id, UpdateUserCommand command,
+                          BinaryContentCommand profileImageCommand) {
+        User user = findUserOrThrow(id);
+        log.debug("Updating user. userId={}, hasProfileImage={}", id, profileImageCommand != null);
+        validateUpdatedUsernameAndEmail(id, command);
 
-        // 프로필 이미지 교체 시 기존 이미지 삭제 후 새로 저장
-        UUID newProfileImageId = user.getProfileImageId();
-        if (profileImageRequest != null) {
-            if (user.getProfileImageId() != null) {
-                binaryContentRepository.deleteById(user.getProfileImageId());
-            }
-            BinaryContent newImage = new BinaryContent(
-                    user.getId(), // userId 설정
-                    null,         // messageId는 null
-                    profileImageRequest.fileName(),
-                    profileImageRequest.contentType(),
-                    profileImageRequest.bytes()
-            );
-            newProfileImageId = binaryContentRepository.save(newImage).getId();
-        }
+        BinaryContent newProfileImage = createProfileImage(profileImageCommand);
 
-        user.update(userRequest.newUsername(), userRequest.newPassword(),
-                userRequest.newEmail(), newProfileImageId);
-        userRepository.save(user);
+        user.update(command.newUsername(), command.newPassword(),
+                command.newEmail(), newProfileImage);
+        if (profileImageCommand != null) {
+            userRepository.saveAndFlush(user);
+            saveProfileImageBytes(user, profileImageCommand);
+        }
 
         UserStatus userStatus = getOrCreateUserStatus(id);
-        return UserResponse.from(user, userStatus);
+        log.info("User updated. userId={}", id);
+        return userMapper.toDto(user, userStatus);
     }
 
     @Override
+    @Transactional
     public void deleteById(UUID id) {
-        User user = userRepository.findById(id);
-        if (user == null) {
-            throw new NotFoundException("존재하지 않는 사용자입니다.");
-        }
-
-        deleteProfileImage(user);
+        findUserOrThrow(id);
+        log.debug("Deleting user. userId={}", id);
         deleteAuthoredChannelData(id);
         deleteUserData(id);
+        log.info("User deleted. userId={}", id);
     }
 
     private void validateUsernameAndEmail(String username, String email) {
         if (userRepository.existsByUsernameOrEmail(username, email)) {
-            throw new BadRequestException("이미 사용 중인 유저 이름 또는 이메일 입니다.");
+            log.warn("User creation failed. duplicated username or email. username={}", username);
+            throw new UserAlreadyExistsException(username);
         }
     }
 
-    private void validateUpdatedUsernameAndEmail(UUID userId, UpdateUserRequest userRequest) {
-        String newUsername = userRequest.newUsername();
-        String newEmail = userRequest.newEmail();
+    private void validateUpdatedUsernameAndEmail(UUID userId, UpdateUserCommand command) {
+        String newUsername = command.newUsername();
+        String newEmail = command.newEmail();
         if (newUsername == null && newEmail == null) {
             return;
         }
 
-        boolean duplicated = userRepository.findByAll().stream()
-                .filter(user -> !user.getId().equals(userId))
-                .anyMatch(user ->
-                        (newUsername != null && user.getUsername().equals(newUsername))
-                                || (newEmail != null && user.getEmail().equals(newEmail)));
-        if (duplicated) {
-            throw new BadRequestException("이미 사용 중인 유저 이름 또는 이메일 입니다.");
+        if (newUsername != null && userRepository.existsByUsernameAndIdNot(newUsername, userId)) {
+            throw new UserAlreadyExistsException(newUsername);
+        }
+        if (newEmail != null && userRepository.existsByEmailAndIdNot(newEmail, userId)) {
+            throw UserAlreadyExistsException.byEmail(newEmail);
         }
     }
 
-    private void saveUserWithProfileImage(User user, CreateBinaryContentRequest profileImageRequest) {
-        userRepository.save(user);
-        if (profileImageRequest == null) {
-            return;
+    private void applyProfileImage(User user, BinaryContentCommand profileImageCommand) {
+        BinaryContent profileImage = createProfileImage(profileImageCommand);
+        if (profileImage != null) {
+            user.update(null, null, null, profileImage);
         }
-
-        UUID profileImageId = saveProfileImage(user.getId(), profileImageRequest);
-        user.update(null, null, null, profileImageId);
-        userRepository.save(user);
     }
 
-    private UUID saveProfileImage(UUID userId, CreateBinaryContentRequest profileImageRequest) {
-        BinaryContent profileImage = new BinaryContent(
-                userId,
-                null,
-                profileImageRequest.fileName(),
-                profileImageRequest.contentType(),
-                profileImageRequest.bytes()
-        );
-        return binaryContentRepository.save(profileImage).getId();
+    private BinaryContent createProfileImage(BinaryContentCommand profileImageCommand) {
+        if (profileImageCommand != null) {
+            return new BinaryContent(
+                    null,
+                    null,
+                    profileImageCommand.fileName(),
+                    profileImageCommand.contentType(),
+                    (long) profileImageCommand.bytes().length
+            );
+        }
+        return null;
     }
 
-    private UserStatus createUserStatus(UUID userId) {
-        UserStatus userStatus = new UserStatus(userId, Instant.now());
+    private void saveProfileImageBytes(User user, BinaryContentCommand profileImageCommand) {
+        if (profileImageCommand != null && user.getProfile() != null) {
+            binaryContentStorage.put(user.getProfile().getId(), profileImageCommand.bytes());
+        }
+    }
+
+    private User findUserOrThrow(UUID id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new UserNotFoundException(id));
+    }
+
+    private UserStatus createUserStatus(User user) {
+        UserStatus userStatus = new UserStatus(user, Instant.now());
         return userStatusRepository.save(userStatus);
     }
 
     private UserStatus getOrCreateUserStatus(UUID userId) {
-        UserStatus userStatus = userStatusRepository.findByUserId(userId)
-                .orElseGet(() -> createUserStatus(userId));
+        UserStatus userStatus = userStatusRepository.findByUser_Id(userId)
+                .orElseGet(() -> createUserStatus(findUserOrThrow(userId)));
         if (userStatus.getLastActiveAt() == null) {
             userStatus.updateLastActiveAt(Instant.now());
-            return userStatusRepository.save(userStatus);
         }
         return userStatus;
     }
 
-    private void deleteProfileImage(User user) {
-        if (user.getProfileImageId() != null) {
-            binaryContentRepository.deleteById(user.getProfileImageId());
-        }
-    }
-
     private void deleteAuthoredChannelData(UUID authorId) {
-        channelRepository.findByAll().stream()
+        channelRepository.findAll().stream()
                 .filter(channel -> authorId.equals(channel.getAuthorId()))
                 .map(Channel::getId)
                 .forEach(this::deleteChannelData);
@@ -180,14 +181,13 @@ public class BasicUserService implements UserService {
 
     private void deleteChannelData(UUID channelId) {
         MessageDeletionSupport.deleteByChannelId(messageRepository, binaryContentRepository, channelId);
-        readStatusRepository.deleteByChannelId(channelId);
+        readStatusRepository.deleteByChannel_Id(channelId);
     }
 
     private void deleteUserData(UUID id) {
         MessageDeletionSupport.deleteByAuthorId(messageRepository, binaryContentRepository, id);
-        channelRepository.deleteByAuthorId(id);
-        readStatusRepository.deleteByUserId(id);
-        userStatusRepository.deleteByUserId(id);
+        readStatusRepository.deleteByUser_Id(id);
+        userStatusRepository.deleteByUser_Id(id);
         userRepository.deleteById(id);
     }
 }

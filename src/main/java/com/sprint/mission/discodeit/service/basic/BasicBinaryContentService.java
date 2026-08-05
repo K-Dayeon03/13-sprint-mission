@@ -1,58 +1,75 @@
 package com.sprint.mission.discodeit.service.basic;
 
-import com.sprint.mission.discodeit.dto.request.CreateBinaryContentRequest;
+import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
+import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
 import com.sprint.mission.discodeit.entity.BinaryContent;
-import com.sprint.mission.discodeit.exception.NotFoundException;
+import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
+import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
 import com.sprint.mission.discodeit.repository.BinaryContentRepository;
 import com.sprint.mission.discodeit.service.BinaryContentService;
+import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
-
+@Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class BasicBinaryContentService implements BinaryContentService {
     private final BinaryContentRepository binaryContentRepository;
+    private final BinaryContentMapper binaryContentMapper;
+    private final BinaryContentStorage binaryContentStorage;
 
     @Override
-    public BinaryContent create(CreateBinaryContentRequest request) {
+    @Transactional
+    public BinaryContentDto create(BinaryContentCommand command) {
         BinaryContent binaryContent = new BinaryContent(
-                null,                  // userId — 호출하는 쪽에서 맥락에 맞게 설정
-                null,                  // messageId — 호출하는 쪽에서 맥락에 맞게 설정
-                request.fileName(),
-                request.contentType(),
-                request.bytes()
+                null,
+                null,
+                command.fileName(),
+                command.contentType(),
+                (long) command.bytes().length
         );
-        return binaryContentRepository.save(binaryContent);
+
+        BinaryContent saved = binaryContentRepository.save(binaryContent);
+        log.debug("Uploading binary content. fileName={}, contentType={}, size={}",
+                command.fileName(), command.contentType(), command.bytes().length);
+        binaryContentStorage.put(saved.getId(), command.bytes());
+        log.info("Binary content uploaded. binaryContentId={}, fileName={}, size={}",
+                saved.getId(), saved.getFileName(), saved.getSize());
+        return binaryContentMapper.toDto(saved);
     }
 
     @Override
-    public BinaryContent findById(UUID id) {
-        BinaryContent binaryContent = binaryContentRepository.findById(id);
-        if (binaryContent == null) {
-            throw new NotFoundException("존재하지 않는 파일입니다.");
-        }
-        return binaryContent;
+    public BinaryContentDto findById(UUID id) {
+        return binaryContentMapper.toDto(findEntityOrThrow(id));
     }
 
     @Override
-    public List<BinaryContent> findAllByIdIn(List<UUID> ids) {
+    public List<BinaryContentDto> findAllByIdIn(List<UUID> ids) {
         if (ids == null || ids.isEmpty()) {
             return Collections.emptyList();
         }
         // 리포지토리에 대량 조회를 위임합니다.
-        return binaryContentRepository.findAllByIdIn(ids);
+        return binaryContentRepository.findAllById(ids).stream()
+                .map(binaryContentMapper::toDto)
+                .toList();
     }
 
     @Override
+    @Transactional
     public void deleteById(UUID id) {
-        BinaryContent binaryContent = binaryContentRepository.findById(id);
-        if (binaryContent == null) {
-            throw new NotFoundException("존재하지 않는 파일입니다.");
-        }
+        findEntityOrThrow(id);
         binaryContentRepository.deleteById(id);
+    }
+
+    private BinaryContent findEntityOrThrow(UUID id) {
+        return binaryContentRepository.findById(id)
+                .orElseThrow(() -> new BinaryContentNotFoundException(id));
     }
 }

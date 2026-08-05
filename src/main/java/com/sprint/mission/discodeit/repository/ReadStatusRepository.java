@@ -1,18 +1,22 @@
 package com.sprint.mission.discodeit.repository;
 
 import com.sprint.mission.discodeit.entity.ReadStatus;
+import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.jpa.repository.JpaRepository;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
-public interface ReadStatusRepository {
-    ReadStatus save(ReadStatus readStatus);
-    ReadStatus findById(UUID id);
-    Optional<ReadStatus> findByUserIdAndChannelId(UUID userId, UUID channelId); // 중복 체크용
-    List<ReadStatus> findAllByUserId(UUID userId);
-    List<ReadStatus> findAllByChannelId(UUID channelId);
-    void deleteById(UUID id);
-    void deleteByChannelId(UUID channelId);
-    void deleteByUserId(UUID userId);
+public interface ReadStatusRepository extends JpaRepository<ReadStatus, UUID> {
+    Optional<ReadStatus> findByUser_IdAndChannel_Id(UUID userId, UUID channelId);
+    List<ReadStatus> findAllByUser_Id(UUID userId);
+    List<ReadStatus> findAllByChannel_Id(UUID channelId);
+
+    @EntityGraph(attributePaths = {"user", "user.profile", "user.userStatus"})
+    List<ReadStatus> findAllByChannel_IdIn(Collection<UUID> channelIds);
+
+    void deleteByUser_Id(UUID userId);
+    void deleteByChannel_Id(UUID channelId);
 }
