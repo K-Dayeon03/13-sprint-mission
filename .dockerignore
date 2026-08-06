@@ -1,0 +1,12 @@
+.git
+.github
+.gradle
+.idea
+.logs
+.discodeit
+.test-storage
+build
+out
+*.log
+.DS_Store
+.env

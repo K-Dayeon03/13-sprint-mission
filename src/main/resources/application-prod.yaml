@@ -9,11 +9,6 @@ spring:
   jpa:
     hibernate:
       ddl-auto: validate
-  boot:
-    admin:
-      client:
-        url: ${SPRING_BOOT_ADMIN_CLIENT_URL}
-
 server:
   port: ${PORT:8080}
 

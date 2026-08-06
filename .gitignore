@@ -8,6 +8,7 @@ build/
 !**/src/test/**/build/
 .kotlin
 .idea
+.env
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
