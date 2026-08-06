@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.Message;
 import com.sprint.mission.discodeit.entity.User;
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,9 +13,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
-import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.util.ReflectionTestUtils;
 
+import java.sql.Timestamp;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -34,6 +37,12 @@ class MessageRepositoryTest {
 
     @Autowired
     UserRepository userRepository;
+
+    @Autowired
+    JdbcTemplate jdbcTemplate;
+
+    @Autowired
+    EntityManager entityManager;
 
     @Test
     @DisplayName("채널 ID로 메시지 목록을 조회한다")
@@ -113,21 +122,32 @@ class MessageRepositoryTest {
         User author = userRepository.save(new User("woody", "password1", "woody@codeit.com", null));
         Channel channel = channelRepository.save(new Channel(ChannelType.PUBLIC, "general", "general channel", null));
 
-        Message first = new Message("first", channel, author);
-        Message second = new Message("second", channel, author);
-        Message third = new Message("third", channel, author);
+        Message first = messageRepository.save(new Message("first", channel, author));
+        Message second = messageRepository.save(new Message("second", channel, author));
+        Message third = messageRepository.save(new Message("third", channel, author));
+        messageRepository.flush();
+
         setCreatedAt(first, Instant.parse("2026-07-27T09:00:00Z"));
         setCreatedAt(second, Instant.parse("2026-07-27T09:01:00Z"));
         setCreatedAt(third, Instant.parse("2026-07-27T09:02:00Z"));
-
-        messageRepository.saveAll(List.of(first, second, third));
-        messageRepository.flush();
+        updateCreatedAt(first);
+        updateCreatedAt(second);
+        updateCreatedAt(third);
+        entityManager.clear();
 
         return new TestData(channel, first, second, third);
     }
 
     private static void setCreatedAt(Message message, Instant createdAt) {
         ReflectionTestUtils.setField(message, "createdAt", createdAt);
+    }
+
+    private void updateCreatedAt(Message message) {
+        jdbcTemplate.update(
+                "update messages set created_at = ? where id = ?",
+                Timestamp.from(message.getCreatedAt()),
+                message.getId()
+        );
     }
 
     private record TestData(

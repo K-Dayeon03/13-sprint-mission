@@ -2,6 +2,7 @@ package com.sprint.mission.discodeit.dto.request;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 
 public record CreateUserRequest(
@@ -16,6 +17,10 @@ public record CreateUserRequest(
         String email,
 
         @NotBlank(message = "비밀번호는 필수입니다.")
-        @Size(max = 60, message = "비밀번호는 60자 이하여야 합니다.")
+        @Size(min = 8, max = 60, message = "비밀번호는 8자 이상 60자 이하여야 합니다.")
+        @Pattern(
+                regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[^A-Za-z0-9]).+$",
+                message = "비밀번호는 영문, 숫자, 특수문자를 포함해야 합니다."
+        )
         String password
 ){}

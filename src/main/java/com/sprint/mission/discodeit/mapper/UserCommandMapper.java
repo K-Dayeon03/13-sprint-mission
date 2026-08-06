@@ -13,15 +13,7 @@ public class UserCommandMapper {
         return new CreateUserCommand(request.username(), request.email(), request.password());
     }
 
-    public CreateUserCommand toCreateCommand(String username, String email, String password) {
-        return new CreateUserCommand(username, email, password);
-    }
-
     public UpdateUserCommand toUpdateCommand(UpdateUserRequest request) {
         return new UpdateUserCommand(request.newUsername(), request.newEmail(), request.newPassword());
-    }
-
-    public UpdateUserCommand toUpdateCommand(String newUsername, String newEmail, String newPassword) {
-        return new UpdateUserCommand(newUsername, newEmail, newPassword);
     }
 }

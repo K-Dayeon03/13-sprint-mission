@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -62,21 +61,16 @@ public class UserController {
     @Operation(summary = "User 등록")
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> createWithProfileImage(
-            @Valid @RequestPart(value = "userCreateRequest", required = false) CreateUserRequest userCreateRequest,
-            @RequestParam(required = false) String username,
-            @RequestParam(required = false) String email,
-            @RequestParam(required = false) String password,
+            @Valid @RequestPart("userCreateRequest") CreateUserRequest userCreateRequest,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
         log.debug("Received user create request. username={}, email={}, hasProfileImage={}",
-                userCreateRequest != null ? userCreateRequest.username() : username,
-                userCreateRequest != null ? userCreateRequest.email() : email,
+                userCreateRequest.username(),
+                userCreateRequest.email(),
                 profile != null && !profile.isEmpty());
 
         UserDto user = userService.create(
-                userCreateRequest != null
-                        ? userCommandMapper.toCreateCommand(userCreateRequest)
-                        : userCommandMapper.toCreateCommand(username, email, password),
+                userCommandMapper.toCreateCommand(userCreateRequest),
                 binaryContentCommandMapper.toCommand(profile, "profile-image")
         );
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
@@ -98,17 +92,12 @@ public class UserController {
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<UserDto> updateWithProfileImage(
             @PathVariable UUID userId,
-            @Valid @RequestPart(value = "userUpdateRequest", required = false) UpdateUserRequest userUpdateRequest,
-            @RequestParam(required = false) String newUsername,
-            @RequestParam(required = false) String newEmail,
-            @RequestParam(required = false) String newPassword,
+            @Valid @RequestPart("userUpdateRequest") UpdateUserRequest userUpdateRequest,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
         return ResponseEntity.ok(userService.update(
                 userId,
-                userUpdateRequest != null
-                        ? userCommandMapper.toUpdateCommand(userUpdateRequest)
-                        : userCommandMapper.toUpdateCommand(newUsername, newEmail, newPassword),
+                userCommandMapper.toUpdateCommand(userUpdateRequest),
                 binaryContentCommandMapper.toCommand(profile, "profile-image")
         ));
     }

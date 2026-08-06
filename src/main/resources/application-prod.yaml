@@ -2,9 +2,9 @@ spring:
   application:
     name: discodeit
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/discodeit}
-    username: ${DB_USERNAME:discodeit_user}
-    password: ${DB_PASSWORD:discodeit1234}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
     driver-class-name: org.postgresql.Driver
   jpa:
     hibernate:
@@ -20,3 +20,13 @@ server:
 logging:
   level:
     com.sprint.mission.discodeit: info
+    org.hibernate.SQL: info
+    org.hibernate.orm.jdbc.bind: off
+
+management:
+  endpoint:
+    health:
+      show-details: never
+  info:
+    env:
+      enabled: false

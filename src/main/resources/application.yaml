@@ -40,8 +40,6 @@ springdoc:
 logging:
   level:
     root: info
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
 
 management:
   endpoints:
@@ -50,10 +48,10 @@ management:
         include: health,info,metrics,loggers
   endpoint:
     health:
-      show-details: always
+      show-details: never
   info:
     env:
-      enabled: true
+      enabled: false
 
 info:
   app:
