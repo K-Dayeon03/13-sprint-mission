@@ -115,7 +115,7 @@ class AWSS3Test {
                 .build();
     }
 
-    private static Properties loadProperties() {
+    static Properties loadProperties() {
         Properties properties = new Properties();
 
         try (FileInputStream inputStream = new FileInputStream(Path.of(".env").toFile())) {
