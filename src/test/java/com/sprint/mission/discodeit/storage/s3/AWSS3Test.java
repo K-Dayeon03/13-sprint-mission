@@ -33,7 +33,7 @@ class AWSS3Test {
     private String region;
     private String bucket;
 
-    private final String key = "test/aws-s3-test.txt";
+    private final String key = "test/aws-s3-test-" + System.currentTimeMillis() + ".txt";
     private final String content = "hello s3";
 
     @BeforeEach
@@ -44,29 +44,22 @@ class AWSS3Test {
         region = properties.getProperty("AWS_S3_REGION");
         bucket = properties.getProperty("AWS_S3_BUCKET");
 
-        assumeTrue(hasText(accessKey), "AWS_S3_ACCESS_KEY is required");
-        assumeTrue(hasText(secretKey), "AWS_S3_SECRET_KEY is required");
-        assumeTrue(hasText(region), "AWS_S3_REGION is required");
-        assumeTrue(hasText(bucket), "AWS_S3_BUCKET is required");
+        assumeTrue(isAwsS3TestEnabled(properties), "AWS_S3_TEST_ENABLED=true is required");
+        assumeTrue(hasUsableText(accessKey), "AWS_S3_ACCESS_KEY is required");
+        assumeTrue(hasUsableText(secretKey), "AWS_S3_SECRET_KEY is required");
+        assumeTrue(hasUsableText(region), "AWS_S3_REGION is required");
+        assumeTrue(hasUsableText(bucket), "AWS_S3_BUCKET is required");
     }
 
     @Test
     void upload() {
-        try (S3Client s3Client = s3Client()) {
-            PutObjectRequest request = PutObjectRequest.builder()
-                    .bucket(bucket)
-                    .key(key)
-                    .contentType("text/plain")
-                    .build();
-
-            s3Client.putObject(request, RequestBody.fromString(content));
-
-            assertThat(true).isTrue();
-        }
+        uploadObject();
     }
 
     @Test
     void download() {
+        uploadObject();
+
         try (S3Client s3Client = s3Client()) {
             GetObjectRequest request = GetObjectRequest.builder()
                     .bucket(bucket)
@@ -115,6 +108,20 @@ class AWSS3Test {
                 .build();
     }
 
+    private void uploadObject() {
+        try (S3Client s3Client = s3Client()) {
+            PutObjectRequest request = PutObjectRequest.builder()
+                    .bucket(bucket)
+                    .key(key)
+                    .contentType("text/plain")
+                    .build();
+
+            s3Client.putObject(request, RequestBody.fromString(content));
+
+            assertThat(true).isTrue();
+        }
+    }
+
     static Properties loadProperties() {
         Properties properties = new Properties();
 
@@ -129,5 +136,25 @@ class AWSS3Test {
 
     private static boolean hasText(String value) {
         return value != null && !value.isBlank();
+    }
+
+    private static boolean hasUsableText(String value) {
+        return hasText(value) && !isPlaceholder(value);
+    }
+
+    private static boolean isPlaceholder(String value) {
+        String trimmedValue = value.trim();
+
+        return trimmedValue.contains("${");
+    }
+
+    private static boolean isAwsS3TestEnabled(Properties properties) {
+        String value = System.getenv("AWS_S3_TEST_ENABLED");
+
+        if (!hasText(value)) {
+            value = properties.getProperty("AWS_S3_TEST_ENABLED");
+        }
+
+        return "true".equalsIgnoreCase(value);
     }
 }

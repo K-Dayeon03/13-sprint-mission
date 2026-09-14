@@ -63,6 +63,24 @@ tasks.named('test') {
     finalizedBy jacocoTestReport
 }
 
+tasks.named('bootRun') {
+    def envFile = file('.env')
+
+    if (envFile.exists()) {
+        def env = new Properties()
+
+        envFile.withInputStream {
+            env.load(it)
+        }
+
+        env.each { key, value ->
+            if (value != null && !value.toString().contains('${')) {
+                environment key, value
+            }
+        }
+    }
+}
+
 jacocoTestReport {
     dependsOn test
     reports {

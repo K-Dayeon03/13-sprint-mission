@@ -5,14 +5,15 @@ import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentDataNot
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentReadFailedException;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentWriteFailedException;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import lombok.extern.slf4j.Slf4j;
 import software.amazon.awssdk.auth.credentials.AwsBasicCredentials;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
-import software.amazon.awssdk.core.ResponseInputStream;
 import software.amazon.awssdk.core.sync.ResponseTransformer;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.regions.Region;
@@ -29,8 +30,11 @@ import java.time.Duration;
 import java.util.UUID;
 
 @Component
+@Slf4j
 @ConditionalOnProperty(name = "discodeit.storage.type", havingValue = "s3")
 public class S3BinaryContentStorage implements BinaryContentStorage {
+
+    private static final long DEFAULT_PRESIGNED_URL_EXPIRATION_SECONDS = 600;
 
     private final String accessKey;
     private final String secretKey;
@@ -38,6 +42,11 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     private final String bucket;
     private final long presignedUrlExpiration;
 
+    public S3BinaryContentStorage(String accessKey, String secretKey, String region, String bucket) {
+        this(accessKey, secretKey, region, bucket, DEFAULT_PRESIGNED_URL_EXPIRATION_SECONDS);
+    }
+
+    @Autowired
     public S3BinaryContentStorage(
             @Value("${discodeit.storage.s3.access-key}") String accessKey,
             @Value("${discodeit.storage.s3.secret-key}") String secretKey,
@@ -63,6 +72,8 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
             s3Client.putObject(request, RequestBody.fromBytes(bytes));
             return id;
         } catch (Exception e) {
+            log.error("Failed to upload binary content to S3. binaryContentId={}, bucket={}, region={}",
+                    id, bucket, region, e);
             throw new BinaryContentWriteFailedException(id, e);
         }
     }
@@ -80,6 +91,8 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
         } catch (NoSuchKeyException e) {
             throw new BinaryContentDataNotFoundException(id);
         } catch (Exception e) {
+            log.error("Failed to read binary content from S3. binaryContentId={}, bucket={}, region={}",
+                    id, bucket, region, e);
             throw new BinaryContentReadFailedException(id, e);
         }
     }

@@ -7,6 +7,11 @@
 .test-storage
 build
 out
+data
 *.log
+*.pem
 .DS_Store
 .env
+.env.*
+!/.env.example
+discodeit.env

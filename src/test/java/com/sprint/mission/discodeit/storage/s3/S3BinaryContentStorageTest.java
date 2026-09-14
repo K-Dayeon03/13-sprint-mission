@@ -31,14 +31,16 @@ class S3BinaryContentStorageTest {
         String secretKey = properties.getProperty("AWS_S3_SECRET_KEY");
         String region = properties.getProperty("AWS_S3_REGION");
         String bucket = properties.getProperty("AWS_S3_BUCKET");
-        long presignedUrlExpiration = Long.parseLong(
-                properties.getProperty("AWS_S3_PRESIGNED_URL_EXPIRATION", "600")
-        );
+        String presignedUrlExpirationValue = properties.getProperty("AWS_S3_PRESIGNED_URL_EXPIRATION", "600");
 
-        assumeTrue(hasText(accessKey), "AWS_S3_ACCESS_KEY is required");
-        assumeTrue(hasText(secretKey), "AWS_S3_SECRET_KEY is required");
-        assumeTrue(hasText(region), "AWS_S3_REGION is required");
-        assumeTrue(hasText(bucket), "AWS_S3_BUCKET is required");
+        assumeTrue(isAwsS3TestEnabled(properties), "AWS_S3_TEST_ENABLED=true is required");
+        assumeTrue(hasUsableText(accessKey), "AWS_S3_ACCESS_KEY is required");
+        assumeTrue(hasUsableText(secretKey), "AWS_S3_SECRET_KEY is required");
+        assumeTrue(hasUsableText(region), "AWS_S3_REGION is required");
+        assumeTrue(hasUsableText(bucket), "AWS_S3_BUCKET is required");
+        assumeTrue(hasUsableText(presignedUrlExpirationValue), "AWS_S3_PRESIGNED_URL_EXPIRATION is required");
+
+        long presignedUrlExpiration = Long.parseLong(presignedUrlExpirationValue);
 
         storage = new S3BinaryContentStorage(
                 accessKey,
@@ -91,5 +93,25 @@ class S3BinaryContentStorageTest {
 
     private static boolean hasText(String value) {
         return value != null && !value.isBlank();
+    }
+
+    private static boolean hasUsableText(String value) {
+        return hasText(value) && !isPlaceholder(value);
+    }
+
+    private static boolean isPlaceholder(String value) {
+        String trimmedValue = value.trim();
+
+        return trimmedValue.contains("${");
+    }
+
+    private static boolean isAwsS3TestEnabled(Properties properties) {
+        String value = System.getenv("AWS_S3_TEST_ENABLED");
+
+        if (!hasText(value)) {
+            value = properties.getProperty("AWS_S3_TEST_ENABLED");
+        }
+
+        return "true".equalsIgnoreCase(value);
     }
 }
