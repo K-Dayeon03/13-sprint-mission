@@ -93,7 +93,7 @@ class ChannelApiIntegrationTest {
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "username", username,
                                 "email", email,
-                                "password", "password1"
+                                "password", "Password1!"
                         ))))
                 .andExpect(status().isCreated())
                 .andReturn()

@@ -18,6 +18,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
@@ -25,6 +26,9 @@ import java.util.UUID;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.isNull;
 import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -58,8 +62,8 @@ class UserControllerTest {
     @DisplayName("사용자 생성 성공")
     void create_success() throws Exception {
         UUID userId = UUID.randomUUID();
-        CreateUserRequest request = new CreateUserRequest("woody", "woody@codeit.com", "password1");
-        CreateUserCommand command = new CreateUserCommand("woody", "woody@codeit.com", "password1");
+        CreateUserRequest request = new CreateUserRequest("woody", "woody@codeit.com", "Password1!");
+        CreateUserCommand command = new CreateUserCommand("woody", "woody@codeit.com", "Password1!");
         UserDto response = new UserDto(userId, "woody", "woody@codeit.com", null, true);
 
         given(userCommandMapper.toCreateCommand(any(CreateUserRequest.class))).willReturn(command);
@@ -92,10 +96,45 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("사용자 생성 실패 - multipart DTO part 누락")
+    void createWithProfileImage_fail_missingRequestPart() throws Exception {
+        mockMvc.perform(multipart("/api/users")
+                        .param("username", "woody")
+                        .param("email", "woody@codeit.com")
+                        .param("password", "Password1!"))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_REQUEST"));
+
+        verify(userService, never()).create(any(), any());
+    }
+
+    @Test
+    @DisplayName("사용자 생성 실패 - multipart DTO 유효성 검증")
+    void createWithProfileImage_fail_validation() throws Exception {
+        MockMultipartFile requestPart = new MockMultipartFile(
+                "userCreateRequest",
+                "",
+                MediaType.APPLICATION_JSON_VALUE,
+                """
+                {"username":"","email":"invalid-email","password":"short"}
+                """.getBytes()
+        );
+
+        mockMvc.perform(multipart("/api/users").file(requestPart))
+                .andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("VALIDATION_FAILED"))
+                .andExpect(jsonPath("$.details.username").exists())
+                .andExpect(jsonPath("$.details.email").exists())
+                .andExpect(jsonPath("$.details.password").exists());
+
+        verify(userService, never()).create(any(), any());
+    }
+
+    @Test
     @DisplayName("사용자 생성 실패 - 중복 사용자")
     void create_fail_duplicateUser() throws Exception {
-        CreateUserRequest request = new CreateUserRequest("woody", "woody@codeit.com", "password1");
-        CreateUserCommand command = new CreateUserCommand("woody", "woody@codeit.com", "password1");
+        CreateUserRequest request = new CreateUserRequest("woody", "woody@codeit.com", "Password1!");
+        CreateUserCommand command = new CreateUserCommand("woody", "woody@codeit.com", "Password1!");
 
         given(userCommandMapper.toCreateCommand(any(CreateUserRequest.class))).willReturn(command);
         given(userService.create(any(CreateUserCommand.class), isNull())).willThrow(new UserAlreadyExistsException("woody"));

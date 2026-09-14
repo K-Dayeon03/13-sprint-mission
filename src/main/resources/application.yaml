@@ -5,11 +5,6 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 20MB
-  boot:
-    admin:
-      client:
-        instance:
-          name: discodeit
   sql:
     init:
       mode: never
@@ -21,9 +16,15 @@ spring:
 
 discodeit:
   storage:
-    type: local
+    type: ${STORAGE_TYPE:local}
     local:
-      root-path: .discodeit/binary-contents
+      root-path: ${STORAGE_LOCAL_ROOT_PATH:.discodeit/storage}
+    s3:
+      access-key: ${AWS_S3_ACCESS_KEY:}
+      secret-key: ${AWS_S3_SECRET_KEY:}
+      region: ${AWS_S3_REGION:}
+      bucket: ${AWS_S3_BUCKET:}
+      presigned-url-expiration: ${AWS_S3_PRESIGNED_URL_EXPIRATION:600}
 server:
   servlet:
     encoding:
@@ -40,8 +41,6 @@ springdoc:
 logging:
   level:
     root: info
-    org.hibernate.SQL: debug
-    org.hibernate.orm.jdbc.bind: trace
 
 management:
   endpoints:
@@ -50,10 +49,10 @@ management:
         include: health,info,metrics,loggers
   endpoint:
     health:
-      show-details: always
+      show-details: never
   info:
     env:
-      enabled: true
+      enabled: false
 
 info:
   app:

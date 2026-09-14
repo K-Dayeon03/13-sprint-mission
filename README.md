@@ -1,5 +1,7 @@
 # Discodeit
 
+[![codecov](https://codecov.io/gh/K-Dayeon03/13-sprint-mission/branch/main/graph/badge.svg)](https://codecov.io/gh/K-Dayeon03/13-sprint-mission)
+
 Java와 Spring Boot로 구현한 Discord 유사 서비스입니다.  
 유저, 채널, 메시지를 중심으로 ReadStatus, UserStatus, BinaryContent 도메인을 함께 관리합니다.
 

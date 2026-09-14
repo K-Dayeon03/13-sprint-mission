@@ -69,7 +69,7 @@ class UserApiIntegrationTest {
         mockMvc.perform(patch("/api/users/{userId}", userId)
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
-                                {"newUsername":"newBuzz","newEmail":"new-buzz@codeit.com","newPassword":"new-password"}
+                                {"newUsername":"newBuzz","newEmail":"new-buzz@codeit.com","newPassword":"NewPass1!"}
                                 """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.id").value(userId.toString()))
@@ -86,7 +86,7 @@ class UserApiIntegrationTest {
                         .content(objectMapper.writeValueAsString(Map.of(
                                 "username", username,
                                 "email", email,
-                                "password", "password1"
+                                "password", "Password1!"
                         ))))
                 .andExpect(status().isCreated())
                 .andReturn()

@@ -8,6 +8,9 @@ build/
 !**/src/test/**/build/
 .kotlin
 .idea
+.env
+discodeit.env
+spy.log
 
 ### IntelliJ IDEA ###
 .idea/modules.xml
