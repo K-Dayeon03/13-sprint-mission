@@ -5,6 +5,8 @@ on:
     branches:
       - main
       - 강다연
+      - 강다연-sprint8
+      - release
 
 permissions:
   contents: read
