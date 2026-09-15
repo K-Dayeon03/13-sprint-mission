@@ -5,7 +5,7 @@ on:
     branches:
       - 강다연
       - 강다연-sprint8
-      - relase
+      - release
 
 permissions:
   contents: read
