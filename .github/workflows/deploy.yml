@@ -107,6 +107,7 @@ jobs:
           aws ecs update-service \
             --cluster "$ECS_CLUSTER" \
             --service "$ECS_SERVICE" \
+            --deployment-configuration "minimumHealthyPercent=0,maximumPercent=200" \
             --desired-count 0
           aws ecs wait services-stable \
             --cluster "$ECS_CLUSTER" \
@@ -122,6 +123,7 @@ jobs:
             --cluster "$ECS_CLUSTER" \
             --service "$ECS_SERVICE" \
             --task-definition "$TASK_DEFINITION_ARN" \
+            --deployment-configuration "minimumHealthyPercent=0,maximumPercent=200" \
             --desired-count 1
           aws ecs wait services-stable \
             --cluster "$ECS_CLUSTER" \
