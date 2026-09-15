@@ -3,8 +3,6 @@ name: CD
 on:
   push:
     branches:
-      - 강다연
-      - 강다연-sprint8
       - release
 
 permissions:
