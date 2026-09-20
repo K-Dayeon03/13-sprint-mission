@@ -12,6 +12,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.logout.HttpStatusReturningLogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
@@ -20,31 +21,37 @@ import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 public class SecurityConfig {
     private final LoginSuccessHandler loginSuccessHandler;
     private final LoginFailureHandler loginFailureHandler;
+
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
-        //클라이언트에서 쿠키에 저장된 CSRF 토큰에 접근해야 하므로 Http Only는 false로 설정
-       //csrf 설정, 브라우저에서 XSRF-TOKEN 쿠키를 읽을 수 있도록 HttpOnly=false로 둔다.
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        // 클라이언트에서 XSRF-TOKEN 쿠키를 읽을 수 있도록 HttpOnly=false로 둔다.
         http.csrf(csrf -> csrf
-                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
-                        .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
-        //Spring Security의 formLogin 기능을 킨다.
-        //이 설정을 하면 UsernamePasswordAuthenticationFilter가 로그인 요청을 처리한다.
-                //기본값은 /login
-                //요구사항 로그인 처리 url /api/auth/login로 설정
-                //이 주소로 post 요청이 오면 컨트롤러가 아니라 Spring Security필터가 먼저 로그인 처리한다는 의미
-        ).formLogin(login -> login.loginProcessingUrl("/api/auth/login")
-                //로그인 성공 시 200 UserReponse를 직접 응답
-                .successHandler(loginSuccessHandler)
+                    .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
+                    .csrfTokenRequestHandler(new SpaCsrfTokenRequestHandler())
+            )
+            // POST /api/auth/login 요청은 컨트롤러가 아니라 Spring Security 필터가 처리한다.
+            .formLogin(login -> login
+                    .loginProcessingUrl("/api/auth/login")
+                    // 로그인 성공 시 200 UserResponse를 직접 응답한다.
+                    .successHandler(loginSuccessHandler)
+                    // 로그인 실패 시 401 ErrorResponse를 직접 응답한다.
+                    .failureHandler(loginFailureHandler)
+            )
+            // Spring Security의 기본 logout 흐름은 유지하고, URL과 성공 응답 방식만 교체한다.
+            .logout(logout -> logout
+                    // CSRF가 켜져 있으므로 POST /api/auth/logout 요청으로 처리된다.
+                    .logoutUrl("/api/auth/logout")
+                    // 기본 SimpleUrlLogoutSuccessHandler 대신 204 No Content를 반환한다.
+                    .logoutSuccessHandler(
+                            new HttpStatusReturningLogoutSuccessHandler(HttpStatus.NO_CONTENT)
+                    )
+            );
 
-                //로그인 실패 시 401 ErrorResponse를직접 응답
-                .failureHandler(loginFailureHandler)
-
-
-        );
         return http.build();
     }
+
     @Bean
-    public PasswordEncoder passwordEncoder(){
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 }
