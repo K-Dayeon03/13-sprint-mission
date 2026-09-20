@@ -20,6 +20,7 @@ import com.sprint.mission.discodeit.repository.UserRepository;
 import com.sprint.mission.discodeit.service.ChannelService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
@@ -46,6 +47,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     public ChannelResponse createPublic(CreatePublicChannelCommand command) {
         if (!StringUtils.hasText(command.name())) {
             throw new InvalidRequestException("채널명을 입력해주세요.");
@@ -159,6 +161,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     public ChannelResponse update(UUID id, UpdateChannelCommand command) {
         Channel channel = findChannelOrThrow(id);
         if (channel.getType() == ChannelType.PRIVATE) {
@@ -180,6 +183,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
+    @PreAuthorize("hasRole('CHANNEL_MANAGER')")
     public void deleteById(UUID id) {
         findChannelOrThrow(id);
         log.debug("Deleting channel. channelId={}", id);

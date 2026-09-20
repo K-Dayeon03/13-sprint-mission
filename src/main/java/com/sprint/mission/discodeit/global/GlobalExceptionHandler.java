@@ -3,6 +3,8 @@ package com.sprint.mission.discodeit.global;
 import com.sprint.mission.discodeit.exception.DiscodeitException;
 import com.sprint.mission.discodeit.exception.ErrorCode;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -84,6 +86,20 @@ public class GlobalExceptionHandler {
                         ErrorCode.UNSUPPORTED_MEDIA_TYPE,
                         e,
                         Map.of("contentType", String.valueOf(e.getContentType()))
+                ));
+    }
+
+    @ExceptionHandler({
+            AccessDeniedException.class,
+            AuthorizationDeniedException.class
+    })
+    public ResponseEntity<ErrorResponse> handleAccessDenied(Exception e) {
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(ErrorResponse.of(
+                        HttpStatus.FORBIDDEN,
+                        "ACCESS_DENIED",
+                        "접근 권한이 없습니다.",
+                        e
                 ));
     }
 
