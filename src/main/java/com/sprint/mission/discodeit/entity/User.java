@@ -22,6 +22,7 @@ public class User extends BaseUpdatableEntity {
 
     }
 
+
     //orphanRemoval는 부모와의 관계가 끊긴 자식 엔티티를 자동 삭제 옵션
     @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "profile_id")
@@ -49,7 +50,11 @@ public class User extends BaseUpdatableEntity {
         this.email = email;
         this.profileImageId = profileImageId;
     }
-
+    public User(String username, String email, String password){
+        this.username = username;
+        this.email = email;
+        this.password = password;
+    }
     public void update(String newUsername, String newPassword, String newEmail, BinaryContent newProfile) {
         // profileImageId도 수정 조건에 포함
         if (newUsername == null && newPassword == null && newEmail == null && newProfile == null) {
@@ -110,4 +115,5 @@ public class User extends BaseUpdatableEntity {
                 ", 수정시간=" + getUpdatedAt() +
                 '}';
     }
+
 }

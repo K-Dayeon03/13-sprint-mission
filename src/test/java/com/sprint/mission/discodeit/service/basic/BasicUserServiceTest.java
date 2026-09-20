@@ -3,8 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
 import com.sprint.mission.discodeit.dto.command.CreateUserCommand;
 import com.sprint.mission.discodeit.dto.command.UpdateUserCommand;
-import com.sprint.mission.discodeit.dto.response.UserDto;
-import com.sprint.mission.discodeit.entity.BinaryContent;
+import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
@@ -26,6 +25,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.time.Instant;
@@ -53,12 +53,13 @@ class BasicUserServiceTest {
     @Mock ChannelRepository channelRepository;
     @Mock ReadStatusRepository readStatusRepository;
     @Mock UserMapper userMapper;
+    @Mock PasswordEncoder passwordEncoder;
 
     @InjectMocks BasicUserService userService;
 
     private User user;
     private UserStatus userStatus;
-    private UserDto userDto;
+    private UserResponse userDto;
 
     @BeforeEach
     void setUp() {
@@ -66,7 +67,7 @@ class BasicUserServiceTest {
         setId(user, UUID.randomUUID());
         userStatus = new UserStatus(user, Instant.now());
         setId(userStatus, UUID.randomUUID());
-        userDto = new UserDto(user.getId(), user.getUsername(), user.getEmail(), null, true);
+        userDto = new UserResponse(user.getId(), user.getUsername(), user.getEmail(), null, true);
     }
 
     @Test
@@ -74,6 +75,7 @@ class BasicUserServiceTest {
     void create_success() {
         CreateUserCommand command = new CreateUserCommand("woody", "woody@codeit.com", "woody1234");
 
+        given(passwordEncoder.encode("woody1234")).willReturn("$2a$10$encodedPassword");
         given(userRepository.existsByUsernameOrEmail("woody", "woody@codeit.com")).willReturn(false);
         given(userRepository.saveAndFlush(any(User.class))).willAnswer(invocation -> {
             User saved = invocation.getArgument(0);
@@ -83,7 +85,7 @@ class BasicUserServiceTest {
         given(userStatusRepository.save(any(UserStatus.class))).willReturn(userStatus);
         given(userMapper.toDto(any(User.class), any(UserStatus.class))).willReturn(userDto);
 
-        UserDto result = userService.create(command, null);
+        UserResponse result = userService.create(command, null);
 
         assertThat(result).isEqualTo(userDto);
         verify(userRepository).saveAndFlush(any(User.class));
@@ -110,6 +112,7 @@ class BasicUserServiceTest {
         BinaryContentCommand profileCommand = new BinaryContentCommand("profile.png", "image/png", bytes);
         UUID profileId = UUID.randomUUID();
 
+        given(passwordEncoder.encode("woody1234")).willReturn("$2a$10$encodedPassword");
         given(userRepository.existsByUsernameOrEmail("woody", "woody@codeit.com")).willReturn(false);
         given(userRepository.saveAndFlush(any(User.class))).willAnswer(invocation -> {
             User saved = invocation.getArgument(0);
@@ -120,7 +123,7 @@ class BasicUserServiceTest {
         given(userStatusRepository.save(any(UserStatus.class))).willReturn(userStatus);
         given(userMapper.toDto(any(User.class), any(UserStatus.class))).willReturn(userDto);
 
-        UserDto result = userService.create(command, profileCommand);
+        UserResponse result = userService.create(command, profileCommand);
 
         assertThat(result).isEqualTo(userDto);
         verify(binaryContentStorage).put(profileId, bytes);
@@ -133,7 +136,7 @@ class BasicUserServiceTest {
         given(userStatusRepository.findByUser_Id(user.getId())).willReturn(Optional.of(userStatus));
         given(userMapper.toDto(user, userStatus)).willReturn(userDto);
 
-        UserDto result = userService.findById(user.getId());
+        UserResponse result = userService.findById(user.getId());
 
         assertThat(result).isEqualTo(userDto);
     }
@@ -156,7 +159,7 @@ class BasicUserServiceTest {
         given(userStatusRepository.findByUser_Id(user.getId())).willReturn(Optional.of(userStatus));
         given(userMapper.toDto(user, userStatus)).willReturn(userDto);
 
-        List<UserDto> result = userService.findByAll();
+        List<UserResponse> result = userService.findByAll();
 
         assertThat(result).containsExactly(userDto);
     }
@@ -165,14 +168,14 @@ class BasicUserServiceTest {
     @DisplayName("유저 수정은 변경 감지로 처리한다")
     void update_success() {
         UpdateUserCommand command = new UpdateUserCommand("newWoody", null, null);
-        UserDto updatedDto = new UserDto(user.getId(), "newWoody", user.getEmail(), null, true);
+        UserResponse updatedDto = new UserResponse(user.getId(), "newWoody", user.getEmail(), null, true);
 
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
         given(userRepository.existsByUsernameAndIdNot("newWoody", user.getId())).willReturn(false);
         given(userStatusRepository.findByUser_Id(user.getId())).willReturn(Optional.of(userStatus));
         given(userMapper.toDto(user, userStatus)).willReturn(updatedDto);
 
-        UserDto result = userService.update(user.getId(), command, null);
+        UserResponse result = userService.update(user.getId(), command, null);
 
         assertThat(result).isEqualTo(updatedDto);
         verify(userRepository, never()).save(any());

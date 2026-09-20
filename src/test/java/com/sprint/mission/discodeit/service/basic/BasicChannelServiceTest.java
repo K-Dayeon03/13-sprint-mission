@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.command.CreatePrivateChannelCommand;
 import com.sprint.mission.discodeit.dto.command.CreatePublicChannelCommand;
 import com.sprint.mission.discodeit.dto.command.UpdateChannelCommand;
-import com.sprint.mission.discodeit.dto.response.ChannelDto;
-import com.sprint.mission.discodeit.dto.response.UserDto;
+import com.sprint.mission.discodeit.dto.response.ChannelResponse;
+import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
@@ -70,7 +70,7 @@ class BasicChannelServiceTest {
     @Test
     @DisplayName("PUBLIC 채널 생성 성공")
     void createPublic_success() {
-        ChannelDto dto = new ChannelDto(publicChannel.getId(), ChannelType.PUBLIC, "공지", "공지 채널입니다.", null, null);
+        ChannelResponse dto = new ChannelResponse(publicChannel.getId(), ChannelType.PUBLIC, "공지", "공지 채널입니다.", null, null);
 
         given(channelRepository.save(any(Channel.class))).willAnswer(invocation -> {
             Channel saved = invocation.getArgument(0);
@@ -80,7 +80,7 @@ class BasicChannelServiceTest {
         given(messageRepository.findByChannel_Id(publicChannel.getId())).willReturn(List.of());
         given(channelMapper.toDto(any(Channel.class), eq(null), eq(null))).willReturn(dto);
 
-        ChannelDto result = channelService.createPublic(new CreatePublicChannelCommand("공지", "공지 채널입니다."));
+        ChannelResponse result = channelService.createPublic(new CreatePublicChannelCommand("공지", "공지 채널입니다."));
 
         assertThat(result).isEqualTo(dto);
         verify(channelRepository).save(any(Channel.class));
@@ -101,8 +101,8 @@ class BasicChannelServiceTest {
         User user = new User("user1", "password1", "user1@codeit.com", null);
         setId(user, UUID.randomUUID());
         ReadStatus readStatus = new ReadStatus(user, privateChannel, Instant.now());
-        UserDto userDto = new UserDto(user.getId(), user.getUsername(), user.getEmail(), null, true);
-        ChannelDto dto = new ChannelDto(privateChannel.getId(), ChannelType.PRIVATE, "가족", "가족 채널입니다.", List.of(userDto), null);
+        UserResponse userDto = new UserResponse(user.getId(), user.getUsername(), user.getEmail(), null, true);
+        ChannelResponse dto = new ChannelResponse(privateChannel.getId(), ChannelType.PRIVATE, "가족", "가족 채널입니다.", List.of(userDto), null);
 
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
         given(channelRepository.save(any(Channel.class))).willAnswer(invocation -> {
@@ -115,7 +115,7 @@ class BasicChannelServiceTest {
         given(userMapper.toDto(user)).willReturn(userDto);
         given(channelMapper.toDto(any(Channel.class), anyList(), eq(null))).willReturn(dto);
 
-        ChannelDto result = channelService.createPrivate(new CreatePrivateChannelCommand("가족", "가족 채널입니다.", List.of(user.getId())));
+        ChannelResponse result = channelService.createPrivate(new CreatePrivateChannelCommand("가족", "가족 채널입니다.", List.of(user.getId())));
 
         assertThat(result).isEqualTo(dto);
         verify(readStatusRepository).save(any(ReadStatus.class));
@@ -151,14 +151,14 @@ class BasicChannelServiceTest {
     @DisplayName("채널 단건 조회 성공")
     void findById_success() {
         Instant lastMessageAt = Instant.parse("2026-07-24T10:00:00Z");
-        ChannelDto dto = new ChannelDto(publicChannel.getId(), ChannelType.PUBLIC, "공지", "공지 채널입니다.", null, lastMessageAt);
+        ChannelResponse dto = new ChannelResponse(publicChannel.getId(), ChannelType.PUBLIC, "공지", "공지 채널입니다.", null, lastMessageAt);
 
         given(channelRepository.findById(publicChannel.getId())).willReturn(Optional.of(publicChannel));
         given(messageRepository.findByChannel_Id(publicChannel.getId()))
                 .willReturn(List.of(messageAt(publicChannel, lastMessageAt)));
         given(channelMapper.toDto(publicChannel, null, lastMessageAt)).willReturn(dto);
 
-        ChannelDto result = channelService.findById(publicChannel.getId());
+        ChannelResponse result = channelService.findById(publicChannel.getId());
 
         assertThat(result).isEqualTo(dto);
     }
@@ -166,13 +166,13 @@ class BasicChannelServiceTest {
     @Test
     @DisplayName("채널 수정은 변경 감지로 처리한다")
     void update_success() {
-        ChannelDto dto = new ChannelDto(publicChannel.getId(), ChannelType.PUBLIC, "새이름", "새설명", null, null);
+        ChannelResponse dto = new ChannelResponse(publicChannel.getId(), ChannelType.PUBLIC, "새이름", "새설명", null, null);
 
         given(channelRepository.findById(publicChannel.getId())).willReturn(Optional.of(publicChannel));
         given(messageRepository.findByChannel_Id(publicChannel.getId())).willReturn(List.of());
         given(channelMapper.toDto(publicChannel, null, null)).willReturn(dto);
 
-        ChannelDto result = channelService.update(publicChannel.getId(), new UpdateChannelCommand("새이름", "새설명"));
+        ChannelResponse result = channelService.update(publicChannel.getId(), new UpdateChannelCommand("새이름", "새설명"));
 
         assertThat(result).isEqualTo(dto);
         verify(channelRepository, never()).save(any());
@@ -208,9 +208,9 @@ class BasicChannelServiceTest {
         setId(participant, userId);
         ReadStatus myReadStatus = new ReadStatus(participant, privateChannel, Instant.now());
         Instant lastMessageAt = Instant.parse("2026-07-24T10:00:00Z");
-        UserDto participantDto = new UserDto(userId, "user1", "user1@codeit.com", null, true);
-        ChannelDto publicDto = new ChannelDto(publicChannel.getId(), ChannelType.PUBLIC, "공지", "공지 채널입니다.", null, lastMessageAt);
-        ChannelDto privateDto = new ChannelDto(privateChannel.getId(), ChannelType.PRIVATE, "가족", "가족 채널입니다.", List.of(participantDto), null);
+        UserResponse participantDto = new UserResponse(userId, "user1", "user1@codeit.com", null, true);
+        ChannelResponse publicDto = new ChannelResponse(publicChannel.getId(), ChannelType.PUBLIC, "공지", "공지 채널입니다.", null, lastMessageAt);
+        ChannelResponse privateDto = new ChannelResponse(privateChannel.getId(), ChannelType.PRIVATE, "가족", "가족 채널입니다.", List.of(participantDto), null);
 
         given(userRepository.findById(userId)).willReturn(Optional.of(participant));
         given(readStatusRepository.findAllByUser_Id(userId)).willReturn(List.of(myReadStatus));
@@ -222,7 +222,7 @@ class BasicChannelServiceTest {
         given(channelMapper.toDto(publicChannel, null, lastMessageAt)).willReturn(publicDto);
         given(channelMapper.toDto(privateChannel, List.of(participantDto), null)).willReturn(privateDto);
 
-        List<ChannelDto> result = channelService.findAllByUserId(userId);
+        List<ChannelResponse> result = channelService.findAllByUserId(userId);
 
         assertThat(result).containsExactly(publicDto, privateDto);
         verify(messageRepository).findLastMessageAtByChannelIdIn(anyList());
@@ -242,7 +242,7 @@ class BasicChannelServiceTest {
         given(readStatusRepository.findAllByUser_Id(userId)).willReturn(List.of());
         given(channelRepository.findAll()).willReturn(List.of());
 
-        List<ChannelDto> result = channelService.findAllByUserId(userId);
+        List<ChannelResponse> result = channelService.findAllByUserId(userId);
 
         assertThat(result).isEmpty();
         verify(messageRepository, never()).findLastMessageAtByChannelIdIn(anyList());

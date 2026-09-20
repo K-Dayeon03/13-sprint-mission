@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.command.CreatePrivateChannelCommand;
 import com.sprint.mission.discodeit.dto.command.CreatePublicChannelCommand;
 import com.sprint.mission.discodeit.dto.command.UpdateChannelCommand;
-import com.sprint.mission.discodeit.dto.response.ChannelDto;
-import com.sprint.mission.discodeit.dto.response.UserDto;
+import com.sprint.mission.discodeit.dto.response.ChannelResponse;
+import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.*;
 import com.sprint.mission.discodeit.exception.InvalidRequestException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
@@ -46,7 +46,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
-    public ChannelDto createPublic(CreatePublicChannelCommand command) {
+    public ChannelResponse createPublic(CreatePublicChannelCommand command) {
         if (!StringUtils.hasText(command.name())) {
             throw new InvalidRequestException("채널명을 입력해주세요.");
         }
@@ -61,7 +61,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
-    public ChannelDto createPrivate(CreatePrivateChannelCommand command) {
+    public ChannelResponse createPrivate(CreatePrivateChannelCommand command) {
         List<User> participants = validateParticipantIds(command.participantIds());
         String name = StringUtils.hasText(command.name()) ? command.name() : null;
         String description = StringUtils.hasText(command.description()) ? command.description() : null;
@@ -80,18 +80,18 @@ public class BasicChannelService implements ChannelService {
     }
 
     @Override
-    public ChannelDto findById(UUID id) {
+    public ChannelResponse findById(UUID id) {
         return toResponse(findChannelOrThrow(id));
     }
 
-    //채널 -> ChannelDto 변환 공통 메서드
-    private ChannelDto toResponse(Channel channel) {
+    //채널 -> ChannelResponse 변환 공통 메서드
+    private ChannelResponse toResponse(Channel channel) {
         Instant lastMessageAt = messageRepository.findByChannel_Id(channel.getId()).stream()
                 .map(Message::getCreatedAt)
                 .max(Instant::compareTo)
                 .orElse(null);
 
-        List<UserDto> participants = null;
+        List<UserResponse> participants = null;
         if (channel.getType() == ChannelType.PRIVATE) {
             participants = readStatusRepository.findAllByChannel_Id(channel.getId()).stream()
                     .map(ReadStatus::getUser)
@@ -102,7 +102,7 @@ public class BasicChannelService implements ChannelService {
         return channelMapper.toDto(channel, participants, lastMessageAt);
     }
     @Override
-    public List<ChannelDto> findAllByUserId(UUID userId) {
+    public List<ChannelResponse> findAllByUserId(UUID userId) {
         findUserOrThrow(userId);
 
         Set<UUID> participatedPrivateChannelIds = readStatusRepository.findAllByUser_Id(userId).stream()
@@ -138,7 +138,7 @@ public class BasicChannelService implements ChannelService {
                 .map(Channel::getId)
                 .collect(Collectors.toSet());
 
-        Map<UUID, List<UserDto>> participantsByChannelId = privateChannelIds.isEmpty()
+        Map<UUID, List<UserResponse>> participantsByChannelId = privateChannelIds.isEmpty()
                 ? Map.of()
                 : readStatusRepository.findAllByChannel_IdIn(privateChannelIds).stream()
                         .collect(Collectors.groupingBy(
@@ -159,7 +159,7 @@ public class BasicChannelService implements ChannelService {
 
     @Override
     @Transactional
-    public ChannelDto update(UUID id, UpdateChannelCommand command) {
+    public ChannelResponse update(UUID id, UpdateChannelCommand command) {
         Channel channel = findChannelOrThrow(id);
         if (channel.getType() == ChannelType.PRIVATE) {
             log.warn("Private channel update rejected. channelId={}", id);

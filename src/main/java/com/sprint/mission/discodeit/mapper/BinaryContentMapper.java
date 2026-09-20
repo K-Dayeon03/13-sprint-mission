@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -12,5 +12,5 @@ public interface BinaryContentMapper {
             target = "downloadUrl",
             expression = "java(\"/api/binaryContents/\" + binaryContent.getId() + \"/download\")"
     )
-    BinaryContentDto toDto(BinaryContent binaryContent);
+    BinaryContentResponse toDto(BinaryContent binaryContent);
 }

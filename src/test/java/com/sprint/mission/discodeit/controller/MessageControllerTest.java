@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.command.CreateMessageCommand;
 import com.sprint.mission.discodeit.dto.request.CreateMessageRequest;
-import com.sprint.mission.discodeit.dto.response.MessageDto;
-import com.sprint.mission.discodeit.dto.response.UserDto;
+import com.sprint.mission.discodeit.dto.response.MessageResponse;
+import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.exception.message.MessageNotFoundException;
 import com.sprint.mission.discodeit.global.GlobalExceptionHandler;
 import com.sprint.mission.discodeit.mapper.MessageCommandMapper;
@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.MessageService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
@@ -30,6 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(MessageController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @Import(GlobalExceptionHandler.class)
 class MessageControllerTest {
 
@@ -53,8 +55,8 @@ class MessageControllerTest {
         UUID authorId = UUID.randomUUID();
         CreateMessageRequest request = new CreateMessageRequest("hello", channelId, authorId, List.of());
         CreateMessageCommand command = new CreateMessageCommand("hello", channelId, authorId, List.of());
-        UserDto author = new UserDto(authorId, "woody", "woody@codeit.com", null, true);
-        MessageDto response = new MessageDto(
+        UserResponse author = new UserResponse(authorId, "woody", "woody@codeit.com", null, true);
+        MessageResponse response = new MessageResponse(
                 messageId,
                 Instant.parse("2026-07-27T09:00:00Z"),
                 null,

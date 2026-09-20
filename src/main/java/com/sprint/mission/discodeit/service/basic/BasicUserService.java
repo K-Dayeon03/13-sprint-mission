@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
 import com.sprint.mission.discodeit.dto.command.CreateUserCommand;
 import com.sprint.mission.discodeit.dto.command.UpdateUserCommand;
-import com.sprint.mission.discodeit.dto.response.UserDto;
+import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
@@ -18,6 +18,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.Instant;
 import java.util.List;
@@ -36,15 +37,16 @@ public class BasicUserService implements UserService {
     private final ReadStatusRepository readStatusRepository;
     private final UserMapper userMapper;
 
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
-    public UserDto create(CreateUserCommand command, BinaryContentCommand profileImageCommand) {
+    public UserResponse create(CreateUserCommand command, BinaryContentCommand profileImageCommand) {
         log.debug("Creating user. username={}, email={}, hasProfileImage={}",
                 command.username(), command.email(), profileImageCommand != null);
-
+        String encodedPassword = passwordEncoder.encode(command.password());
         validateUsernameAndEmail(command.username(), command.email());
-        User user = new User(command.username(), command.password(), command.email(), null);
+        User user = new User(command.username(), encodedPassword, command.email(), null);
         applyProfileImage(user, profileImageCommand);
         User saved = userRepository.saveAndFlush(user);
         saveProfileImageBytes(saved, profileImageCommand);
@@ -57,14 +59,14 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
-    public UserDto findById(UUID id) {
+    public UserResponse findById(UUID id) {
         User user = findUserOrThrow(id);
         UserStatus userStatus = getOrCreateUserStatus(id);
         return userMapper.toDto(user, userStatus);
     }
     @Override
     @Transactional
-    public List<UserDto> findByAll() {
+    public List<UserResponse> findByAll() {
         return userRepository.findAll().stream()
                 .map(user -> {
                     UserStatus userStatus = getOrCreateUserStatus(user.getId());
@@ -75,8 +77,8 @@ public class BasicUserService implements UserService {
 
     @Override
     @Transactional
-    public UserDto update(UUID id, UpdateUserCommand command,
-                          BinaryContentCommand profileImageCommand) {
+    public UserResponse update(UUID id, UpdateUserCommand command,
+                               BinaryContentCommand profileImageCommand) {
         User user = findUserOrThrow(id);
         log.debug("Updating user. userId={}, hasProfileImage={}", id, profileImageCommand != null);
         validateUpdatedUsernameAndEmail(id, command);

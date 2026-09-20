@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
 import com.sprint.mission.discodeit.dto.command.CreateMessageCommand;
 import com.sprint.mission.discodeit.dto.command.UpdateMessageCommand;
-import com.sprint.mission.discodeit.dto.response.MessageDto;
+import com.sprint.mission.discodeit.dto.response.MessageResponse;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -45,7 +45,7 @@ public class BasicMessageService implements MessageService {
     private final PageResponseMapper pageResponseMapper;
     @Override
     @Transactional
-    public MessageDto create(CreateMessageCommand command) {
+    public MessageResponse create(CreateMessageCommand command) {
         int attachmentCount = command.attachments() == null ? 0 : command.attachments().size();
         log.debug("Creating message. channelId={}, authorId={}, attachmentCount={}",
                 command.channelId(),
@@ -86,13 +86,13 @@ public class BasicMessageService implements MessageService {
     }
 
     @Override
-    public MessageDto findById(UUID id) {
+    public MessageResponse findById(UUID id) {
         Message message = findMessageOrThrow(id);
         return messageMapper.toDto(message);
     }
 
     @Override
-    public PageResponse<MessageDto> findAllByChannelId(UUID channelId, Instant cursor, int size) {
+    public PageResponse<MessageResponse> findAllByChannelId(UUID channelId, Instant cursor, int size) {
         findChannelOrThrow(channelId);
 
         int pageSize = size <= 0 ? 50 : Math.min(size, 50);
@@ -108,7 +108,7 @@ public class BasicMessageService implements MessageService {
                 ? messages.subList(0, pageSize)
                 : messages;
 
-        List<MessageDto> content = pageContent.stream()
+        List<MessageResponse> content = pageContent.stream()
                 .map(messageMapper::toDto)
                 .toList();
 
@@ -125,7 +125,7 @@ public class BasicMessageService implements MessageService {
     }
     @Override
     @Transactional
-    public MessageDto update(UUID id, UpdateMessageCommand command) {
+    public MessageResponse update(UUID id, UpdateMessageCommand command) {
         log.debug("Updating message. messageId={}", id);
 
         Message message = findMessageOrThrow(id);

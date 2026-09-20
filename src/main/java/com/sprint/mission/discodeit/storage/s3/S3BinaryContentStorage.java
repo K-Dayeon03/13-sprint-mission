@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.storage.s3;
 
-import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentDataNotFoundException;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentReadFailedException;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentWriteFailedException;
@@ -98,7 +98,7 @@ public class S3BinaryContentStorage implements BinaryContentStorage {
     }
 
     @Override
-    public ResponseEntity<Void> download(BinaryContentDto binaryContentDto) {
+    public ResponseEntity<Void> download(BinaryContentResponse binaryContentDto) {
         String presignedUrl = generatePresignedUrl(
                 binaryContentDto.id().toString(),
                 binaryContentDto.contentType()

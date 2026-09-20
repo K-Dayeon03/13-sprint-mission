@@ -3,8 +3,8 @@ package com.sprint.mission.discodeit.controller;
 import com.sprint.mission.discodeit.dto.request.CreateUserRequest;
 import com.sprint.mission.discodeit.dto.request.UpdateUserRequest;
 import com.sprint.mission.discodeit.dto.request.UpdateUserStatusRequest;
-import com.sprint.mission.discodeit.dto.response.UserDto;
-import com.sprint.mission.discodeit.dto.response.UserStatusDto;
+import com.sprint.mission.discodeit.dto.response.UserResponse;
+import com.sprint.mission.discodeit.dto.response.UserStatusResponse;
 import com.sprint.mission.discodeit.mapper.BinaryContentCommandMapper;
 import com.sprint.mission.discodeit.mapper.UserCommandMapper;
 import com.sprint.mission.discodeit.mapper.UserStatusCommandMapper;
@@ -53,14 +53,14 @@ public class UserController {
 
     @Operation(summary = "User 등록")
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> create(@Valid @RequestBody CreateUserRequest request) {
-        UserDto user = userService.create(userCommandMapper.toCreateCommand(request), null);
+    public ResponseEntity<UserResponse> create(@Valid @RequestBody CreateUserRequest request) {
+        UserResponse user = userService.create(userCommandMapper.toCreateCommand(request), null);
         return ResponseEntity.status(HttpStatus.CREATED).body(user);
     }
 
     @Operation(summary = "User 등록")
     @RequestMapping(method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserDto> createWithProfileImage(
+    public ResponseEntity<UserResponse> createWithProfileImage(
             @Valid @RequestPart("userCreateRequest") CreateUserRequest userCreateRequest,
             @RequestPart(value = "profile", required = false) MultipartFile profile
     ) {
@@ -69,7 +69,7 @@ public class UserController {
                 userCreateRequest.email(),
                 profile != null && !profile.isEmpty());
 
-        UserDto user = userService.create(
+        UserResponse user = userService.create(
                 userCommandMapper.toCreateCommand(userCreateRequest),
                 binaryContentCommandMapper.toCommand(profile, "profile-image")
         );
@@ -78,19 +78,19 @@ public class UserController {
 
     @Operation(summary = "전체 User 목록 조회")
     @RequestMapping(method = RequestMethod.GET)
-    public ResponseEntity<List<UserDto>> findAll() {
+    public ResponseEntity<List<UserResponse>> findAll() {
         return ResponseEntity.ok(userService.findByAll());
     }
 
     @Operation(summary = "User 정보 수정")
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDto> update(@PathVariable UUID userId, @Valid @RequestBody UpdateUserRequest request) {
+    public ResponseEntity<UserResponse> update(@PathVariable UUID userId, @Valid @RequestBody UpdateUserRequest request) {
         return ResponseEntity.ok(userService.update(userId, userCommandMapper.toUpdateCommand(request), null));
     }
 
     @Operation(summary = "User 정보 수정")
     @RequestMapping(value = "/{userId}", method = RequestMethod.PATCH, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<UserDto> updateWithProfileImage(
+    public ResponseEntity<UserResponse> updateWithProfileImage(
             @PathVariable UUID userId,
             @Valid @RequestPart("userUpdateRequest") UpdateUserRequest userUpdateRequest,
             @RequestPart(value = "profile", required = false) MultipartFile profile
@@ -111,8 +111,8 @@ public class UserController {
 
     @Operation(summary = "User 온라인 상태 업데이트")
     @RequestMapping(value = {"/{userId}/status", "/{userId}/userStatus"}, method = RequestMethod.PATCH)
-    public ResponseEntity<UserStatusDto> updateStatus(@PathVariable UUID userId,
-                                                      @Valid @RequestBody UpdateUserStatusRequest request) {
+    public ResponseEntity<UserStatusResponse> updateStatus(@PathVariable UUID userId,
+                                                           @Valid @RequestBody UpdateUserStatusRequest request) {
         return ResponseEntity.ok(userStatusService.updateByUserId(userId, userStatusCommandMapper.toUpdateCommand(request)));
     }
 }

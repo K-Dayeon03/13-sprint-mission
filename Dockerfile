@@ -13,18 +13,17 @@ RUN --mount=type=cache,target=/root/.gradle ./gradlew dependencies --no-daemon
 COPY src ./src
 
 RUN --mount=type=cache,target=/root/.gradle ./gradlew clean bootJar --no-daemon \
-    && cp build/libs/13-sprint-mission-1.2-M8.jar /tmp/discodeit-1.2-M8.jar
+    && cp build/libs/*.jar /tmp/discodeit.jar
 
 FROM eclipse-temurin:17-jre-jammy AS runtime
 
 ENV PROJECT_NAME=discodeit
-ENV PROJECT_VERSION=1.2-M8
 ENV JVM_OPTS=""
 
 WORKDIR /app
 
-COPY --from=builder /tmp/discodeit-1.2-M8.jar /app/discodeit-1.2-M8.jar
+COPY --from=builder /tmp/discodeit.jar /app/discodeit.jar
 
 EXPOSE 80
 
-ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar /app/${PROJECT_NAME}-${PROJECT_VERSION}.jar"]
+ENTRYPOINT ["sh", "-c", "java $JVM_OPTS -jar /app/discodeit.jar"]

@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.command.CreateUserCommand;
 import com.sprint.mission.discodeit.dto.request.CreateUserRequest;
-import com.sprint.mission.discodeit.dto.response.UserDto;
+import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.global.GlobalExceptionHandler;
 import com.sprint.mission.discodeit.mapper.BinaryContentCommandMapper;
@@ -14,6 +14,7 @@ import com.sprint.mission.discodeit.service.UserStatusService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
@@ -34,6 +35,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(UserController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @Import(GlobalExceptionHandler.class)
 class UserControllerTest {
 
@@ -64,7 +66,7 @@ class UserControllerTest {
         UUID userId = UUID.randomUUID();
         CreateUserRequest request = new CreateUserRequest("woody", "woody@codeit.com", "Password1!");
         CreateUserCommand command = new CreateUserCommand("woody", "woody@codeit.com", "Password1!");
-        UserDto response = new UserDto(userId, "woody", "woody@codeit.com", null, true);
+        UserResponse response = new UserResponse(userId, "woody", "woody@codeit.com", null, true);
 
         given(userCommandMapper.toCreateCommand(any(CreateUserRequest.class))).willReturn(command);
         given(userService.create(command, null)).willReturn(response);
