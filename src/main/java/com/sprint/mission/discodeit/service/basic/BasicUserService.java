@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserRole;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -94,6 +95,19 @@ public class BasicUserService implements UserService {
 
         UserStatus userStatus = getOrCreateUserStatus(id);
         log.info("User updated. userId={}", id);
+        return userMapper.toDto(user, userStatus);
+    }
+
+    @Override
+    @Transactional
+    public UserResponse updateRole(UUID id, UserRole role) {
+        User user = findUserOrThrow(id);
+
+        // 권한 변경 규칙은 엔티티 메서드에 모아둔다.
+        user.updateRole(role);
+
+        UserStatus userStatus = getOrCreateUserStatus(id);
+        log.info("User role updated. userId={}, role={}", id, role);
         return userMapper.toDto(user, userStatus);
     }
 

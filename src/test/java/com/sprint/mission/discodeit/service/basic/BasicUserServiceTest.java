@@ -7,6 +7,7 @@ import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserRole;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.user.UserAlreadyExistsException;
 import com.sprint.mission.discodeit.exception.user.UserNotFoundException;
@@ -67,7 +68,7 @@ class BasicUserServiceTest {
         setId(user, UUID.randomUUID());
         userStatus = new UserStatus(user, Instant.now());
         setId(userStatus, UUID.randomUUID());
-        userDto = new UserResponse(user.getId(), user.getUsername(), user.getEmail(), null, true);
+        userDto = new UserResponse(user.getId(), user.getUsername(), user.getEmail(), null, true, UserRole.USER);
     }
 
     @Test
@@ -168,7 +169,7 @@ class BasicUserServiceTest {
     @DisplayName("유저 수정은 변경 감지로 처리한다")
     void update_success() {
         UpdateUserCommand command = new UpdateUserCommand("newWoody", null, null);
-        UserResponse updatedDto = new UserResponse(user.getId(), "newWoody", user.getEmail(), null, true);
+        UserResponse updatedDto = new UserResponse(user.getId(), "newWoody", user.getEmail(), null, true, UserRole.USER);
 
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
         given(userRepository.existsByUsernameAndIdNot("newWoody", user.getId())).willReturn(false);

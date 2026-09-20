@@ -4,6 +4,7 @@ import com.sprint.mission.discodeit.dto.response.UserResponse;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -19,11 +20,10 @@ public class DiscodeitUserDetails implements UserDetails {
     // 원문 비밀번호가 아니라 "$2a$10$..." 형태의 값
     private final String password;
 
-    // 사용자의 권한 목록입니다.
-    // 지금 프로젝트에는 권한 시스템이 없으므로 빈 목록으로 둡니다.
+    // Spring Security는 hasRole("ADMIN")을 ROLE_ADMIN 권한으로 비교한다.
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of();
+        return List.of(new SimpleGrantedAuthority("ROLE_" + userResponse.role().name()));
     }
     // Spring Security가 비밀번호를 비교할 때 사용하는 값입니다.
     @Override

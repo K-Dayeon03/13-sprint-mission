@@ -17,7 +17,9 @@ public class User extends BaseUpdatableEntity {
     private String password;
     @Column(name = "email", nullable = false, unique = true, length = 100)
     private String email;
-
+    @Enumerated(EnumType.STRING)
+    @Column(name = "role", nullable = false, length = 20)
+    private UserRole role = UserRole.USER;
     protected User() {
 
     }
@@ -48,12 +50,20 @@ public class User extends BaseUpdatableEntity {
         this.username = username;
         this.password = password;
         this.email = email;
+        this.role = UserRole.USER;
         this.profileImageId = profileImageId;
     }
     public User(String username, String email, String password){
         this.username = username;
         this.email = email;
         this.password = password;
+        this.role = UserRole.USER;
+    }
+    public void updateRole(UserRole role) {
+        if (role == null) {
+            throw new InvalidRequestException("권한은 필수입니다.");
+        }
+        this.role = role;
     }
     public void update(String newUsername, String newPassword, String newEmail, BinaryContent newProfile) {
         // profileImageId도 수정 조건에 포함

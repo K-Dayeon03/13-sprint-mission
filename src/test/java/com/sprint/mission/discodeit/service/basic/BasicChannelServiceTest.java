@@ -9,6 +9,7 @@ import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
+import com.sprint.mission.discodeit.entity.UserRole;
 import com.sprint.mission.discodeit.exception.InvalidRequestException;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.exception.channel.PrivateChannelUpdateException;
@@ -101,7 +102,7 @@ class BasicChannelServiceTest {
         User user = new User("user1", "password1", "user1@codeit.com", null);
         setId(user, UUID.randomUUID());
         ReadStatus readStatus = new ReadStatus(user, privateChannel, Instant.now());
-        UserResponse userDto = new UserResponse(user.getId(), user.getUsername(), user.getEmail(), null, true);
+        UserResponse userDto = new UserResponse(user.getId(), user.getUsername(), user.getEmail(), null, true, UserRole.USER);
         ChannelResponse dto = new ChannelResponse(privateChannel.getId(), ChannelType.PRIVATE, "가족", "가족 채널입니다.", List.of(userDto), null);
 
         given(userRepository.findById(user.getId())).willReturn(Optional.of(user));
@@ -208,7 +209,7 @@ class BasicChannelServiceTest {
         setId(participant, userId);
         ReadStatus myReadStatus = new ReadStatus(participant, privateChannel, Instant.now());
         Instant lastMessageAt = Instant.parse("2026-07-24T10:00:00Z");
-        UserResponse participantDto = new UserResponse(userId, "user1", "user1@codeit.com", null, true);
+        UserResponse participantDto = new UserResponse(userId, "user1", "user1@codeit.com", null, true, UserRole.USER);
         ChannelResponse publicDto = new ChannelResponse(publicChannel.getId(), ChannelType.PUBLIC, "공지", "공지 채널입니다.", null, lastMessageAt);
         ChannelResponse privateDto = new ChannelResponse(privateChannel.getId(), ChannelType.PRIVATE, "가족", "가족 채널입니다.", List.of(participantDto), null);
 
