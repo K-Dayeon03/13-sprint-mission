@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sprint.mission.discodeit.dto.command.CreatePublicChannelCommand;
 import com.sprint.mission.discodeit.dto.request.CreatePublicChannelRequest;
-import com.sprint.mission.discodeit.dto.response.ChannelDto;
+import com.sprint.mission.discodeit.dto.response.ChannelResponse;
 import com.sprint.mission.discodeit.entity.ChannelType;
 import com.sprint.mission.discodeit.exception.channel.ChannelNotFoundException;
 import com.sprint.mission.discodeit.global.GlobalExceptionHandler;
@@ -12,6 +12,7 @@ import com.sprint.mission.discodeit.service.ChannelService;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.context.annotation.Import;
@@ -28,6 +29,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ChannelController.class)
+@AutoConfigureMockMvc(addFilters = false)
 @Import(GlobalExceptionHandler.class)
 class ChannelControllerTest {
 
@@ -49,7 +51,7 @@ class ChannelControllerTest {
         UUID channelId = UUID.randomUUID();
         CreatePublicChannelRequest request = new CreatePublicChannelRequest("general", "general channel");
         CreatePublicChannelCommand command = new CreatePublicChannelCommand("general", "general channel");
-        ChannelDto response = new ChannelDto(channelId, ChannelType.PUBLIC, "general", "general channel", null, null);
+        ChannelResponse response = new ChannelResponse(channelId, ChannelType.PUBLIC, "general", "general channel", null, null);
 
         given(channelCommandMapper.toCreatePublicCommand(any(CreatePublicChannelRequest.class))).willReturn(command);
         given(channelService.createPublic(command)).willReturn(response);

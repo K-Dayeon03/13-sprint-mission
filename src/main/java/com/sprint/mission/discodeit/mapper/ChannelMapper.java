@@ -1,11 +1,10 @@
 package com.sprint.mission.discodeit.mapper;
 
-import com.sprint.mission.discodeit.dto.response.ChannelDto;
-import com.sprint.mission.discodeit.dto.response.UserDto;
+import com.sprint.mission.discodeit.dto.response.ChannelResponse;
+import com.sprint.mission.discodeit.dto.response.UserResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
@@ -18,9 +17,9 @@ public interface ChannelMapper {
     @Mapping(target = "description", source = "channel.description")
     @Mapping(target = "participants", source = "participants")
     @Mapping(target = "lastMessageAt", source = "lastMessageAt")
-    ChannelDto toDto(
+    ChannelResponse toDto(
             Channel channel,
-            List<UserDto> participants,
+            List<UserResponse> participants,
             Instant lastMessageAt
     );
 }

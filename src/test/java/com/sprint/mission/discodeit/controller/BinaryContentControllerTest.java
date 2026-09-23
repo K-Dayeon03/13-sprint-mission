@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import org.junit.jupiter.api.DisplayName;
@@ -27,7 +27,7 @@ class BinaryContentControllerTest {
         BinaryContentController controller = new BinaryContentController(binaryContentStorage, binaryContentService);
 
         UUID binaryContentId = UUID.randomUUID();
-        BinaryContentDto dto = new BinaryContentDto(
+        BinaryContentResponse dto = new BinaryContentResponse(
                 binaryContentId,
                 Instant.now(),
                 "요청서.png",

@@ -2,12 +2,16 @@ package com.sprint.mission.discodeit.integration;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.TestingAuthenticationToken;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
@@ -24,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
-@AutoConfigureMockMvc
+@AutoConfigureMockMvc(addFilters = false)
 @ActiveProfiles("test")
 @Transactional
 class MessageApiIntegrationTest {
@@ -34,6 +38,11 @@ class MessageApiIntegrationTest {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @AfterEach
+    void tearDown() {
+        SecurityContextHolder.clearContext();
+    }
 
     @Test
     @DisplayName("메시지를 생성하고 채널별 목록에서 조회한다")
@@ -107,6 +116,14 @@ class MessageApiIntegrationTest {
     }
 
     private UUID createPublicChannel(String name) throws Exception {
+        SecurityContextHolder.getContext().setAuthentication(
+                new TestingAuthenticationToken(
+                        "channel-manager",
+                        null,
+                        List.of(new SimpleGrantedAuthority("ROLE_CHANNEL_MANAGER"))
+                )
+        );
+
         String response = mockMvc.perform(post("/api/channels/public")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(Map.of(

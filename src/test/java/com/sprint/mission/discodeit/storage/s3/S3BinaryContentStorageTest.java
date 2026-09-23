@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.storage.s3;
 
-import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpHeaders;
@@ -74,7 +74,7 @@ class S3BinaryContentStorageTest {
     @Test
     void download_redirectsToPresignedUrl() {
         storage.put(binaryContentId, bytes);
-        BinaryContentDto binaryContent = new BinaryContentDto(
+        BinaryContentResponse binaryContent = new BinaryContentResponse(
                 binaryContentId,
                 Instant.now(),
                 "aws-s3-test.txt",

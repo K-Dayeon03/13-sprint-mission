@@ -3,7 +3,7 @@ package com.sprint.mission.discodeit.service.basic;
 import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
 import com.sprint.mission.discodeit.dto.command.CreateMessageCommand;
 import com.sprint.mission.discodeit.dto.command.UpdateMessageCommand;
-import com.sprint.mission.discodeit.dto.response.MessageDto;
+import com.sprint.mission.discodeit.dto.response.MessageResponse;
 import com.sprint.mission.discodeit.dto.response.PageResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.entity.Channel;
@@ -60,7 +60,7 @@ class BasicMessageServiceTest {
     private User user;
     private Channel channel;
     private Message message;
-    private MessageDto messageDto;
+    private MessageResponse messageDto;
 
     @BeforeEach
     void setUp() {
@@ -73,7 +73,7 @@ class BasicMessageServiceTest {
         setId(message, UUID.randomUUID());
         setCreatedAt(message, Instant.parse("2026-07-24T10:00:00Z"));
 
-        messageDto = new MessageDto(
+        messageDto = new MessageResponse(
                 message.getId(),
                 message.getCreatedAt(),
                 message.getUpdatedAt(),
@@ -98,7 +98,7 @@ class BasicMessageServiceTest {
         });
         given(messageMapper.toDto(any(Message.class))).willReturn(messageDto);
 
-        MessageDto result = messageService.create(command);
+        MessageResponse result = messageService.create(command);
 
         assertThat(result).isEqualTo(messageDto);
         verify(messageRepository).saveAndFlush(any(Message.class));
@@ -126,7 +126,7 @@ class BasicMessageServiceTest {
         });
         given(messageMapper.toDto(any(Message.class))).willReturn(messageDto);
 
-        MessageDto result = messageService.create(command);
+        MessageResponse result = messageService.create(command);
 
         assertThat(result).isEqualTo(messageDto);
         verify(binaryContentStorage).put(any(UUID.class), eq(bytes));
@@ -166,7 +166,7 @@ class BasicMessageServiceTest {
         setId(olderMessage, UUID.randomUUID());
         setCreatedAt(olderMessage, Instant.parse("2026-07-24T09:59:00Z"));
 
-        MessageDto olderDto = new MessageDto(
+        MessageResponse olderDto = new MessageResponse(
                 olderMessage.getId(),
                 olderMessage.getCreatedAt(),
                 olderMessage.getUpdatedAt(),
@@ -181,7 +181,7 @@ class BasicMessageServiceTest {
                 .willReturn(new SliceImpl<>(List.of(message, olderMessage)));
         given(messageMapper.toDto(message)).willReturn(messageDto);
 
-        PageResponse<MessageDto> result = messageService.findAllByChannelId(channel.getId(), null, 1);
+        PageResponse<MessageResponse> result = messageService.findAllByChannelId(channel.getId(), null, 1);
 
         assertThat(result.content()).containsExactly(messageDto);
         assertThat(result.hasNext()).isTrue();
@@ -206,7 +206,7 @@ class BasicMessageServiceTest {
     @DisplayName("메시지 수정은 변경 감지로 처리하고 DTO를 반환한다")
     void update_success() {
         UpdateMessageCommand command = new UpdateMessageCommand("수정된 내용");
-        MessageDto updatedDto = new MessageDto(
+        MessageResponse updatedDto = new MessageResponse(
                 message.getId(),
                 message.getCreatedAt(),
                 message.getUpdatedAt(),
@@ -219,7 +219,7 @@ class BasicMessageServiceTest {
         given(messageRepository.findById(message.getId())).willReturn(Optional.of(message));
         given(messageMapper.toDto(message)).willReturn(updatedDto);
 
-        MessageDto result = messageService.update(message.getId(), command);
+        MessageResponse result = messageService.update(message.getId(), command);
 
         assertThat(result.content()).isEqualTo("수정된 내용");
         verify(messageRepository, never()).save(any());

@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.command.CreateUserStatusCommand;
 import com.sprint.mission.discodeit.dto.command.UpdateUserStatusCommand;
-import com.sprint.mission.discodeit.dto.response.UserStatusDto;
+import com.sprint.mission.discodeit.dto.response.UserStatusResponse;
 import com.sprint.mission.discodeit.entity.User;
 import com.sprint.mission.discodeit.entity.UserStatus;
 import com.sprint.mission.discodeit.exception.InvalidRequestException;
@@ -31,7 +31,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     @Transactional
-    public UserStatusDto create(CreateUserStatusCommand command) {
+    public UserStatusResponse create(CreateUserStatusCommand command) {
         User user = findUserOrThrow(command.userId());
         userStatusRepository.findByUser_Id(command.userId())
                 .ifPresent(us -> {
@@ -43,7 +43,7 @@ public class BasicUserStatusService implements UserStatusService {
     }
 
     @Override
-    public UserStatusDto findById(UUID id) {
+    public UserStatusResponse findById(UUID id) {
         return userStatusMapper.toDto(findEntityOrThrow(id));
     }
 //
@@ -54,7 +54,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     @Transactional
-    public UserStatusDto update(UUID id, UpdateUserStatusCommand command) {
+    public UserStatusResponse update(UUID id, UpdateUserStatusCommand command) {
         UserStatus userStatus = findEntityOrThrow(id);
         validateUpdateCommand(command);
         userStatus.updateLastActiveAt(command.newLastActiveAt());
@@ -63,7 +63,7 @@ public class BasicUserStatusService implements UserStatusService {
 
     @Override
     @Transactional
-    public UserStatusDto updateByUserId(UUID userId, UpdateUserStatusCommand command) {
+    public UserStatusResponse updateByUserId(UUID userId, UpdateUserStatusCommand command) {
         UserStatus userStatus = userStatusRepository.findByUser_Id(userId)
                 .orElseThrow(() -> UserStatusNotFoundException.byUserId(userId));
         validateUpdateCommand(command);

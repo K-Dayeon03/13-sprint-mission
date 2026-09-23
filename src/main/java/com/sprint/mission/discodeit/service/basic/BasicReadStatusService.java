@@ -2,7 +2,7 @@ package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.command.CreateReadStatusCommand;
 import com.sprint.mission.discodeit.dto.command.UpdateReadStatusCommand;
-import com.sprint.mission.discodeit.dto.response.ReadStatusDto;
+import com.sprint.mission.discodeit.dto.response.ReadStatusResponse;
 import com.sprint.mission.discodeit.entity.Channel;
 import com.sprint.mission.discodeit.entity.ReadStatus;
 import com.sprint.mission.discodeit.entity.User;
@@ -34,7 +34,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     @Transactional
-    public ReadStatusDto create(CreateReadStatusCommand command) {
+    public ReadStatusResponse create(CreateReadStatusCommand command) {
         User user = findUserOrThrow(command.userId());
         Channel channel = findChannelOrThrow(command.channelId());
         readStatusRepository.findByUser_IdAndChannel_Id(command.userId(), command.channelId())
@@ -47,12 +47,12 @@ public class BasicReadStatusService implements ReadStatusService {
     }
 
     @Override
-    public ReadStatusDto findById(UUID id) {
+    public ReadStatusResponse findById(UUID id) {
         return readStatusMapper.toDto(findEntityOrThrow(id));
     }
 
     @Override
-    public List<ReadStatusDto> findAllByUserId(UUID userId) {
+    public List<ReadStatusResponse> findAllByUserId(UUID userId) {
         return readStatusRepository.findAllByUser_Id(userId).stream()
                 .map(readStatusMapper::toDto)
                 .toList();
@@ -60,7 +60,7 @@ public class BasicReadStatusService implements ReadStatusService {
 
     @Override
     @Transactional
-    public ReadStatusDto update(UUID id, UpdateReadStatusCommand command) {
+    public ReadStatusResponse update(UUID id, UpdateReadStatusCommand command) {
         ReadStatus readStatus = findEntityOrThrow(id);
         readStatus.updateLastReadAt(command.newLastReadAt());
         return readStatusMapper.toDto(readStatus);

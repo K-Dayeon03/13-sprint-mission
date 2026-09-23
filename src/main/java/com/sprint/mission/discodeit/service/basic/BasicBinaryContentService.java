@@ -1,7 +1,7 @@
 package com.sprint.mission.discodeit.service.basic;
 
 import com.sprint.mission.discodeit.dto.command.BinaryContentCommand;
-import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.entity.BinaryContent;
 import com.sprint.mission.discodeit.exception.binaryContent.BinaryContentNotFoundException;
 import com.sprint.mission.discodeit.mapper.BinaryContentMapper;
@@ -27,7 +27,7 @@ public class BasicBinaryContentService implements BinaryContentService {
 
     @Override
     @Transactional
-    public BinaryContentDto create(BinaryContentCommand command) {
+    public BinaryContentResponse create(BinaryContentCommand command) {
         BinaryContent binaryContent = new BinaryContent(
                 null,
                 null,
@@ -46,12 +46,12 @@ public class BasicBinaryContentService implements BinaryContentService {
     }
 
     @Override
-    public BinaryContentDto findById(UUID id) {
+    public BinaryContentResponse findById(UUID id) {
         return binaryContentMapper.toDto(findEntityOrThrow(id));
     }
 
     @Override
-    public List<BinaryContentDto> findAllByIdIn(List<UUID> ids) {
+    public List<BinaryContentResponse> findAllByIdIn(List<UUID> ids) {
         if (ids == null || ids.isEmpty()) {
             return Collections.emptyList();
         }

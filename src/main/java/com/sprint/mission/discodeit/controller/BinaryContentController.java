@@ -1,6 +1,6 @@
 package com.sprint.mission.discodeit.controller;
 
-import com.sprint.mission.discodeit.dto.response.BinaryContentDto;
+import com.sprint.mission.discodeit.dto.response.BinaryContentResponse;
 import com.sprint.mission.discodeit.service.BinaryContentService;
 import com.sprint.mission.discodeit.storage.BinaryContentStorage;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,7 +37,7 @@ public class BinaryContentController {
     public ResponseEntity<?> download(@PathVariable UUID binaryContentId) {
         log.debug("Downloading binary content. binaryContentId={}", binaryContentId);
 
-        BinaryContentDto binaryContent = binaryContentService.findById(binaryContentId);
+        BinaryContentResponse binaryContent = binaryContentService.findById(binaryContentId);
 
         log.info("Binary content download requested. binaryContentId={}, fileName={}, size={}",
                 binaryContent.id(), binaryContent.fileName(), binaryContent.size());
@@ -47,25 +47,25 @@ public class BinaryContentController {
 
     @Operation(summary = "여러 첨부 파일 조회")
     @RequestMapping(value = "/api/binary-contents", method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContentDto>> findAllByIdIn(@RequestParam List<UUID> ids) {
+    public ResponseEntity<List<BinaryContentResponse>> findAllByIdIn(@RequestParam List<UUID> ids) {
         return ResponseEntity.ok(binaryContentService.findAllByIdIn(ids));
     }
 
     @Operation(summary = "여러 첨부 파일 조회")
     @RequestMapping(value = "/api/binaryContents", method = RequestMethod.GET)
-    public ResponseEntity<List<BinaryContentDto>> findAllByIdInSpec(@RequestParam List<UUID> binaryContentIds) {
+    public ResponseEntity<List<BinaryContentResponse>> findAllByIdInSpec(@RequestParam List<UUID> binaryContentIds) {
         return ResponseEntity.ok(binaryContentService.findAllByIdIn(binaryContentIds));
     }
 
     @Operation(summary = "첨부 파일 조회")
     @RequestMapping(value = "/api/binaryContents/{binaryContentId}", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContentDto> findSpec(@PathVariable UUID binaryContentId) {
+    public ResponseEntity<BinaryContentResponse> findSpec(@PathVariable UUID binaryContentId) {
         return ResponseEntity.ok(binaryContentService.findById(binaryContentId));
     }
 
     @Operation(summary = "첨부 파일 조회")
     @RequestMapping(value = "/api/binaryContent/find", method = RequestMethod.GET)
-    public ResponseEntity<BinaryContentDto> find(@RequestParam UUID binaryContentId) {
+    public ResponseEntity<BinaryContentResponse> find(@RequestParam UUID binaryContentId) {
         return ResponseEntity.ok(binaryContentService.findById(binaryContentId));
     }
 }

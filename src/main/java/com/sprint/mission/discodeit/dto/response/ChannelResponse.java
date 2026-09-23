@@ -8,11 +8,11 @@ import java.util.UUID;
 
 //채널 정보와 최근 메세지 시간,
 //private 채널 참여자 정보를 포함하는 응답 DTO
-public record ChannelDto(
+public record ChannelResponse(
         UUID id,
         ChannelType type,
         String name,
         String description,
-        List<UserDto> participants,
+        List<UserResponse> participants,
         Instant lastMessageAt
 ) {}
